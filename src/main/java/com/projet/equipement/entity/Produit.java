@@ -3,11 +3,16 @@ package com.projet.equipement.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.Data;
+import lombok.*;
 
 @Entity
-@Data
-public class produit {
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class Produit {
     @Id
     @Column(unique=true, nullable=false, length=10)
     private Long id;
