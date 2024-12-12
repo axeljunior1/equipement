@@ -2,6 +2,7 @@ package com.projet.equipement.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.*;
 
@@ -14,6 +15,7 @@ import lombok.*;
 @NoArgsConstructor
 public class Produit {
     @Id
+    @GeneratedValue
     @Column(unique=true, nullable=false, length=10)
     private Long id;
     @Column(nullable=false, length=100 )

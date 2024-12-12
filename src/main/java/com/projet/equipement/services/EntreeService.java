@@ -2,7 +2,6 @@ package com.projet.equipement.services;
 
 
 import com.projet.equipement.entity.Entree;
-import com.projet.equipement.entity.Produit;
 import com.projet.equipement.repository.EntreeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

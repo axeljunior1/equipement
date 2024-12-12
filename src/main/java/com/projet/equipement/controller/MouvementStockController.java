@@ -4,36 +4,40 @@ import com.projet.equipement.entity.MouvementStock;
 import com.projet.equipement.services.MouvementStockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@RequestMapping("/mouvementStock")
+@RequestMapping("/mouvement-stock")
 @RestController
 public class MouvementStockController {
     
     @Autowired
     private MouvementStockService mouvementStockService;
-    
+
+    @GetMapping("")
     public ResponseEntity<List<MouvementStock>> findAllMouvementStocks() {
         List<MouvementStock> mouvementStocks = mouvementStockService.findAll();
         return ResponseEntity.ok(mouvementStocks) ;
     }
-    public ResponseEntity<Optional<MouvementStock>> findMouvementStock(int id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<MouvementStock>> findMouvementStock(@PathVariable int id) {
         Optional<MouvementStock> mouvementStock = mouvementStockService.findById(id);
         return ResponseEntity.ok(mouvementStock);
     }
-    public ResponseEntity<MouvementStock> addMouvementStock(MouvementStock mouvementStock) {
+    @PostMapping
+    public ResponseEntity<MouvementStock> addMouvementStock(@RequestBody MouvementStock mouvementStock) {
         mouvementStock = mouvementStockService.save(mouvementStock);
         return ResponseEntity.ok(mouvementStock);
     }
-    public ResponseEntity<MouvementStock> updateMouvementStock(int id, MouvementStock mouvementStock) {
+    @PutMapping
+    public ResponseEntity<MouvementStock> updateMouvementStock(@RequestBody MouvementStock mouvementStock) {
         mouvementStock = mouvementStockService.save(mouvementStock);
         return ResponseEntity.ok(mouvementStock);
     }
-    public ResponseEntity<String> deleteMouvementStock(int id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteMouvementStock(@PathVariable int id) {
         mouvementStockService.deleteById(id);
         return ResponseEntity.ok("MouvementStock deleted");
     }

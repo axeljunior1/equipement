@@ -27,6 +27,4 @@ public class FournisseurService {
         fournisseurRepository.deleteById(id);
     }
 
-
-
 }

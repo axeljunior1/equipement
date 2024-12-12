@@ -12,6 +12,7 @@ import lombok.*;
 @Table(name = "ENTREES")
 public class Entree {
     @Id
+    @GeneratedValue
     private Long id_entree;
     private int quantite;
     private String date_entree;

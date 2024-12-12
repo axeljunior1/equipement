@@ -63,7 +63,7 @@ create table ROLE
     ID_ROLE     INTEGER auto_increment,
     NOM         CHARACTER VARYING(255) not null,
     DESCRIPTION CHARACTER VARYING(1022),
-    primary key (ID)
+    primary key (ID_ROLE)
 );
 
 create table PRODUITS
@@ -88,5 +88,20 @@ create table UTILISATEURS
     ID_ROLE        INTEGER,
     constraint UTILISATEURS_ROLE_ID_ROLE_FK
         foreign key (ID_ROLE) references ROLE
+);
+
+create table CLIENTS
+(
+    ID_CLIENT    INTEGER auto_increment
+        primary key,
+    FIRSTNAME           CHARACTER VARYING(255) not null ,
+    LASTNAME           CHARACTER VARYING(255) ,
+    EMAIL           CHARACTER VARYING(255) ,
+    PHONE           CHARACTER VARYING(255) ,
+    ADDRESS           CHARACTER VARYING(255) ,
+    CITY           CHARACTER VARYING(255) ,
+    STATE           CHARACTER VARYING(255) ,
+    ZIP           CHARACTER VARYING(255) ,
+    COUNTRY           CHARACTER VARYING(255)
 );
 

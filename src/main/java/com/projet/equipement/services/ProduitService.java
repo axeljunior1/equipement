@@ -23,6 +23,15 @@ public class ProduitService{
     public Produit save(Produit produit){
         return produitRepository.save(produit);
     }
+    public Produit update(Produit produit){
+        //Todo revoir cette fonction
+        Optional<Produit> optionalProduit  = findById(Math.toIntExact(produit.getId()));
+        if(optionalProduit.isEmpty()){
+            return null;
+        }
+        produitRepository.save(produit);
+        return produit;
+    }
     public void deleteById(int id){
         produitRepository.deleteById(id);
     }

@@ -1,9 +1,6 @@
 package com.projet.equipement.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -17,6 +14,7 @@ public class Fournisseur {
 
     @Column(name = "ID_FOURNISSEUR")
     @Id
+    @GeneratedValue
     private Long id;
     @Column(name = "NOM")
     private String nom;

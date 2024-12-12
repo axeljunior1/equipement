@@ -12,6 +12,7 @@ import lombok.*;
 @Table(name ="MOUVEMENTS_STOCK")
 public class MouvementStock {
     @Id
+    @GeneratedValue
     @Column(name = "ID_MOUVEMENT")
     private Long  id_mvt;
 

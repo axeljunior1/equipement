@@ -1,9 +1,6 @@
 package com.projet.equipement.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -15,6 +12,7 @@ import lombok.*;
 @Table(name = "ROLE")
 public class Role {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID_ROLE")
     private Long id;
     private String nom;
