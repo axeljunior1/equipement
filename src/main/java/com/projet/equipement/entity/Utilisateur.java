@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "UTILISATEURS")
 public class Utilisateur {
-    @GeneratedValue
+
     @Id
     @Column(name = "ID_UTILISATEUR")
     private Long id;

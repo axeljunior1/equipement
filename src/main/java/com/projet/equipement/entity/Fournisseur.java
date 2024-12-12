@@ -9,18 +9,18 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "FOURNISSEURS")
+@Table(name = "fournisseurs")
 public class Fournisseur {
 
-    @Column(name = "ID_FOURNISSEUR")
+    @Column(name = "id_fournisseur")
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "NOM")
+    @Column(name = "nom")
     private String nom;
-    @Column(name = "CONTACT")
+    @Column(name = "contact")
     private String contact;
-    @Column(name = "ADRESSE")
+    @Column(name = "adresse")
     private String adresse;
 }
 

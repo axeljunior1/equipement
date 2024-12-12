@@ -9,19 +9,19 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "ENTREES")
+@Table(name = "entrees")
 public class Entree {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_entree;
     private int quantite;
     private String date_entree;
     private double prix_achat;
     @OneToOne
-    @JoinColumn(name = "ID_PRODUIT")
+    @JoinColumn(name = "id_produit")
     private Produit produit;
     @OneToOne
-    @JoinColumn(name = "ID_FOURNISSEUR")
+    @JoinColumn(name = "id_fournisseur")
     private Fournisseur fournisseur;
 }
 

@@ -9,27 +9,27 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name ="MOUVEMENTS_STOCK")
+@Table(name ="mouvements_stock")
 public class MouvementStock {
     @Id
-    @GeneratedValue
-    @Column(name = "ID_MOUVEMENT")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_mouvement")
     private Long  id_mvt;
 
     @OneToOne
-    @JoinColumn(name = "ID_PRODUIT")
+    @JoinColumn(name = "id_produit")
     private Produit produit ;
 
     @OneToOne
-    @JoinColumn(name = "ID_UTILISATEUR")
+    @JoinColumn(name = "id_utilisateur")
     private Utilisateur utilisateur ;
 
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "TYPE_MOUVEMENT")
+    @Column(name = "type_mouvement")
     private TypeMouvement typeMouvement ;
 
-    @Column(name = "QUANTITE")
+    @Column(name = "quantite")
     private Integer quantity ;
 
 

@@ -9,31 +9,31 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "SORTIES")
+@Table(name = "sorties")
 public class Sortie {
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "ID_SORTIE")
+    @Column(name = "id_sortie")
     private Long id;
-    @Column(name = "QUANTITE")
+    @Column(name = "quantite")
     private int quantite;
 
-    @Column(name = "DATE_SORTIE")
+    @Column(name = "date_sortie")
     private String dateSortie;
 
-    @Column(name = "PRIX_VENTE")
+    @Column(name = "prix_vente")
     private double prixVente;
 
     @OneToOne
-    @JoinColumn(name = "ID_PRODUIT")
+    @JoinColumn(name = "id_produit")
     private Produit produit;
 
     @OneToOne
-    @JoinColumn(name = "ID_UTILISATEUR")
+    @JoinColumn(name = "id_utilisateur")
     private Utilisateur utilisateur;
 
     @OneToOne
-    @JoinColumn(name = "ID_CLIENT")
+    @JoinColumn(name = "id_client")
     private Client client;
 }
 

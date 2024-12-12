@@ -1,9 +1,6 @@
 package com.projet.equipement.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -13,22 +10,19 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "produits")
 public class Produit {
     @Id
-    @GeneratedValue
-    @Column(unique=true, nullable=false, length=10)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable=false, length=100 )
-    private String name;
+    private String nom;
     private String description;
     private String image;
-    private String category;
-    private String price;
+    @Column(name = "prix_unitaire")
+    private String prixUnitaire;
+
+    @Column(name = "stock_initial")
     private String quantity;
-    private String unit;
-    private String status;
-    private String type;
-    private String location;
 
 
 }
