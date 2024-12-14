@@ -22,8 +22,8 @@ public class EntreeController {
         return ResponseEntity.ok( entrees) ;
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Entree>> findEntree(@PathVariable int id) {
-        Optional<Entree> entree = entreeService.findById(id);
+    public ResponseEntity< Entree> findEntree(@PathVariable Long id) {
+         Entree entree = entreeService.findById(id);
         return ResponseEntity.ok(entree);
     }
     @PostMapping("")
@@ -37,7 +37,7 @@ public class EntreeController {
         return ResponseEntity.ok(entree);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteEntree(@PathVariable int id ) {
+    public ResponseEntity<String> deleteEntree(@PathVariable Long id ) {
         entreeService.deleteById(id);
         return ResponseEntity.ok("Entree deleted");
     }

@@ -1,7 +1,9 @@
 package com.projet.equipement.controller;
 
-import com.projet.equipement.entity.Produit;
-import com.projet.equipement.services.ProduitService;
+import com.projet.equipement.dto.ClientDto;
+import com.projet.equipement.entity.Client;
+import com.projet.equipement.services.ClientService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,34 +16,34 @@ import java.util.Optional;
 public class ClientController {
 
     @Autowired
-    private ProduitService produitService;
+    private ClientService clientService;
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Produit>> findProduitById(@PathVariable int id) {
-        Optional<Produit> produit = produitService.findById(id);
-        return ResponseEntity.ok(produit);
+    public ResponseEntity<Client> findClientById(@PathVariable Long id) {
+         Client client = clientService.findById(id);
+        return ResponseEntity.ok(client);
     }
     @GetMapping("")
-    public ResponseEntity<List<Produit>> findAllProduit() {
-        List<Produit> produits = produitService.findAll();
-        return ResponseEntity.ok(produits);
+    public ResponseEntity<List<Client>> findAllClient() {
+        List<Client> clients = clientService.findAll();
+        return ResponseEntity.ok(clients);
     }
     @PostMapping("")
-    public ResponseEntity<Produit> addProduit(@RequestBody Produit produit) {
-        produitService.save(produit);
-        return ResponseEntity.ok(produit);
+    public ResponseEntity<Client> addClient(@RequestBody Client client) {
+        clientService.save(client);
+        return ResponseEntity.ok(client);
     }
-    @PutMapping("")
-    public ResponseEntity<Produit> updateProduit(@RequestBody Produit produit) {
-        Produit updatedProduit = produitService.update(produit);
-        return ResponseEntity.ok(updatedProduit);
+    @PatchMapping("/{id}")
+    public ResponseEntity<Client> partialUpdateClient(@PathVariable Long id ,@Valid @RequestBody ClientDto clientDto) {
+        Client updatedClient = clientService.updateClient(clientDto, id);
+        return ResponseEntity.ok(updatedClient);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduit(@PathVariable int id) {
-        produitService.deleteById(id);
-        return ResponseEntity.ok("Produit deleted");
+    public ResponseEntity<String> deleteClient(@PathVariable Long id) {
+        clientService.deleteById(id);
+        return ResponseEntity.ok("Client deleted");
     }
 
 }

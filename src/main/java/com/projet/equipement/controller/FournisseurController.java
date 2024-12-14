@@ -18,8 +18,8 @@ public class FournisseurController {
     private FournisseurService fournisseurService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Fournisseur>> findFournisseurById(@PathVariable int id) {
-        Optional<Fournisseur> fournisseur = fournisseurService.findById(id);
+    public ResponseEntity< Fournisseur> findFournisseurById(@PathVariable Long id) {
+         Fournisseur fournisseur = fournisseurService.findById(id);
         return ResponseEntity.ok(fournisseur);
     }
     @GetMapping("")
@@ -40,7 +40,7 @@ public class FournisseurController {
 //    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFournisseur(@PathVariable int id) {
+    public ResponseEntity<String> deleteFournisseur(@PathVariable Long id) {
         fournisseurService.deleteById(id);
         return ResponseEntity.ok("Fournisseur deleted");
     }

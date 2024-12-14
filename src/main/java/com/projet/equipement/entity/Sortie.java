@@ -3,6 +3,8 @@ package com.projet.equipement.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -19,7 +21,7 @@ public class Sortie {
     private int quantite;
 
     @Column(name = "date_sortie")
-    private String dateSortie;
+    private LocalDateTime dateSortie;
 
     @Column(name = "prix_vente")
     private double prixVente;

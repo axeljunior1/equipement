@@ -13,9 +13,12 @@ import lombok.*;
 public class Entree {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_entree")
     private Long id_entree;
+
     private int quantite;
-    private String date_entree;
+
+    @Column(name = "prix_achat")
     private double prix_achat;
     @OneToOne
     @JoinColumn(name = "id_produit")

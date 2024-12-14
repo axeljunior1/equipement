@@ -1,7 +1,7 @@
-package com.projet.equipement.entity;
+package com.projet.equipement.dto;
 
-
-import jakarta.persistence.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.Column;
 import lombok.*;
 
 @Getter
@@ -9,13 +9,9 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "clients")
-public class Client {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "id_client")
-    private Long id;
+@ToString
+public class ClientDto {
+
     private String firstName;
     private String lastName;
     private String email;
@@ -25,5 +21,8 @@ public class Client {
     private String state;
     private String zip;
     private String country;
+
+    @Column(columnDefinition = "json")
+    private JsonNode metadata;
 
 }

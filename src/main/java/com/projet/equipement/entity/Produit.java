@@ -14,15 +14,17 @@ import lombok.*;
 public class Produit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_produit")
     private Long id;
+
     private String nom;
     private String description;
     private String image;
     @Column(name = "prix_unitaire")
-    private String prixUnitaire;
+    private int prixUnitaire;
 
     @Column(name = "stock_initial")
-    private String quantity;
+    private int quantity;
 
 
 }

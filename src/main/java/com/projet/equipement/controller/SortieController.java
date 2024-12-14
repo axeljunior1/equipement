@@ -22,8 +22,8 @@ public class SortieController {
         return ResponseEntity.ok(sorties) ;
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Sortie>> findSortie(@PathVariable int id) {
-        Optional<Sortie> sortie = sortieService.findById(id);
+    public ResponseEntity< Sortie> findSortie(@PathVariable Long id) {
+         Sortie sortie = sortieService.findById(id);
         return ResponseEntity.ok(sortie);
     }
     @PostMapping("")
@@ -37,7 +37,7 @@ public class SortieController {
         return ResponseEntity.ok(sortie);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteSortie(int id) {
+    public ResponseEntity<String> deleteSortie(Long id) {
         sortieService.deleteById(id);
         return ResponseEntity.ok("Sortie deleted");
     }

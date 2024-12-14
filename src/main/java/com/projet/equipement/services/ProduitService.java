@@ -2,12 +2,12 @@ package com.projet.equipement.services;
 
 
 import com.projet.equipement.entity.Produit;
+import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.ProduitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProduitService{
@@ -17,22 +17,17 @@ public class ProduitService{
     public List<Produit> findAll(){
         return produitRepository.findAll();
     }
-    public Optional<Produit> findById(int id){
-        return Optional.of(produitRepository.findById(id)).get();
+    public  Produit findById(Long id){
+        return  produitRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Produit", id));
     }
     public Produit save(Produit produit){
         return produitRepository.save(produit);
     }
-    public Produit update(Produit produit){
-        //Todo revoir cette fonction
-        Optional<Produit> optionalProduit  = findById(Math.toIntExact(produit.getId()));
-        if(optionalProduit.isEmpty()){
-            return null;
-        }
-        produitRepository.save(produit);
-        return produit;
-    }
-    public void deleteById(int id){
+
+
+
+    public void deleteById(Long id){
         produitRepository.deleteById(id);
     }
 

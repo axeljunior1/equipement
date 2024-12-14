@@ -2,6 +2,7 @@ package com.projet.equipement.services;
 
 
 import com.projet.equipement.entity.Fournisseur;
+import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.FournisseurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,13 +18,15 @@ public class FournisseurService {
     public List<Fournisseur> findAll(){
         return fournisseurRepository.findAll();
     }
-    public Optional<Fournisseur> findById(int id){
-        return Optional.of(fournisseurRepository.findById(id)).get();
+    public  Fournisseur findById(Long id){
+        return  fournisseurRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Fournisseur", id));
+
     }
     public Fournisseur save(Fournisseur fournisseur){
         return fournisseurRepository.save(fournisseur);
     }
-    public void deleteById(int id){
+    public void deleteById(Long id){
         fournisseurRepository.deleteById(id);
     }
 

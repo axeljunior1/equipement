@@ -22,8 +22,8 @@ public class MouvementStockController {
         return ResponseEntity.ok(mouvementStocks) ;
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<MouvementStock>> findMouvementStock(@PathVariable int id) {
-        Optional<MouvementStock> mouvementStock = mouvementStockService.findById(id);
+    public ResponseEntity< MouvementStock> findMouvementStock(@PathVariable Long id) {
+         MouvementStock mouvementStock = mouvementStockService.findById(id);
         return ResponseEntity.ok(mouvementStock);
     }
     @PostMapping
@@ -37,7 +37,7 @@ public class MouvementStockController {
         return ResponseEntity.ok(mouvementStock);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteMouvementStock(@PathVariable int id) {
+    public ResponseEntity<String> deleteMouvementStock(@PathVariable Long id) {
         mouvementStockService.deleteById(id);
         return ResponseEntity.ok("MouvementStock deleted");
     }
