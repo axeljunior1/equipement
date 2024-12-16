@@ -1,5 +1,6 @@
 package com.projet.equipement.controller;
 
+import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.services.ProduitService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequestMapping("/produit")
 @RestController
@@ -32,9 +32,9 @@ public class ProduitController {
         produitService.save(produit);
         return ResponseEntity.ok(produit);
     }
-    @PutMapping
-    public ResponseEntity<Produit> updateProduit(Produit produit) {
-        produitService.save(produit);
+    @PatchMapping("/{id}")
+    public ResponseEntity<Produit> updateProduit(@PathVariable Long id, ProduitUpdateDto produitUpdateDto) {
+         Produit produit =  produitService.updateProduit(produitUpdateDto, id);
         return ResponseEntity.ok(produit);
     }
     @DeleteMapping("/{id}")

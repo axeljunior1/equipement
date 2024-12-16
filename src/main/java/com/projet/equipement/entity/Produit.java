@@ -1,7 +1,10 @@
 package com.projet.equipement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Set;
 
 @Entity
 
@@ -21,10 +24,14 @@ public class Produit {
     private String description;
     private String image;
     @Column(name = "prix_unitaire")
-    private int prixUnitaire;
+    private Integer prixUnitaire;
 
     @Column(name = "stock_initial")
-    private int quantity;
+    private Integer quantity;
+
+    @OneToMany(mappedBy = "produit")
+    @JsonIgnore
+    private Set<MouvementStock> mouvementStocks;
 
 
 }

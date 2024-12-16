@@ -1,6 +1,6 @@
 package com.projet.equipement.mapper;
 
-import com.projet.equipement.dto.ClientDto;
+import com.projet.equipement.dto.client.ClientUpdateDto;
 import com.projet.equipement.entity.Client;
 import org.springframework.stereotype.Component;
 
@@ -9,16 +9,15 @@ public class ClientMapper {
 
 
 
-    public void updateClientFromDto(ClientDto clientDto, Client client){
-        if (clientDto.getFirstName() != null) client.setFirstName(clientDto.getFirstName());
-        if (clientDto.getLastName() != null) client.setLastName(clientDto.getLastName());
-        if (clientDto.getEmail() != null) client.setEmail(clientDto.getEmail());
-        if (clientDto.getPhone() != null) client.setPhone(clientDto.getPhone());
-        if(clientDto.getAddress() != null) client.setAddress(clientDto.getAddress());
-        if (clientDto.getCity() != null) client.setCity(clientDto.getCity());
-        if (clientDto.getState() != null) client.setState(clientDto.getState());
-        if (clientDto.getZip() != null) client.setZip(clientDto.getZip());
-        if (clientDto.getCountry() != null) client.setCountry(clientDto.getCountry());
-
+    public void updateClientFromDto(ClientUpdateDto clientUpdateDto, Client client){
+        if (clientUpdateDto.getFirstName() != null) client.setFirstName(clientUpdateDto.getFirstName());
+        if (clientUpdateDto.getLastName() != null) client.setLastName(clientUpdateDto.getLastName());
+        if (clientUpdateDto.getEmail() != null) client.setEmail(clientUpdateDto.getEmail());
+        if (clientUpdateDto.getPhone() != null) client.setPhone(clientUpdateDto.getPhone());
+        if(clientUpdateDto.getAddress() != null) client.setAddress(clientUpdateDto.getAddress());
+        if (clientUpdateDto.getCity() != null) client.setCity(clientUpdateDto.getCity());
+        if (clientUpdateDto.getState() != null) client.setState(clientUpdateDto.getState());
+        if (clientUpdateDto.getZip() != null) client.setZip(clientUpdateDto.getZip());
+        if (clientUpdateDto.getCountry() != null) client.setCountry(clientUpdateDto.getCountry());
     }
 }

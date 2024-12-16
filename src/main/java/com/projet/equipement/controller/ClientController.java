@@ -1,22 +1,23 @@
 package com.projet.equipement.controller;
 
-import com.projet.equipement.dto.ClientDto;
+import com.projet.equipement.dto.client.ClientUpdateDto;
 import com.projet.equipement.entity.Client;
 import com.projet.equipement.services.ClientService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequestMapping("/client")
 @RestController
 public class ClientController {
 
-    @Autowired
-    private ClientService clientService;
+    private final ClientService clientService;
+
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
+    }
 
 
     @GetMapping("/{id}")
@@ -35,8 +36,8 @@ public class ClientController {
         return ResponseEntity.ok(client);
     }
     @PatchMapping("/{id}")
-    public ResponseEntity<Client> partialUpdateClient(@PathVariable Long id ,@Valid @RequestBody ClientDto clientDto) {
-        Client updatedClient = clientService.updateClient(clientDto, id);
+    public ResponseEntity<Client> partialUpdateClient(@PathVariable Long id ,@Valid @RequestBody ClientUpdateDto clientUpdateDto) {
+        Client updatedClient = clientService.updateClient(clientUpdateDto, id);
         return ResponseEntity.ok(updatedClient);
     }
 

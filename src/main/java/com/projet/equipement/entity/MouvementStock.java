@@ -14,9 +14,9 @@ public class MouvementStock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_mouvement")
-    private Long  id_mvt;
+    private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_produit")
     private Produit produit ;
 
@@ -32,7 +32,13 @@ public class MouvementStock {
     @Column(name = "quantite")
     private Integer quantity ;
 
+    @OneToOne
+    @JoinColumn(name = "id_entree", nullable = true) // Relie un MouvementStock à une Entree
+    private Entree entree;
 
+    @OneToOne
+    @JoinColumn(name = "id_sortie", nullable = true) // Relie un MouvementStock à une Entree
+    private Sortie sortie;
 
 
 

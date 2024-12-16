@@ -1,4 +1,4 @@
-package com.projet.equipement.dto;
+package com.projet.equipement.dto.utilisateur;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class UtilisateurDto {
+public class UtilisateurPostDto {
     private String nom;
     private String email;
 

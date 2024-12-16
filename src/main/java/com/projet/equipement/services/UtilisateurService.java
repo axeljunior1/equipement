@@ -1,7 +1,7 @@
 package com.projet.equipement.services;
 
 
-import com.projet.equipement.dto.UtilisateurDto;
+import com.projet.equipement.dto.utilisateur.UtilisateurUpdateDto;
 import com.projet.equipement.entity.Role;
 import com.projet.equipement.entity.Utilisateur;
 import com.projet.equipement.exceptions.EntityNotFoundException;
@@ -12,10 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UtilisateurService {
@@ -85,17 +84,17 @@ public class UtilisateurService {
 
 
     @Transactional
-    public Utilisateur updateUtilisateur(UtilisateurDto utilisateurDto, Long id) {
+    public Utilisateur updateUtilisateur(UtilisateurUpdateDto utilisateurUpdateDto, Long id) {
         Utilisateur utilisateur = findById(id);
         Set<Role> roles = new HashSet<>();
-        if (utilisateurDto.getRoleIds() != null) {
-            for (Long idDto : utilisateurDto.getRoleIds()) {
+        if (utilisateurUpdateDto.getRoleIds() != null) {
+            for (Long idDto : utilisateurUpdateDto.getRoleIds()) {
                 Role role = roleService.findById(idDto);
                 roles.add(role);
             }
         }
 
-        utilisateurMapper.updateUtilisateurFromDto(utilisateurDto,utilisateur, roles);
+        utilisateurMapper.updateUtilisateurFromDto(utilisateurUpdateDto,utilisateur, roles);
         return utilisateurRepository.save(utilisateur);
     }
 

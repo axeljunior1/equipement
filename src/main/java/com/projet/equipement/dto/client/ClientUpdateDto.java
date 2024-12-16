@@ -1,4 +1,4 @@
-package com.projet.equipement.dto;
+package com.projet.equipement.dto.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.Column;
@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ClientDto {
+public class ClientUpdateDto {
 
     private String firstName;
     private String lastName;
@@ -22,7 +22,5 @@ public class ClientDto {
     private String zip;
     private String country;
 
-    @Column(columnDefinition = "json")
-    private JsonNode metadata;
 
 }

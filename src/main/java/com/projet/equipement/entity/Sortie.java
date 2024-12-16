@@ -18,13 +18,13 @@ public class Sortie {
     @Column(name = "id_sortie")
     private Long id;
     @Column(name = "quantite")
-    private int quantite;
+    private Integer quantite;
 
     @Column(name = "date_sortie")
     private LocalDateTime dateSortie;
 
     @Column(name = "prix_vente")
-    private double prixVente;
+    private Double prixVente;
 
     @OneToOne
     @JoinColumn(name = "id_produit")
@@ -37,5 +37,12 @@ public class Sortie {
     @OneToOne
     @JoinColumn(name = "id_client")
     private Client client;
+
+    @OneToOne(mappedBy = "sortie", cascade = CascadeType.ALL)
+    private MouvementStock mouvementStock;
+
+
 }
+
+
 

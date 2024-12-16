@@ -1,7 +1,6 @@
 package com.projet.equipement.controller;
 
-import com.projet.equipement.dto.UtilisateurDto;
-import com.projet.equipement.entity.Role;
+import com.projet.equipement.dto.utilisateur.UtilisateurUpdateDto;
 import com.projet.equipement.entity.Utilisateur;
 import com.projet.equipement.services.UtilisateurService;
 import jakarta.validation.Valid;
@@ -9,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
 
 @RequestMapping("/utilisateur")
 @RestController
@@ -35,10 +34,10 @@ public class UtilisateurController {
     }
     
     @PatchMapping("/{id}")
-    public ResponseEntity updateUtilisateur(@PathVariable Long id , @Valid  @RequestBody UtilisateurDto utilisateurDto) {
+    public ResponseEntity updateUtilisateur(@PathVariable Long id , @Valid  @RequestBody UtilisateurUpdateDto utilisateurUpdateDto) {
 
         // Objets pour construire Utilisateur et ses Rôles
-        Utilisateur utilisateur = utilisateurService.updateUtilisateur(utilisateurDto, id);
+        Utilisateur utilisateur = utilisateurService.updateUtilisateur(utilisateurUpdateDto, id);
         return ResponseEntity.ok(utilisateur);
     }
 

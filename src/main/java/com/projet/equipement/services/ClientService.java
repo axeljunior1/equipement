@@ -1,7 +1,7 @@
 package com.projet.equipement.services;
 
 
-import com.projet.equipement.dto.ClientDto;
+import com.projet.equipement.dto.client.ClientUpdateDto;
 import com.projet.equipement.entity.Client;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ClientMapper;
@@ -32,9 +32,9 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    public Client updateClient(ClientDto clientDto, Long id) {
+    public Client updateClient(ClientUpdateDto clientUpdateDto, Long id) {
         Client client = findById(id);
-        clientMapper.updateClientFromDto(clientDto, client);
+        clientMapper.updateClientFromDto(clientUpdateDto, client);
         return clientRepository.save(client);
     }
 
