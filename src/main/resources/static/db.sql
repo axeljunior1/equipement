@@ -17,7 +17,7 @@ create table ENTREES
         foreign key (ID_UTILISATEUR) references UTILISATEURS
 );
 
-create table MOUVEMENTS_STOCK
+create table MOUVEMENTS_STOCK1
 (
     ID_MOUVEMENT   INTEGER auto_increment
         primary key,

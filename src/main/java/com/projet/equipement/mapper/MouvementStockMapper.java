@@ -33,12 +33,12 @@ public class MouvementStockMapper {
         Sortie sortie;
         if (mouvementStockPostDto.getSortieId() == null) {
             entree = entreeService.findById(mouvementStockPostDto.getUtilisateurId());
-            mouvementStock.setTypeMouvement(TypeMouvement.entree);
+            mouvementStock.setTypeMouvement(TypeMouvement.ENTREE);
             mouvementStock.setEntree(entree);
         }
         if (mouvementStockPostDto.getEntreeId() == null) {
             sortie = sortieService.findById(mouvementStockPostDto.getUtilisateurId());
-            mouvementStock.setTypeMouvement(TypeMouvement.sortie);
+            mouvementStock.setTypeMouvement(TypeMouvement.SORTIE);
             mouvementStock.setSortie(sortie);
 
         }

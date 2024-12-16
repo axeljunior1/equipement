@@ -49,7 +49,7 @@ public class EntreeController {
                 .utilisateurId(entree.getUtilisateur().getId())
                 .sortieId(null)
                 .quantity(entree.getQuantite())
-                .typeMouvement(TypeMouvement.entree)
+                .typeMouvement(TypeMouvement.ENTREE)
                 .build();
 
         //save le post

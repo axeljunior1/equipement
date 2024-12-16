@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name ="mouvements_stock")
+
 public class MouvementStock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +25,8 @@ public class MouvementStock {
     @JoinColumn(name = "id_utilisateur")
     private Utilisateur utilisateur ;
 
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_mouvement")
+    @Column(name = "type_mouvemnt")
     private TypeMouvement typeMouvement ;
 
     @Column(name = "quantite")
@@ -39,7 +39,6 @@ public class MouvementStock {
     @OneToOne
     @JoinColumn(name = "id_sortie", nullable = true) // Relie un MouvementStock à une Entree
     private Sortie sortie;
-
 
 
 }
