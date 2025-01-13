@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class EquipementApplication {
 
     public static void main(String[] args) {
+
+//        System.out.println(CodeBarreUtils.generateEAN13WithPrefix("9"));
+
         SpringApplication.run(EquipementApplication.class, args);
     }
 

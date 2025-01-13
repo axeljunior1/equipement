@@ -12,28 +12,30 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "clients")
-public class Client {
+@Table(name = "employes")
+public class Employe {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id_client")
+    @Column(name = "id_employe")
     private Long id;
     private String nom;
     private String prenom;
-    @Column()
-    private String email;
-    private String telephone;
 
 
     @Column(name = "created_at")
     private LocalDateTime dateCreation;
 
-    @OneToOne(mappedBy = "client")
+    @OneToOne(mappedBy = "employe")
     @JsonIgnore
     private Vente vente;
+
+    @OneToOne(mappedBy = "employe")
+    @JsonIgnore
+    private Achat achat;
 
 
 
 }
+
 

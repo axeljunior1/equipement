@@ -1,22 +1,26 @@
 package com.projet.equipement.services;
 
 
+import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.repository.ProduitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class ProduitService{
-    @Autowired
-    private ProduitRepository produitRepository;
-    @Autowired
-    private ProduitMapper produitMapper;
+
+    private final ProduitRepository produitRepository;
+    private final ProduitMapper produitMapper;
+
+    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper) {
+        this.produitRepository = produitRepository;
+        this.produitMapper = produitMapper;
+    }
 
     public List<Produit> findAll(){
         return produitRepository.findAll();
@@ -25,7 +29,8 @@ public class ProduitService{
         return  produitRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
     }
-    public Produit save(Produit produit){
+    public Produit save(ProduitPostDto produitPostDto){
+        Produit produit = produitMapper.PostProduitFromDto(produitPostDto);
         return produitRepository.save(produit);
     }
 
@@ -39,5 +44,8 @@ public class ProduitService{
     public void deleteById(Long id){
         produitRepository.deleteById(id);
     }
-
+//    public Produit findByCode(String codeBarre) {
+//        return produitRepository.findByCode(codeBarre)
+//                .orElseThrow(() -> new EntityNotFoundException("Lot", codeBarre));
+//    }
 }

@@ -20,5 +20,8 @@ public class ProduitUpdateDto {
     @NotNull(message = "Le prix unitaire est obligatoire")
     private Integer prixUnitaire;
 
+    private Integer stockInitial;
+
+
 
 }
