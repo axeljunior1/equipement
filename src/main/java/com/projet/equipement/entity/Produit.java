@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -21,6 +23,12 @@ public class Produit {
     private String nom;
     @Column(nullable = false)
     private String description;
+
+    private String categorie;
+
+    @Column(name = "qr_code", columnDefinition="bytea")
+    private byte[] qrCode;
+
     @JsonIgnore
     private String image;
     @Column(name = "prix_achat")
@@ -29,9 +37,9 @@ public class Produit {
     @Column(name = "stock_initial")
     private Integer stockInitial;
 
-    @OneToOne(mappedBy ="produit" )
+    @OneToMany(mappedBy ="produit" )
     @JsonIgnore
-    private LigneVente ligneVente;
+    private List<LigneVente> ligneVentes;
 
     @OneToOne(mappedBy ="produit" )
     @JsonIgnore

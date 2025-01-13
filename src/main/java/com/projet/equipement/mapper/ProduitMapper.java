@@ -17,17 +17,20 @@ public class ProduitMapper {
         if (produitUpdateDto.getImage() != null) produit.setImage(produitUpdateDto.getImage());
         if (produitUpdateDto.getPrixUnitaire() != null) produit.setPrixUnitaire(produitUpdateDto.getPrixUnitaire());
         if (produitUpdateDto.getStockInitial() != null) produit.setStockInitial(produitUpdateDto.getStockInitial());
+        if (produitUpdateDto.getQrCode() != null) produit.setQrCode(produitUpdateDto.getQrCode());
+        if(produitUpdateDto.getCategorie() != null) produit.setCategorie(produitUpdateDto.getCategorie());
     }
 
     public Produit PostProduitFromDto(ProduitPostDto produitPostDto ){
-        Produit produit = Produit.builder()
+        return Produit.builder()
                 .nom(produitPostDto.getNom())
                 .description(produitPostDto.getDescription())
                 .image(produitPostDto.getImage())
                 .prixUnitaire(produitPostDto.getPrixUnitaire())
                 .stockInitial(produitPostDto.getStockInitial())
+                .qrCode(produitPostDto.getQrCode())
+                .categorie(produitPostDto.getCategorie())
                 .build();
-        return produit;
     }
 
 }

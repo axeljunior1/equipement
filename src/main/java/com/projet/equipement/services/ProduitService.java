@@ -16,10 +16,12 @@ public class ProduitService{
 
     private final ProduitRepository produitRepository;
     private final ProduitMapper produitMapper;
+    private final QrCodeService qrCodeService;
 
-    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper) {
+    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, QrCodeService qrCodeService) {
         this.produitRepository = produitRepository;
         this.produitMapper = produitMapper;
+        this.qrCodeService = qrCodeService;
     }
 
     public List<Produit> findAll(){
@@ -29,8 +31,12 @@ public class ProduitService{
         return  produitRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
     }
+
     public Produit save(ProduitPostDto produitPostDto){
         Produit produit = produitMapper.PostProduitFromDto(produitPostDto);
+        Produit produitSaved = produitRepository.save(produit);
+        // set le qr code du produit
+        produitSaved.setQrCode(qrCodeService.genAndSaveQrCodeByProduct(produit));
         return produitRepository.save(produit);
     }
 
@@ -44,8 +50,5 @@ public class ProduitService{
     public void deleteById(Long id){
         produitRepository.deleteById(id);
     }
-//    public Produit findByCode(String codeBarre) {
-//        return produitRepository.findByCode(codeBarre)
-//                .orElseThrow(() -> new EntityNotFoundException("Lot", codeBarre));
-//    }
+
 }
