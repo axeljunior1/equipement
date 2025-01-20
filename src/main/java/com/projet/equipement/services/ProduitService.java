@@ -7,6 +7,7 @@ import com.projet.equipement.entity.Produit;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.repository.ProduitRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +31,14 @@ public class ProduitService{
     public  Produit findById(Long id){
         return  produitRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
+    }
+
+    public List<Produit> rechercherProduits(String motCle){
+        return produitRepository.rechercherProduits(motCle);
+    }
+
+    public List<Produit> findBySpec(Specification<Produit> spec){
+        return produitRepository.findAll(spec);
     }
 
     public Produit save(ProduitPostDto produitPostDto){

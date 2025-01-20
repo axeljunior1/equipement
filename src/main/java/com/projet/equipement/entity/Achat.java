@@ -28,6 +28,10 @@ public class Achat {
     private LocalDateTime dateDerniereMiseAJour;
 
 
+    @Column(name = "created_at")
+    private LocalDateTime dateCreation;
+
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "employe_id")
     private Employe employe;

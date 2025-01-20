@@ -1,5 +1,6 @@
 package com.projet.equipement.controller;
 
+import com.projet.equipement.dto.achat.AchatGetDto;
 import com.projet.equipement.dto.achat.AchatPostDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
 import com.projet.equipement.entity.Achat;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestMapping("/achat")
 @RestController
@@ -19,9 +21,9 @@ public class AchatController {
     private AchatService achatService;
 
     @GetMapping("")
-    public ResponseEntity<List<Achat>> findAllAchats() {
+    public ResponseEntity<List<AchatGetDto>> findAllAchats() {
         List<Achat> achats = achatService.findAll();
-        return ResponseEntity.ok( achats) ;
+        return ResponseEntity.ok(achats.stream().map(AchatGetDto::new).collect(Collectors.toList()));
     }
     
     @GetMapping("/{id}")
