@@ -5,6 +5,8 @@ import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.services.ProduitService;
 import com.projet.equipement.specifications.ProduitSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +31,8 @@ public class ProduitController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Produit>> findAllProduit() {
-        List<Produit> produits = produitService.findAll();
+    public ResponseEntity<Page<Produit>> findAllProduit(Pageable pageable) {
+        Page<Produit> produits = produitService.findAll(pageable);
         return ResponseEntity.ok(produits);
     }
 

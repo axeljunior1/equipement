@@ -7,6 +7,8 @@ import com.projet.equipement.entity.Produit;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.repository.ProduitRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +27,8 @@ public class ProduitService{
         this.qrCodeService = qrCodeService;
     }
 
-    public List<Produit> findAll(){
-        return produitRepository.findAll();
+    public Page<Produit> findAll(Pageable pageable){
+        return produitRepository.findAll(pageable);
     }
     public  Produit findById(Long id){
         return  produitRepository.findById(id)
