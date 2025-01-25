@@ -29,7 +29,9 @@ public class Produit {
     @Column(nullable = false)
     private String description;
 
-    private String categorie;
+    @ManyToOne()
+    @JoinColumn(name = "categorie_id")
+    private Categorie categorie;
 
     @Builder.Default
     @Column(name = "qr_code", columnDefinition="bytea")

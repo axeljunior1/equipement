@@ -19,12 +19,10 @@ public class ProduitService{
 
     private final ProduitRepository produitRepository;
     private final ProduitMapper produitMapper;
-    private final QrCodeService qrCodeService;
 
-    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, QrCodeService qrCodeService) {
+    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper) {
         this.produitRepository = produitRepository;
         this.produitMapper = produitMapper;
-        this.qrCodeService = qrCodeService;
     }
 
     public Page<Produit> findAll(Pageable pageable){

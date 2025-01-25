@@ -1,30 +1,28 @@
 package com.projet.equipement.controller;
 
 import com.projet.equipement.dto.achat.AchatGetDto;
-import com.projet.equipement.dto.achat.AchatPostDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
 import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.LigneAchat;
 import com.projet.equipement.services.AchatService;
 import com.projet.equipement.services.LigneAchatService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RequestMapping("/achat")
 @RestController
 public class AchatController {
 
-    @Autowired
-    private AchatService achatService;
-    @Autowired
-    private LigneAchatService ligneAchatService;
+    private final AchatService achatService;
+    private final LigneAchatService ligneAchatService;
+
+    public AchatController(AchatService achatService, LigneAchatService ligneAchatService) {
+        this.achatService = achatService;
+        this.ligneAchatService = ligneAchatService;
+    }
 
     @GetMapping("")
     public ResponseEntity<Page<AchatGetDto>> findAllAchats(Pageable pageable) {
@@ -39,16 +37,11 @@ public class AchatController {
     }
 
     @GetMapping("/{id}/lignes")
-    public ResponseEntity<Page<LigneAchat>> findAchatLineByid(@PathVariable Long id, Pageable pageable) {
+    public ResponseEntity<Page<LigneAchat>> findAchatLineById(@PathVariable Long id, Pageable pageable) {
          Page<LigneAchat> ligneAchats = ligneAchatService.findByAchatId(id, pageable);
         return ResponseEntity.ok(ligneAchats);
     }
-    
-    @PostMapping("")
-    public ResponseEntity<Achat> addAchat(@RequestBody AchatPostDto achatPostDto) {
-       Achat achat = achatService.save(achatPostDto);
-        return ResponseEntity.ok(achat);
-    }
+
     
     @PatchMapping("/{id}")
     public ResponseEntity<Achat> updateAchat(@PathVariable Long id , @Valid  @RequestBody AchatUpdateDto achatUpdateDto) {

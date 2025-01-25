@@ -2,7 +2,11 @@ package com.projet.equipement.mapper;
 
 import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
+import com.projet.equipement.entity.Categorie;
 import com.projet.equipement.entity.Produit;
+import com.projet.equipement.exceptions.EntityNotFoundException;
+import com.projet.equipement.repository.CategorieRepository;
+import com.projet.equipement.repository.ProduitRepository;
 import org.springframework.stereotype.Component;
 
 
@@ -10,6 +14,13 @@ import org.springframework.stereotype.Component;
 public class ProduitMapper {
 
 
+    private final ProduitRepository produitRepository;
+    private final CategorieRepository categorieRepository;
+
+    public ProduitMapper(ProduitRepository produitRepository, CategorieRepository categorieRepository) {
+        this.produitRepository = produitRepository;
+        this.categorieRepository = categorieRepository;
+    }
 
     public void updateProduitFromDto(ProduitUpdateDto produitUpdateDto, Produit produit){
         if (produitUpdateDto.getNom() != null) produit.setNom(produitUpdateDto.getNom());
@@ -18,7 +29,12 @@ public class ProduitMapper {
         if (produitUpdateDto.getPrixUnitaire() != null) produit.setPrixUnitaire(produitUpdateDto.getPrixUnitaire());
         if (produitUpdateDto.getStockInitial() != null) produit.setStockInitial(produitUpdateDto.getStockInitial());
         if (produitUpdateDto.getQrCode() != null) produit.setQrCode(produitUpdateDto.getQrCode());
-        if(produitUpdateDto.getCategorie() != null) produit.setCategorie(produitUpdateDto.getCategorie());
+        if(produitUpdateDto.getCategorieId() != null) {
+            Categorie categorie = categorieRepository.findById(Long.valueOf(produitUpdateDto.getCategorieId())).orElseThrow(
+                    () -> new EntityNotFoundException("Produit", Long.valueOf(produitUpdateDto.getCategorieId()))
+            );
+            produit.setCategorie(categorie);
+        };
     }
 
     public Produit PostProduitFromDto(ProduitPostDto produitPostDto ){
@@ -28,7 +44,9 @@ public class ProduitMapper {
                 .image(produitPostDto.getImage())
                 .prixUnitaire(produitPostDto.getPrixUnitaire())
                 .stockInitial(produitPostDto.getStockInitial())
-                .categorie(produitPostDto.getCategorie())
+                .categorie(categorieRepository.findById(Long.valueOf(produitPostDto.getCategorieId())).orElseThrow(
+                        () -> new EntityNotFoundException("Produit", Long.valueOf(produitPostDto.getCategorieId()))
+                ))
                 .build();
     }
 
