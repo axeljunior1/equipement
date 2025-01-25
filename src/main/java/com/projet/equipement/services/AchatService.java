@@ -7,6 +7,8 @@ import com.projet.equipement.entity.Achat;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.AchatMapper;
 import com.projet.equipement.repository.AchatRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,8 +27,8 @@ public class AchatService {
         this.clientService = clientService;
     }
 
-    public List<Achat> findAll() {
-        return achatRepository.findAll();
+    public Page<Achat> findAll(Pageable pageable) {
+        return achatRepository.findAll(pageable);
     }
 
     public Achat findById(Long id) {
@@ -54,15 +56,6 @@ public class AchatService {
         return achatRepository.save(achat);
     }
 
-    // Add a role to a user
-//    public void addRoleToUser(Long userId, Long roleId) {
-//        Achat achat = findById(userId);
-//        Role role = roleRepository.findById(roleId)
-//                .orElseThrow(() -> new RuntimeException("Role not found"));
-//
-//        // Add the role to the user
-//        achat.getRoles().add(role);
-//        achatRepository.save(achat);
-//    }
+
 
 }

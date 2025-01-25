@@ -6,6 +6,8 @@ import com.projet.equipement.dto.ligneAchat.LigneAchatUpdateDto;
 import com.projet.equipement.entity.LigneAchat;
 import com.projet.equipement.services.LigneAchatService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,19 +25,15 @@ public class LigneAchatController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<LigneAchat>> findAllLigneAchats() {
-        List<LigneAchat> ligneAchats = ligneAchatService.findAll();
+    public ResponseEntity<Page<LigneAchat>> findAllLigneAchats(Pageable pageable) {
+        Page<LigneAchat> ligneAchats = ligneAchatService.findAll(pageable);
         return ResponseEntity.ok( ligneAchats) ;
     }
 
     @GetMapping("")
-    public ResponseEntity<List<LigneAchatGetDto>> findAllLigneAchatsDto() {
-        List<LigneAchat> ligneAchats = ligneAchatService.findAll();
-
-        return ResponseEntity.ok( ligneAchats.stream()
-                .map(LigneAchatGetDto::new)
-                .collect(Collectors.toList())
-        ) ;
+    public ResponseEntity<Page<LigneAchatGetDto>> findAllLigneAchatsDto(Pageable pageable) {
+        Page<LigneAchat> ligneAchats = ligneAchatService.findAll(pageable);
+        return ResponseEntity.ok(ligneAchats.map(LigneAchatGetDto::new));
     }
 
 

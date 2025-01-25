@@ -4,9 +4,13 @@ import com.projet.equipement.dto.achat.AchatGetDto;
 import com.projet.equipement.dto.achat.AchatPostDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
 import com.projet.equipement.entity.Achat;
+import com.projet.equipement.entity.LigneAchat;
 import com.projet.equipement.services.AchatService;
+import com.projet.equipement.services.LigneAchatService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,17 +23,25 @@ public class AchatController {
 
     @Autowired
     private AchatService achatService;
+    @Autowired
+    private LigneAchatService ligneAchatService;
 
     @GetMapping("")
-    public ResponseEntity<List<AchatGetDto>> findAllAchats() {
-        List<Achat> achats = achatService.findAll();
-        return ResponseEntity.ok(achats.stream().map(AchatGetDto::new).collect(Collectors.toList()));
+    public ResponseEntity<Page<AchatGetDto>> findAllAchats(Pageable pageable) {
+        Page <Achat> achats = achatService.findAll(pageable);
+        return ResponseEntity.ok(achats.map(AchatGetDto::new));
     }
     
     @GetMapping("/{id}")
     public ResponseEntity< Achat> findAchat(@PathVariable Long id) {
          Achat achat = achatService.findById(id);
         return ResponseEntity.ok(achat);
+    }
+
+    @GetMapping("/{id}/lignes")
+    public ResponseEntity<Page<LigneAchat>> findAchatLineByid(@PathVariable Long id, Pageable pageable) {
+         Page<LigneAchat> ligneAchats = ligneAchatService.findByAchatId(id, pageable);
+        return ResponseEntity.ok(ligneAchats);
     }
     
     @PostMapping("")

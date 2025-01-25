@@ -7,6 +7,8 @@ import com.projet.equipement.entity.LigneAchat;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.LigneAchatMapper;
 import com.projet.equipement.repository.LigneAchatRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +28,8 @@ public class LigneAchatService {
         this.produitService = produitService;
     }
 
-    public List<LigneAchat> findAll(){
-        return ligneAchatRepository.findAll();
+    public Page<LigneAchat> findAll(Pageable pageable){
+        return ligneAchatRepository.findAll(pageable);
     }
 
     public  LigneAchat findById(Long id){
@@ -51,4 +53,7 @@ public class LigneAchatService {
         ligneAchatRepository.deleteById(id);
     }
 
+    public Page<LigneAchat> findByAchatId(Long id, Pageable pageable) {
+        return ligneAchatRepository.findByAchatId(id,pageable);
+    }
 }

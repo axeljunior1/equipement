@@ -45,9 +45,6 @@ public class ProduitService{
 
     public Produit save(ProduitPostDto produitPostDto){
         Produit produit = produitMapper.PostProduitFromDto(produitPostDto);
-        Produit produitSaved = produitRepository.save(produit);
-        // set le qr code du produit
-        produitSaved.setQrCode(qrCodeService.genAndSaveQrCodeByProduct(produit));
         return produitRepository.save(produit);
     }
 

@@ -19,7 +19,6 @@ public class ProduitPostDto {
     @NotNull(message = "Le prix unitaire est obligatoire")
     private Integer prixUnitaire;
     private String categorie;
-    private byte[] qrCode;
 
     private Integer stockInitial;
 

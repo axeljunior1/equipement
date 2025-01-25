@@ -29,7 +29,7 @@ public class LigneAchat {
     @JsonIgnore
     private Achat achat;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "produit_id")
     @JsonIgnore
     private Produit produit;

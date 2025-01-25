@@ -28,7 +28,6 @@ public class ProduitMapper {
                 .image(produitPostDto.getImage())
                 .prixUnitaire(produitPostDto.getPrixUnitaire())
                 .stockInitial(produitPostDto.getStockInitial())
-                .qrCode(produitPostDto.getQrCode())
                 .categorie(produitPostDto.getCategorie())
                 .build();
     }

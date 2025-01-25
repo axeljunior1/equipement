@@ -1,6 +1,8 @@
 package com.projet.equipement.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.projet.equipement.services.QrCodeService;
+import com.projet.equipement.utils.EAN13Generator;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "produits")
 public class Produit {
+
+    private static String EAN_CONST = new EAN13Generator().generateEAN13WithFirstThreeChars("999");
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_produit")
@@ -26,8 +31,13 @@ public class Produit {
 
     private String categorie;
 
+    @Builder.Default
     @Column(name = "qr_code", columnDefinition="bytea")
-    private byte[] qrCode;
+    private byte[] qrCode = new EAN13Generator().genAndSaveQrCodeByProduct(EAN_CONST);
+
+    @Builder.Default
+    @Column(name = "ean13")
+    private String ena13 = EAN_CONST;
 
     @JsonIgnore
     private String image;
@@ -41,9 +51,9 @@ public class Produit {
     @JsonIgnore
     private List<LigneVente> ligneVentes;
 
-    @OneToOne(mappedBy ="produit" )
+    @OneToMany(mappedBy ="produit" , cascade = CascadeType.ALL)
     @JsonIgnore
-    private LigneAchat ligneAchat;
+    private List<LigneAchat> ligneAchats;
 
 
 //    @OneToMany(mappedBy = "produit")

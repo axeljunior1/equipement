@@ -18,3 +18,8 @@ docker cp Postgres:/backup.sql .
 docker exec -it Postgresql bash
 pg_dump -U root dev > export.sql
 docker cp Postgresql:export.sql C:\work\Dossier\equipement\src\main\resources\static  -- tu inverse pour faire l'inverse😂
+
+A la creation d'un produit, je veux:
+* creer un numero unique et le stocker avec ce produit, 
+* il est utilisé pour generer le qrCode du produit
+
