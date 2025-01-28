@@ -1,7 +1,6 @@
 package com.projet.equipement.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.projet.equipement.services.QrCodeService;
 import com.projet.equipement.utils.EAN13Generator;
 import jakarta.persistence.*;
 import lombok.*;
