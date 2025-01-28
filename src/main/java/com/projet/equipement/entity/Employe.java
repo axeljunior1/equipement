@@ -21,6 +21,7 @@ public class Employe {
     private Long id;
     private String nom;
     private String prenom;
+    private String password;
 
 
     @Column(name = "created_at")
