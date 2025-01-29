@@ -93,6 +93,9 @@ public class LigneAchatService {
         Produit produit = produitRepository.findById(idProduit).orElseThrow(()-> new EntityNotFoundException("Produit", idProduit));
         ligneAchatRepository.deleteById(id);
         TypeMouvementStock typeMouvementStock = typeMouvementStockRepository.findByCode("ACHAT_MARCHANDISE");
+
+//        il faut rechercher par l'ide de leve d'origine, car sinon il suprime les autres lignes
+
         List<MouvementStock> mouvementStocks = mouvementStockRepository.findByProduitAndTypeMouvement(produit, typeMouvementStock);
         for (MouvementStock mouvementStock : mouvementStocks) {
             mouvementStockRepository.deleteById(mouvementStock.getId());

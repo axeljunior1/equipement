@@ -1,12 +1,14 @@
 package com.projet.equipement.dto.client;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ClientPostDto {
     private String nom;
     private String pronom;

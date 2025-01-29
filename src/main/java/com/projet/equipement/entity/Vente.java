@@ -28,7 +28,7 @@ public class Vente {
     @Column(name = "updated_at")
     private LocalDateTime dateDerniereMiseAJour;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "client_id")
     private Client client;
 

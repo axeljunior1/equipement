@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,9 +30,9 @@ public class Client {
     @Column(name = "created_at")
     private LocalDateTime dateCreation;
 
-    @OneToOne(mappedBy = "client")
+    @OneToMany(mappedBy = "client")
     @JsonIgnore
-    private Vente vente;
+    private List<Vente> ventes;
 
 
 

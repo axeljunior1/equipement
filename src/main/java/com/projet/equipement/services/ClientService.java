@@ -32,6 +32,11 @@ public class ClientService {
                 .orElseThrow(() -> new EntityNotFoundException("Client", id));
     }
 
+    public Client findByTelephone(String tel) {
+        return clientRepository.findByTelephone(tel)
+                .orElseThrow(() -> new EntityNotFoundException("Client", tel ));
+    }
+
     public Client save(ClientPostDto clientPostDto) {
 //        Set<Role> roles = client.getRoles();
        Client client =  clientMapper.postClientDto(clientPostDto);

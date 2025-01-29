@@ -1,31 +1,42 @@
 package com.projet.equipement.controller;
 
+import com.projet.equipement.dto.client.ClientPostDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
+import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
-import com.projet.equipement.entity.Caisse;
-import com.projet.equipement.entity.LigneVente;
-import com.projet.equipement.entity.Vente;
+import com.projet.equipement.entity.*;
+import com.projet.equipement.repository.ClientRepository;
+import com.projet.equipement.services.ClientService;
+import com.projet.equipement.services.LigneVenteService;
 import com.projet.equipement.services.VenteService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RequestMapping("/ventes")
 @RestController
 public class VenteController {
 
     private final VenteService venteService;
+    private final ClientService clientService;
+    private final ClientRepository clientRepository;
+    private final LigneVenteService ligneVenteService;
 
-    public VenteController(VenteService venteService) {
+    public VenteController(VenteService venteService, ClientService clientService, ClientRepository clientRepository, LigneVenteService ligneVenteService) {
         this.venteService = venteService;
+        this.clientService = clientService;
+        this.clientRepository = clientRepository;
+        this.ligneVenteService = ligneVenteService;
     }
 
     @GetMapping("")
@@ -64,13 +75,44 @@ public class VenteController {
         return ResponseEntity.ok("Vente deleted");
     }
 
-    @PostMapping("/createVenteNLignes")
-    public ResponseEntity<Caisse> createVenteNLignes(@RequestBody Caisse caisse){
 
+@PostMapping("/createVenteNLignes")
+@Transactional // Active la gestion transactionnelle
+public ResponseEntity<Vente> createVenteNLignes( @RequestBody Caisse caisse) {
 
-
-        return ResponseEntity.ok(null);
+    Optional<Client> cli = clientRepository.findByTelephone(caisse.getClientTelephone());
+    if (cli.isEmpty()) {
+        ClientPostDto clientPostDto = ClientPostDto.builder()
+                .telephone(caisse.getClientTelephone())
+                .nom(caisse.getClientNom())
+                .pronom(caisse.getClientPrenom())
+                .email(caisse.getClientEmail())
+                .build();
+        cli = Optional.ofNullable(clientService.save(clientPostDto));
     }
+
+    Client client = cli.get();
+
+    VentePostDto ventePostDto = VentePostDto.builder()
+            .clientId(client.getId())
+            .montantTotal(caisse.getVenteMontantTotal())
+            .employeId(caisse.getVenteEmployeId())
+            .dateDerniereMiseAjour(LocalDateTime.now())
+            .build();
+    Vente vente = venteService.save(ventePostDto);
+
+    caisse.getLignesCaisses().forEach(ligneCaisse -> {
+        LigneVentePostDto ligneVentePostDto = LigneVentePostDto.builder()
+                .venteId(Math.toIntExact(vente.getId()))
+                .prixVenteUnitaire(ligneCaisse.getLVentePrixVenteUnitaire())
+                .produitId(ligneCaisse.getLVenteProduitId())
+                .quantite(ligneCaisse.getLVenteQuantite())
+                .build();
+        ligneVenteService.save(ligneVentePostDto);
+    });
+
+    return ResponseEntity.ok(vente);
+}
 
 
 

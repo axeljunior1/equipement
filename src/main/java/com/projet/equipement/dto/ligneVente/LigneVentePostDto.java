@@ -2,13 +2,15 @@ package com.projet.equipement.dto.ligneVente;
 
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.entity.Vente;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class LigneVentePostDto {
 
     private Integer prixVenteUnitaire;
