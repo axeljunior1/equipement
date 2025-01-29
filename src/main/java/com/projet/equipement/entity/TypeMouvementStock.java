@@ -1,5 +1,6 @@
 package com.projet.equipement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.projet.equipement.entity.enumeration.TypeMouvement;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,6 +34,10 @@ public class TypeMouvementStock {
     @Column(nullable = false, length = 10)
     @Enumerated(EnumType.STRING)
     private TypeMouvement typeMouvement;
+
+    @OneToMany(mappedBy = "typeMouvement")
+    @JsonIgnore
+    private Set<TypeMouvementStock> typeMouvementStocks;
 
 
 

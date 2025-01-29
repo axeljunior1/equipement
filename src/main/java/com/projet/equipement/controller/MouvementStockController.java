@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/mouvement-stock")
+@RequestMapping("/mouvements-stock")
 @RestController
 public class MouvementStockController {
 
@@ -44,7 +44,7 @@ public class MouvementStockController {
         return ResponseEntity.ok(mouvementStockService.save(mouvementStockPostDto));
     }
 
-    
+
     @PatchMapping("/{id}")
     public ResponseEntity<MouvementStock> updateMouvementStock(@PathVariable Long id , @Valid  @RequestBody MouvementStockUpdateDto mouvementStockUpdateDto) {
         MouvementStock mouvementStock = mouvementStockService.updateMouvementStock(mouvementStockUpdateDto, id);
