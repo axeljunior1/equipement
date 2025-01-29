@@ -22,6 +22,9 @@ public interface MouvementStockRepository extends JpaRepository<MouvementStock, 
     @Query("select mv from MouvementStock mv where mv.produit.id = :id")
     Page<MouvementStock> findAllMouvementStockByProductId(@Param("id") Long id, Pageable pageable);
 
+    @Query("select mv from MouvementStock mv where mv.produit.id = :id")
+    List<MouvementStock> findAllMouvementStockByProductIdList(@Param("id") Long id);
+
     List<MouvementStock> findByProduitAndTypeMouvement(Produit produit, TypeMouvementStock typeMouvementStock);
 }
 

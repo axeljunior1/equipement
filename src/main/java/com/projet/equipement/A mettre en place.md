@@ -122,3 +122,12 @@ Gestion des erreurs et cas limites.
 Concurrence pour éviter les conflits de modification simultanée.
 Performance sur de grandes quantités de données.
 Ces scénarios vous permettront de garantir la fiabilité et la robustesse de votre système de gestion des stocks.
+
+
+
+# Notion de vente
+1. crée un vente
+   1. creer des lignes dans vente en fonction des produits vendu 
+   2. creer un client si il n'existe pas 
+   3. verifier la qte restant en stock pour chaque ligne 
+   4. 

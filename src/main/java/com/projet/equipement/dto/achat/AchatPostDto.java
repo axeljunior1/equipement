@@ -11,8 +11,6 @@ public class AchatPostDto {
 
     private Integer montantTotal;
 
-
-
     private Long employeId;
 
 }

@@ -60,8 +60,8 @@ public class LigneAchatService {
 
         LigneAchat ligneAchat = ligneAchatMapper.postLigneAchatFromDto(ligneAchatPostDto, achatService, produitService);
         LigneAchat save = ligneAchatRepository.save(ligneAchat);
+
         // Gestion du mvt de stock
-        TypeMouvementStock typeMouvementStock = new TypeMouvementStock();
         LocalDateTime dateCreate = LocalDateTime.now();
         MouvementStockPostDto mouvementStockPostDto = MouvementStockPostDto.builder()
                 .reference("ACH_"+ ligneAchatPostDto.getAchatId() + "_LIG_"+ save.getId() )

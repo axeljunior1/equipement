@@ -4,6 +4,7 @@ import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
+import com.projet.equipement.entity.Caisse;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Vente;
 import com.projet.equipement.services.VenteService;
@@ -61,6 +62,14 @@ public class VenteController {
     public ResponseEntity<String> deleteVente(@PathVariable Long id ) {
         venteService.deleteById(id);
         return ResponseEntity.ok("Vente deleted");
+    }
+
+    @PostMapping("/createVenteNLignes")
+    public ResponseEntity<Caisse> createVenteNLignes(@RequestBody Caisse caisse){
+
+
+
+        return ResponseEntity.ok(null);
     }
 
 

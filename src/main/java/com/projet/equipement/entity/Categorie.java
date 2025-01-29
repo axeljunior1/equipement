@@ -1,5 +1,6 @@
 package com.projet.equipement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,7 @@ public class Categorie {
 
     // Relation inverse : une catégorie peut avoir plusieurs produits
     @OneToMany(mappedBy = "categorie")
+    @JsonIgnore
     private List<Produit> produits;
 
 }
