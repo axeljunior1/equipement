@@ -1,7 +1,6 @@
 package com.projet.equipement.dto.ligneAchat;
 
 import com.projet.equipement.entity.LigneAchat;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,7 @@ public class LigneAchatGetDto {
 
     private Long id ;
 
-    private Integer prixAchatUnitaire;
+    private Integer prixUnitaire;
 
     private Integer quantite;
 
@@ -19,13 +18,16 @@ public class LigneAchatGetDto {
 
     private Long produitId;
 
+    private String  produitNom;
+
 
     public LigneAchatGetDto(LigneAchat ligneAchat) {
         this.id = ligneAchat.getId();
         this.achatId = ligneAchat.getAchat().getId();
         this.produitId = ligneAchat.getProduit().getId();
         this.quantite = ligneAchat.getQuantite();
-        this.prixAchatUnitaire = ligneAchat.getPrixAchatUnitaire();
+        this.prixUnitaire = ligneAchat.getPrixAchatUnitaire();
+        this.produitNom = ligneAchat.getProduit().getNom();
     }
 
 }

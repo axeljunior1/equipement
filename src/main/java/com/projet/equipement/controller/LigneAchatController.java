@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RequestMapping("/ligneAchat")
+@RequestMapping("/ligneAchats")
 @RestController
 public class LigneAchatController {
 

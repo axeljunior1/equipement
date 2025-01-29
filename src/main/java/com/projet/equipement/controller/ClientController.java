@@ -6,12 +6,14 @@ import com.projet.equipement.entity.Client;
 import com.projet.equipement.services.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/client")
+@RequestMapping("/clients")
 @RestController
 public class ClientController {
 
@@ -19,8 +21,8 @@ public class ClientController {
     private ClientService clientService;
 
     @GetMapping("")
-    public ResponseEntity<List<Client>> findAllClients() {
-        List<Client> clients = clientService.findAll();
+    public ResponseEntity<Page<Client>> findAllClients(Pageable pageable) {
+        Page<Client> clients = clientService.findAll(pageable);
         return ResponseEntity.ok( clients) ;
     }
     @GetMapping("/{id}")

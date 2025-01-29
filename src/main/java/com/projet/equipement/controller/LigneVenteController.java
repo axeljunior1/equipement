@@ -6,13 +6,15 @@ import com.projet.equipement.dto.ligneVente.LigneVenteUpdateDto;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.services.LigneVenteService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RequestMapping("/ligneVente")
+@RequestMapping("/ligneVentes")
 @RestController
 public class LigneVenteController {
 
@@ -23,9 +25,9 @@ public class LigneVenteController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<LigneVenteGetDto>> findAllLigneVentes() {
-        List<LigneVente> ligneVentes = ligneVenteService.findAll();
-        return ResponseEntity.ok( ligneVentes.stream().map(LigneVenteGetDto::new).collect(Collectors.toList())) ;
+    public ResponseEntity<Page<LigneVenteGetDto>> findAllLigneVentes(Pageable pageable) {
+        Page<LigneVente> ligneVentes = ligneVenteService.findAll(pageable);
+        return ResponseEntity.ok(ligneVentes.map(LigneVenteGetDto::new));
     }
     @GetMapping("/{id}")
     public ResponseEntity< LigneVente> findLigneVente(@PathVariable Long id) {

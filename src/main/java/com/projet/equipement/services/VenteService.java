@@ -3,10 +3,14 @@ package com.projet.equipement.services;
 
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
+import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Vente;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.VenteMapper;
+import com.projet.equipement.repository.LigneVenteRepository;
 import com.projet.equipement.repository.VenteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,16 +21,21 @@ public class VenteService {
     private final VenteMapper venteMapper;
     private final EmployeService employeService;
     private final ClientService clientService;
+    private final LigneVenteRepository ligneVenteRepository;
 
-    public VenteService(VenteRepository venteRepository, VenteMapper venteMapper, EmployeService employeService, ClientService clientService) {
+    public VenteService(VenteRepository venteRepository, VenteMapper venteMapper, EmployeService employeService, ClientService clientService, LigneVenteRepository ligneVenteRepository) {
         this.venteRepository = venteRepository;
         this.venteMapper = venteMapper;
         this.employeService = employeService;
         this.clientService = clientService;
+        this.ligneVenteRepository = ligneVenteRepository;
     }
 
-    public List<Vente> findAll() {
-        return venteRepository.findAll();
+    public Page<Vente> findAll(Pageable pageable) {
+        return venteRepository.findAll(pageable);
+    }
+    public Page<LigneVente> findLineByVenteId(Long id, Pageable pageable) {
+        return ligneVenteRepository.findLineByVenteId(id, pageable);
     }
 
     public Vente findById(Long id) {

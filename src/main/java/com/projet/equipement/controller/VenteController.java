@@ -1,29 +1,41 @@
 package com.projet.equipement.controller;
 
+import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
+import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Vente;
 import com.projet.equipement.services.VenteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RequestMapping("/vente")
+@RequestMapping("/ventes")
 @RestController
 public class VenteController {
 
-    @Autowired
-    private VenteService venteService;
+    private final VenteService venteService;
+
+    public VenteController(VenteService venteService) {
+        this.venteService = venteService;
+    }
 
     @GetMapping("")
-    public ResponseEntity<List<VenteGetDto>> findAllVentes() {
-        List<Vente> ventes = venteService.findAll();
-        return ResponseEntity.ok( ventes.stream().map(VenteGetDto::new).collect(Collectors.toList())) ;
+    public ResponseEntity<Page<VenteGetDto>> findAllVentes(Pageable pageable) {
+        Page<Vente> ventes = venteService.findAll(pageable);
+        return ResponseEntity.ok( ventes.map(VenteGetDto::new));
+    }
+    @GetMapping("/{id}/lignes")
+    public ResponseEntity<Page<LigneVenteGetDto>> findAllLigneVentesByVenteId(@PathVariable Long id, Pageable pageable) {
+        Page<LigneVente> lineByVenteId = venteService.findLineByVenteId(id, pageable);
+        return ResponseEntity.ok( lineByVenteId.map(LigneVenteGetDto::new));
     }
     
     @GetMapping("/{id}")

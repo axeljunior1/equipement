@@ -21,7 +21,11 @@ public class VenteGetDto {
 
     private Long clientId;
 
+    private String clientNom;
+
     private Long employeId;
+
+    private String employeNom;
 
     private List<Long> lignesVenteId;
 
@@ -31,6 +35,8 @@ public class VenteGetDto {
         this.montantTotal = vente.getMontantTotal();
         this.clientId = vente.getClient().getId();
         this.employeId = vente.getEmploye().getId();
+        this.clientNom = vente.getClient().getNom();
+        this.employeNom = vente.getEmploye().getNom();
         this.lignesVenteId =  vente.getLigneVentes().stream().map(LigneVente::getId).collect(Collectors.toList()) ;
     }
 }

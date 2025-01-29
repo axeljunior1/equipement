@@ -7,6 +7,8 @@ import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.LigneVenteMapper;
 import com.projet.equipement.repository.LigneVenteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +28,8 @@ public class LigneVenteService {
         this.produitService = produitService;
     }
 
-    public List<LigneVente> findAll(){
-        return ligneVenteRepository.findAll();
+    public Page<LigneVente> findAll(Pageable pageable){
+        return ligneVenteRepository.findAll(pageable);
     }
 
     public  LigneVente findById(Long id){

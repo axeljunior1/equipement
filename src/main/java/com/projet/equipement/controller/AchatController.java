@@ -2,6 +2,7 @@ package com.projet.equipement.controller;
 
 import com.projet.equipement.dto.achat.AchatGetDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
+import com.projet.equipement.dto.ligneAchat.LigneAchatGetDto;
 import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.LigneAchat;
 import com.projet.equipement.services.AchatService;
@@ -12,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/achat")
+@RequestMapping("/achats")
 @RestController
 public class AchatController {
 
@@ -37,9 +38,9 @@ public class AchatController {
     }
 
     @GetMapping("/{id}/lignes")
-    public ResponseEntity<Page<LigneAchat>> findAchatLineById(@PathVariable Long id, Pageable pageable) {
+    public ResponseEntity<Page<LigneAchatGetDto>> findAchatLineById(@PathVariable Long id, Pageable pageable) {
          Page<LigneAchat> ligneAchats = ligneAchatService.findByAchatId(id, pageable);
-        return ResponseEntity.ok(ligneAchats);
+        return ResponseEntity.ok(ligneAchats.map(LigneAchatGetDto::new));
     }
 
     

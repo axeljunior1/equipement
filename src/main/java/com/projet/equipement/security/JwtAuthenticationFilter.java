@@ -1,6 +1,7 @@
 package com.projet.equipement.security;
 
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,24 +36,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7); // Supprime "Bearer "
-            username = jwtUtil.getUsernameFromToken(token);
-        }
-
-        // Si le token est valide et que l'utilisateur n'est pas encore authentifié
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = employeeDetailsService.loadUserByUsername(username);
-
-            if (jwtUtil.validateToken(token)) {
-                // Crée une authentification et configure le contexte de sécurité
-                var authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        try{
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                token = authorizationHeader.substring(7); // Supprime "Bearer "
+                username = jwtUtil.getUsernameFromToken(token);
             }
+
+            // Si le token est valide et que l'utilisateur n'est pas encore authentifié
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = employeeDetailsService.loadUserByUsername(username);
+
+                if (jwtUtil.validateToken(token)) {
+                    // Crée une authentification et configure le contexte de sécurité
+                    var authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
+            }
+        }catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token expiré. Veuillez vous reconnecter.");
+            return;  // On arrête le filtre ici
         }
 
         // Continue le traitement de la requête

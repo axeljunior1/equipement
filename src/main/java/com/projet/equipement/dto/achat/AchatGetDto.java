@@ -17,6 +17,8 @@ public class AchatGetDto {
 
     private Long employeId;
 
+    private String  employeNom;
+
     private LocalDateTime dateCreation;
 
 
@@ -28,5 +30,6 @@ public class AchatGetDto {
         this.employeId = achat.getEmploye().getId();
         this.montantTotal = achat.getMontantTotal();
         this.dateCreation = achat.getDateCreation();
+        this.employeNom = achat.getEmploye().getNom();
     }
 }
