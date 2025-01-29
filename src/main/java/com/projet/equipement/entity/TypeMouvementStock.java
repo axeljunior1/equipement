@@ -1,5 +1,6 @@
 package com.projet.equipement.entity;
 
+import com.projet.equipement.entity.enumeration.TypeMouvement;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "achats")
+@Table(name = "types_mouvement_stock")
 
 public class TypeMouvementStock {
 

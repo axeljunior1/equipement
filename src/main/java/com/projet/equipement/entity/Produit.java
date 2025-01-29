@@ -56,6 +56,10 @@ public class Produit {
     @JsonIgnore
     private List<LigneAchat> ligneAchats;
 
+    @OneToMany(mappedBy = "produit")
+    @JsonIgnore
+    private List<MouvementStock> mouvementStocks;
+
 
 //    @OneToMany(mappedBy = "produit")
 //    @JsonIgnore

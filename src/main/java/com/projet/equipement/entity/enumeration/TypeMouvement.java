@@ -1,4 +1,4 @@
-package com.projet.equipement.entity;
+package com.projet.equipement.entity.enumeration;
 
 public enum TypeMouvement {
     ENTREE, SORTIE

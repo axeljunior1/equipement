@@ -14,11 +14,9 @@ import org.springframework.stereotype.Component;
 public class ProduitMapper {
 
 
-    private final ProduitRepository produitRepository;
     private final CategorieRepository categorieRepository;
 
-    public ProduitMapper(ProduitRepository produitRepository, CategorieRepository categorieRepository) {
-        this.produitRepository = produitRepository;
+    public ProduitMapper( CategorieRepository categorieRepository) {
         this.categorieRepository = categorieRepository;
     }
 
