@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,13 +28,13 @@ public class Employe {
     @Column(name = "created_at")
     private LocalDateTime dateCreation;
 
-    @OneToOne(mappedBy = "employe")
+    @OneToMany(mappedBy = "employe")
     @JsonIgnore
-    private Vente vente;
+    private List<Vente> ventes;
 
-    @OneToOne(mappedBy = "employe")
+    @OneToMany(mappedBy = "employe")
     @JsonIgnore
-    private Achat achat;
+    private List<Achat> achats;
 
 
 

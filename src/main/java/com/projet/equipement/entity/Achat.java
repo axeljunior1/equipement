@@ -32,7 +32,7 @@ public class Achat {
     private LocalDateTime dateCreation;
 
 
-    @OneToOne()
+    @ManyToOne()
     @JoinColumn(name = "employe_id")
     private Employe employe;
 

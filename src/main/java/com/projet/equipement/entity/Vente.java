@@ -32,7 +32,7 @@ public class Vente {
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "employe_id")
     private Employe employe;
 
