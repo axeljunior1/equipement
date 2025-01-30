@@ -35,6 +35,11 @@ public class ProduitController {
         Produit produit = produitService.findById(id);
         return ResponseEntity.ok(new ProduitGetDto(produit));
     }
+    @GetMapping("/code-barre/{ean13}")
+    public ResponseEntity<ProduitGetDto> findProduitByEan13(@PathVariable String ean13) {
+        Produit produit = produitService.findByEan13(ean13);
+        return ResponseEntity.ok(new ProduitGetDto(produit));
+    }
 
     @GetMapping
     public ResponseEntity<Page<ProduitGetDto>> findAllProduit(Pageable pageable) {

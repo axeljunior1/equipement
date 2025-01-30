@@ -8,13 +8,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProduitRepository extends JpaRepository<Produit,  Long>, JpaSpecificationExecutor<Produit> {
     @Query("SELECT p FROM Produit p WHERE " +
             "LOWER(p.nom) LIKE LOWER(CONCAT('%', :motCle, '%')) OR " +
-            "LOWER(p.description) LIKE LOWER(CONCAT('%', :motCle, '%')) OR " +
-            "LOWER(p.categorie) LIKE LOWER(CONCAT('%', :motCle, '%'))")
+            "LOWER(p.description) LIKE LOWER(CONCAT('%', :motCle, '%'))")
     List<Produit> rechercherProduits(@Param("motCle") String motCle);
 
+    Optional<Produit> findByEan13(String ean13);
 }

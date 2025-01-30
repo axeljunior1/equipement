@@ -28,6 +28,12 @@ public class EmployeController {
          Employe employe = employeService.findById(id);
         return ResponseEntity.ok(employe);
     }
+    @GetMapping("/user/{username}")
+    public ResponseEntity< Employe> findEmployeByUsername(@PathVariable String username) {
+         Employe employe = employeService.findByUsername(username);
+        return ResponseEntity.ok(employe);
+    }
+
     @PostMapping("")
     public ResponseEntity<Employe> addEmploye(@RequestBody EmployePostDto employePostDto) {
        Employe employe = employeService.save(employePostDto);

@@ -38,7 +38,7 @@ public class Produit {
 
     @Builder.Default
     @Column(name = "ean13")
-    private String ena13 = EAN_CONST;
+    private String ean13 = EAN_CONST;
 
     @JsonIgnore
     private String image;

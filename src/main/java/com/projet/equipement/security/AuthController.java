@@ -2,6 +2,8 @@ package com.projet.equipement.security;
 
 
 
+import com.projet.equipement.dto.employe.EmployeGetDto;
+import com.projet.equipement.services.EmployeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,10 +17,12 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     private final JwtUtil jwtUtil;
+    private final EmployeService employeService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, EmployeService employeService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.employeService = employeService;
     }
 
     @PostMapping("/login")
@@ -26,13 +30,13 @@ public class AuthController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             String token = jwtUtil.generateToken(loginRequest.getUsername());
-            return ResponseEntity.ok().body( new JwtResponse(token));
+            return ResponseEntity.ok().body( new JwtResponse(token, new EmployeGetDto(employeService.findByUsername(loginRequest.getUsername()))));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Nom ou mot de passe incorrect.");
         }
     }
 
-    
+
 
 
 }

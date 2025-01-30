@@ -30,6 +30,12 @@ public class EmployeService {
                 .orElseThrow(() -> new EntityNotFoundException("Employe", id));
     }
 
+
+    public Employe findByUsername(String username) {
+        return employeRepository.findByNom(username)
+                .orElseThrow(() -> new EntityNotFoundException("Employe", username));
+    }
+
     public Employe save(EmployePostDto employePostDto) {
 //        Set<Role> roles = employe.getRoles();
        Employe employe =  employeMapper.postEmployeDto(employePostDto);

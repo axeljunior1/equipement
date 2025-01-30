@@ -33,6 +33,11 @@ public class ProduitService{
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
     }
 
+    public Produit findByEan13(String ean13) {
+        return  produitRepository.findByEan13(ean13)
+                .orElseThrow(() -> new EntityNotFoundException("Produit", ean13));
+    }
+
     public List<Produit> rechercherProduits(String motCle){
         return produitRepository.rechercherProduits(motCle);
     }
@@ -56,5 +61,6 @@ public class ProduitService{
     public void deleteById(Long id){
         produitRepository.deleteById(id);
     }
+
 
 }

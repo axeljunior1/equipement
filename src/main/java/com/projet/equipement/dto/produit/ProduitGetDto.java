@@ -38,7 +38,7 @@ public class ProduitGetDto {
         this.image = produit.getImage();
         this.prixUnitaire = produit.getPrixUnitaire();
         this.stockInitial = produit.getStockInitial();
-        this.ean13 = produit.getEna13();
+        this.ean13 = produit.getEan13();
         this.qrCode = produit.getQrCode();
         if (produit.getCategorie() != null) {
             this.categorieId = Math.toIntExact(produit.getCategorie().getId());
