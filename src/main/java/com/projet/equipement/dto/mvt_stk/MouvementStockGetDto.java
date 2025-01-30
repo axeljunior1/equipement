@@ -31,6 +31,10 @@ public class MouvementStockGetDto {
 
     private LocalDateTime createdAt; // Date de création
 
+    private Integer idLigneOrigine;
+
+    private Integer idEvenementOrigine;
+
 
     public MouvementStockGetDto(MouvementStock mouvementStock) {
         this.produitId = mouvementStock.getProduit().getId();
@@ -41,6 +45,8 @@ public class MouvementStockGetDto {
         this.commentaire = mouvementStock.getCommentaire();
         this.createdAt = mouvementStock.getCreatedAt();
         this.produitNom = mouvementStock.getProduit().getNom();
+        this.idEvenementOrigine = mouvementStock.getIdEvenementOrigine();
+        this.idLigneOrigine = mouvementStock.getIdLigneOrigine();
     }
 
 

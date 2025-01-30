@@ -28,8 +28,8 @@ public class VenteMapper {
     public Vente postVenteDto(VentePostDto ventePostDto, ClientService clientService, EmployeService employeService) {
         Vente vente = new Vente();
         vente.setMontantTotal(ventePostDto.getMontantTotal());
-        vente.setClient(clientService.findById(Long.valueOf(ventePostDto.getClientId())));
-        vente.setEmploye(employeService.findById(Long.valueOf(ventePostDto.getEmployeId())));
+        vente.setClient(clientService.findById(ventePostDto.getClientId()));
+        vente.setEmploye(employeService.findById(ventePostDto.getEmployeId()));
         vente.setDateDerniereMiseAJour(ventePostDto.getDateDerniereMiseAjour());
         return vente;
     }

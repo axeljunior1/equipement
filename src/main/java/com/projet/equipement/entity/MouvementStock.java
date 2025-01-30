@@ -28,6 +28,12 @@ public class MouvementStock  {
     @Column(name = "quantite", nullable = false)
     private Integer quantite; // Quantité du mouvement (doit être positive)
 
+    @Column(name = "id_ligne_origine", nullable = false)
+    private Integer idLigneOrigine;
+
+    @Column(name = "id_evenement_origine", nullable = false)
+    private Integer idEvenementOrigine;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_mouvement_id", nullable = false)
     private TypeMouvementStock typeMouvement; // Relation Many-to-One vers types_mouvement_stock

@@ -29,6 +29,9 @@ public class MouvementStockUpdateDto {
 
     private LocalDateTime createdAt; // Date de création
 
+    private Integer idLigneOrigine;
+
+    private Integer idEvenementOrigine;
 
 
 }

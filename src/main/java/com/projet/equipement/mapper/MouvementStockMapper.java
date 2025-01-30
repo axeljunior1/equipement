@@ -32,6 +32,8 @@ public class MouvementStockMapper {
         if (mouvementStockUpdateDto.getReference() != null) mouvementStock.setReference(mouvementStockUpdateDto.getReference());
         if (mouvementStockUpdateDto.getCommentaire() != null) mouvementStock.setCommentaire(mouvementStockUpdateDto.getCommentaire());
         if(mouvementStockUpdateDto.getTypeMouvementCode() !=null) mouvementStock.setTypeMouvement(mouvementStockUpdateDto.getTypeMouvementCode());
+        if(mouvementStockUpdateDto.getIdEvenementOrigine() != null) mouvementStock.setIdEvenementOrigine(mouvementStockUpdateDto.getIdEvenementOrigine());
+        if(mouvementStockUpdateDto.getIdLigneOrigine() != null) mouvementStock.setIdLigneOrigine(mouvementStockUpdateDto.getIdLigneOrigine());
         if(mouvementStockUpdateDto.getProduitId() != null) {
             Produit produit = produitRepository.findById(mouvementStock.getId()).orElseThrow(
                     () -> new EntityNotFoundException("MouvementStock", mouvementStock.getId())
@@ -47,6 +49,8 @@ public class MouvementStockMapper {
                 .commentaire(mouvementStockPostDto.getCommentaire())
                 .typeMouvement(typeMouvementStock)
                 .quantite(mouvementStockPostDto.getQuantite())
+                .idLigneOrigine(mouvementStockPostDto.getIdLigneOrigine())
+                .idEvenementOrigine(mouvementStockPostDto.getIdEvenementOrigine())
                 .produit(produitRepository.findById(mouvementStockPostDto.getProduitId()).orElseThrow(()->{
                     return new EntityNotFoundException("Produit", mouvementStockPostDto.getProduitId());
                 }))

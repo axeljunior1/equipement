@@ -31,7 +31,7 @@ public class LigneVente {
     @JsonIgnore
     private Vente vente;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "produit_id")
     private Produit produit;
 

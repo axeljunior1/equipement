@@ -3,11 +3,7 @@ package com.projet.equipement.services;
 
 import com.projet.equipement.dto.ligneAchat.LigneAchatPostDto;
 import com.projet.equipement.dto.ligneAchat.LigneAchatUpdateDto;
-import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.entity.LigneAchat;
-import com.projet.equipement.entity.MouvementStock;
-import com.projet.equipement.entity.Produit;
-import com.projet.equipement.entity.TypeMouvementStock;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.LigneAchatMapper;
 import com.projet.equipement.mapper.MouvementStockMapper;
@@ -18,10 +14,7 @@ import com.projet.equipement.repository.TypeMouvementStockRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LigneAchatService {
@@ -30,20 +23,14 @@ public class LigneAchatService {
     private final LigneAchatMapper ligneAchatMapper;
     private final AchatService achatService;
     private final ProduitService produitService;
-    private final MouvementStockRepository mouvementStockRepository;
-    private final MouvementStockMapper mouvementStockMapper;
-    private final ProduitRepository produitRepository;
-    private final TypeMouvementStockRepository typeMouvementStockRepository;
+    private final MouvementStockService mouvementStockService;
 
-    public LigneAchatService(LigneAchatRepository ligneAchatRepository, LigneAchatMapper ligneAchatMapper, AchatService achatService, ProduitService produitService, MouvementStockRepository mouvementStockRepository, MouvementStockMapper mouvementStockMapper, ProduitRepository produitRepository, TypeMouvementStockRepository typeMouvementStockRepository) {
+    public LigneAchatService(LigneAchatRepository ligneAchatRepository, LigneAchatMapper ligneAchatMapper, AchatService achatService, ProduitService produitService, MouvementStockRepository mouvementStockRepository, MouvementStockMapper mouvementStockMapper, ProduitRepository produitRepository, TypeMouvementStockRepository typeMouvementStockRepository, MouvementStockService mouvementStockService) {
         this.ligneAchatRepository = ligneAchatRepository;
         this.ligneAchatMapper = ligneAchatMapper;
         this.achatService = achatService;
         this.produitService = produitService;
-        this.mouvementStockRepository = mouvementStockRepository;
-        this.mouvementStockMapper = mouvementStockMapper;
-        this.produitRepository = produitRepository;
-        this.typeMouvementStockRepository = typeMouvementStockRepository;
+        this.mouvementStockService = mouvementStockService;
     }
 
     public Page<LigneAchat> findAll(Pageable pageable){
@@ -55,28 +42,25 @@ public class LigneAchatService {
                 .orElseThrow(() -> new EntityNotFoundException("LigneAchat", id));
     }
 
+    @Transactional
     public LigneAchat save(LigneAchatPostDto ligneAchatPostDto){
 
-
         LigneAchat ligneAchat = ligneAchatMapper.postLigneAchatFromDto(ligneAchatPostDto, achatService, produitService);
-        LigneAchat save = ligneAchatRepository.save(ligneAchat);
+        LigneAchat saveLigneAchat = ligneAchatRepository.save(ligneAchat);
 
-        // Gestion du mvt de stock
-        LocalDateTime dateCreate = LocalDateTime.now();
-        MouvementStockPostDto mouvementStockPostDto = MouvementStockPostDto.builder()
-                .reference("ACH_"+ ligneAchatPostDto.getAchatId() + "_LIG_"+ save.getId() )
-                .produitId(Long.valueOf(ligneAchatPostDto.getProduitId()))
-                .quantite(ligneAchatPostDto.getQuantite())
-                .commentaire("Généré à partir de la ligne d'un achat")
-                .createdAt(dateCreate)
-                .dateMouvement(dateCreate)
-                .typeMouvementCode("ACHAT_MARCHANDISE")
-                .build();
+        // Enregistrement du mouvement de stock via le service dédié
+        mouvementStockService.enregistrerMouvementStock(
+                Long.valueOf(ligneAchatPostDto.getProduitId()),
+                ligneAchatPostDto.getQuantite(),
+                "ACH_"+ ligneAchatPostDto.getAchatId() + "_LIG_"+ saveLigneAchat.getId(),
+                "Généré à partir de la ligne d'un achat",
+                "ACHAT_MARCHANDISE",
+                Math.toIntExact(ligneAchat.getAchat().getId()),
+                Math.toIntExact(ligneAchat.getId())
+        );
 
-        // Save un movement de stock
-        mouvementStockRepository.save(mouvementStockMapper.PostMouvementStockFromDto(mouvementStockPostDto));
 
-        return save;
+        return saveLigneAchat;
     }
 
 
@@ -86,20 +70,14 @@ public class LigneAchatService {
         return ligneAchatRepository.save(ligneAchat);
     }
 
+    @Transactional
     public void deleteById(Long id){
         // cet id est l'id de la ligne d'achat
-        LigneAchat ligneAchat = findById(id);
-        Long idProduit = ligneAchat.getProduit().getId();
-        Produit produit = produitRepository.findById(idProduit).orElseThrow(()-> new EntityNotFoundException("Produit", idProduit));
+        LigneAchat ligneAchat = this.findById(id);
+        String reference = "ACH_"+ ligneAchat.getAchat().getId() + "_LIG_"+ ligneAchat.getId() ;
+
+        mouvementStockService.deleteByReference(reference);
         ligneAchatRepository.deleteById(id);
-        TypeMouvementStock typeMouvementStock = typeMouvementStockRepository.findByCode("ACHAT_MARCHANDISE");
-
-//        il faut rechercher par l'ide de leve d'origine, car sinon il suprime les autres lignes
-
-        List<MouvementStock> mouvementStocks = mouvementStockRepository.findByProduitAndTypeMouvement(produit, typeMouvementStock);
-        for (MouvementStock mouvementStock : mouvementStocks) {
-            mouvementStockRepository.deleteById(mouvementStock.getId());
-        }
     }
 
     public Page<LigneAchat> findByAchatId(Long id, Pageable pageable) {

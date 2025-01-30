@@ -22,13 +22,15 @@ public class VenteService {
     private final EmployeService employeService;
     private final ClientService clientService;
     private final LigneVenteRepository ligneVenteRepository;
+    private final MouvementStockService mouvementStockService;
 
-    public VenteService(VenteRepository venteRepository, VenteMapper venteMapper, EmployeService employeService, ClientService clientService, LigneVenteRepository ligneVenteRepository) {
+    public VenteService(VenteRepository venteRepository, VenteMapper venteMapper, EmployeService employeService, ClientService clientService, LigneVenteRepository ligneVenteRepository, MouvementStockService mouvementStockService) {
         this.venteRepository = venteRepository;
         this.venteMapper = venteMapper;
         this.employeService = employeService;
         this.clientService = clientService;
         this.ligneVenteRepository = ligneVenteRepository;
+        this.mouvementStockService = mouvementStockService;
     }
 
     public Page<Vente> findAll(Pageable pageable) {
@@ -50,10 +52,14 @@ public class VenteService {
         return venteRepository.save(vente);
     }
 
+
+
     public void deleteById(Long id) {
+
+        String code = "VENTE_PRODUIT";
+        mouvementStockService.deleteByIdOrigineEveAndTypeMvtCode(id, code);
         venteRepository.deleteById(id);
     }
-
 
 
     public Vente updateVente(VenteUpdateDto venteUpdateDto, Long id) {

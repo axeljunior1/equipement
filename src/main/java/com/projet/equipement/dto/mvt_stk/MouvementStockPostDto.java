@@ -28,5 +28,8 @@ public class MouvementStockPostDto {
 
     private LocalDateTime createdAt; // Date de création
 
+    private Integer idLigneOrigine;
+
+    private Integer idEvenementOrigine;
 
 }

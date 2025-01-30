@@ -32,7 +32,7 @@ public class Achat {
     private LocalDateTime dateCreation;
 
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne()
     @JoinColumn(name = "employe_id")
     private Employe employe;
 

@@ -11,20 +11,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class AchatService {
     private final AchatRepository achatRepository;
     private final AchatMapper achatMapper;
     private final EmployeService employeService;
     private final ClientService clientService;
+    private final MouvementStockService mouvementStockService;
 
-    public AchatService(AchatRepository achatRepository, AchatMapper achatMapper, EmployeService employeService, ClientService clientService) {
+    public AchatService(AchatRepository achatRepository, AchatMapper achatMapper, EmployeService employeService, ClientService clientService, MouvementStockService mouvementStockService) {
         this.achatRepository = achatRepository;
         this.achatMapper = achatMapper;
         this.employeService = employeService;
         this.clientService = clientService;
+        this.mouvementStockService = mouvementStockService;
     }
 
     public Page<Achat> findAll(Pageable pageable) {
@@ -44,6 +44,9 @@ public class AchatService {
     }
 
     public void deleteById(Long id) {
+
+        String code = "ACHAT_MARCHANDISE";
+        mouvementStockService.deleteByIdOrigineEveAndTypeMvtCode(id, code);
         achatRepository.deleteById(id);
     }
 
