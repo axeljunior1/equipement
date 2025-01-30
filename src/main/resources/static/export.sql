@@ -350,6 +350,50 @@ ALTER SEQUENCE public.lignes_ventes_id_seq OWNED BY public.lignes_ventes.id_lign
 
 
 --
+-- Name: mouvement_stock; Type: TABLE; Schema: public; Owner: root
+--
+
+CREATE TABLE public.mouvement_stock (
+    id integer NOT NULL,
+    reference character varying(50),
+    produit_id integer NOT NULL,
+    quantite integer NOT NULL,
+    type_mouvement_id integer NOT NULL,
+    date_mouvement timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    commentaire text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    id_evenement_origine integer NOT NULL,
+    id_ligne_origine integer NOT NULL,
+    CONSTRAINT mouvement_stock_quantite_check CHECK ((quantite > 0))
+);
+
+
+ALTER TABLE public.mouvement_stock OWNER TO root;
+
+--
+-- Name: mouvement_stock_id_seq; Type: SEQUENCE; Schema: public; Owner: root
+--
+
+CREATE SEQUENCE public.mouvement_stock_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.mouvement_stock_id_seq OWNER TO root;
+
+--
+-- Name: mouvement_stock_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: root
+--
+
+ALTER SEQUENCE public.mouvement_stock_id_seq OWNED BY public.mouvement_stock.id;
+
+
+--
 -- Name: paiements; Type: TABLE; Schema: public; Owner: root
 --
 
@@ -638,6 +682,13 @@ ALTER TABLE ONLY public.lignes_ventes ALTER COLUMN id_lignes_ventes SET DEFAULT 
 
 
 --
+-- Name: mouvement_stock id; Type: DEFAULT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.mouvement_stock ALTER COLUMN id SET DEFAULT nextval('public.mouvement_stock_id_seq'::regclass);
+
+
+--
 -- Name: paiements id; Type: DEFAULT; Schema: public; Owner: root
 --
 
@@ -677,7 +728,6 @@ ALTER TABLE ONLY public.ventes ALTER COLUMN id_ventes SET DEFAULT nextval('publi
 --
 
 COPY public.achats (id_achat, employe_id, montant_total, created_at, updated_at) FROM stdin;
-1	1	5000.00	2025-01-12 13:14:42.236664	\N
 \.
 
 
@@ -703,6 +753,8 @@ COPY public.categorie (categorie_id, nom, description, created_at, updated_at) F
 
 COPY public.clients (id_client, nom, prenom, email, telephone, adresse, created_at, updated_at) FROM stdin;
 1	cli 1 	pre cli 1	string@cli1.com	0749482336	\N	\N	2025-01-12 10:05:41.163419
+18	cli 2 test	pre cli 2 test	string@cli1.com	0749482337	\N	\N	2025-01-29 20:29:06.529902
+23					\N	\N	2025-01-30 03:08:02.299405
 \.
 
 
@@ -712,7 +764,6 @@ COPY public.clients (id_client, nom, prenom, email, telephone, adresse, created_
 
 COPY public.employes (id_employe, nom, prenom, role, created_at, updated_at, password) FROM stdin;
 2	user	prenom	user	2025-01-27 02:04:40.813077	2025-01-27 02:04:40.813077	$2a$10$WilGubwNhqkCTtjm3NI8O.WUny5BRaD7rgCnJ.h/krQSTYtU1uCFu
-1	sdsd	dfd	user	\N	2025-01-12 11:00:21.626596	$2a$10$SeXOUI9YUvIxBVLhs0VwTujpQsKx20zFuvqdqWH8xjxaFvsVFzR06
 4	admin	administrateur	admin	2025-01-28 00:23:49.933132	2025-01-28 00:23:49.933132	$2a$10$76WZfvrWTE5K0LUn9WWE9.ecnlZlAKyT.GI0i3Mk1YnIf8nEnjoUy
 \.
 
@@ -738,9 +789,6 @@ COPY public.fournisseurs (id, nom, prenom, email, telephone, adresse, created_at
 --
 
 COPY public.lignes_achats (id_lignes_achat, lot_id, prix_achat, quantite, created_at, updated_at, produit_id, achat_id) FROM stdin;
-1	\N	1500.00	2	2025-01-12 13:27:54.91878	2025-01-12 13:27:54.91878	2	1
-10	\N	15.00	2	2025-01-28 20:07:39.458445	2025-01-28 20:07:39.458445	4	1
-11	\N	160.00	3	2025-01-28 20:13:48.802081	2025-01-28 20:13:48.802081	5	1
 \.
 
 
@@ -749,12 +797,20 @@ COPY public.lignes_achats (id_lignes_achat, lot_id, prix_achat, quantite, create
 --
 
 COPY public.lignes_ventes (id_lignes_ventes, vente_id, produit_id, quantite, prix_vente_unitaire) FROM stdin;
-1	2	2	1	1800.00
-2	2	2	1	1800.00
-3	2	3	3	6.00
-4	2	5	10	123.00
-5	2	10	4	19.00
-6	2	6	4	14.00
+12	18	5	1	160.00
+13	18	2	1	10.00
+14	19	11	4	200.00
+\.
+
+
+--
+-- Data for Name: mouvement_stock; Type: TABLE DATA; Schema: public; Owner: root
+--
+
+COPY public.mouvement_stock (id, reference, produit_id, quantite, type_mouvement_id, date_mouvement, commentaire, created_at, updated_at, id_evenement_origine, id_ligne_origine) FROM stdin;
+17	VTE_18_LIG_12	5	1	2	2025-01-30 03:08:13.191134	Généré à partir de la ligne d'une vente	\N	\N	18	12
+18	VTE_18_LIG_13	2	1	2	2025-01-30 03:08:16.914499	Généré à partir de la ligne d'une vente	\N	\N	18	13
+19	VTE_19_LIG_14	11	4	2	2025-01-30 03:12:04.701481	Généré à partir de la ligne d'une vente	\N	\N	19	14
 \.
 
 
@@ -780,6 +836,7 @@ COPY public.produits (id_produit, reference, nom, description, prix_achat, prix_
 10	\N	produit	descrip	13.00	\N	\N	\N	\N	0	0	2025-01-24 23:44:12.439625	2025-01-24 23:44:12.439625	string	12	\\x89504e470d0a1a0a0000000d49484452000000640000006401000000005899a8f9000000be49444154785ee5d3b10dc4200c05509f52a4bb0922b10663850582d8cc9dd740ca02d0a540f2c189bbd060e8e322d22b08b6f303dc5480a709e185b003d8a188237ac3694260ae25e236276f2645694e1c49c5a6b3aef27cb4b5d376950b9776835da17208b0fafa16410cf6fa3e87c233e8dc759d4f126f874e96ea7c92e874c8b15c3212974b1cffba169477c6febddedbedaae4e5745793acae720a4a0ce7a498549d4116aaa06bd7a2725ed2a1977a4e50f95754f87f6941773d5a1f060921270ac39ae30000000049454e44ae426082	9995849709669	\N
 6	\N	souris oi	ze	10.00	\N	\N	\N	\N	0	0	2025-01-20 16:23:29.028611	2025-01-20 16:23:29.028611	ze	123	\\x89504e470d0a1a0a0000000d49484452000000640000006401000000005899a8f9000000be49444154785ee5d2bd11c3200c05e0e7a37099057c9735dc6525b380bd41b2129dd6f01d0b984e0567055ffc5ba0d05bdd57004f4290534db89b1c2a42070c7f4512c404890582753eb8a64cd1168a2ee7f292c0b0a764592dfd35976e735a6a1cb699697226383cb62c9a08038f151728dd5c7be1b1407e6ecd546fc914312a897dbb4e42532a32e1c892579a19a37f3d7f2f685afe41e6da1408961bec3ba82b6d01f9fd9caad8ed593449a0e7c7ad93d094fa73f2c6d16d5647dd5a5fae601f9e244572800000000049454e44ae426082	\N	\N
 7	\N	Sceau 1	sceau bebe jaune	100.00	\N	\N	\N	\N	0	0	2025-01-20 16:27:18.231827	2025-01-20 16:27:18.231827		7	\\x89504e470d0a1a0a0000000d49484452000000640000006401000000005899a8f9000000be49444154785ee5d2b10dc4200c05509fe8ef1640620dba5b299980cb0237933bd640ca02a1a388e43352386830f4b1d2bc484ebe0d404d1d7037213c525800dc509e625291ce09c18a61453da5b4c749916efbfa220eb236c9bae2f9bc6ea7ed8a0b836b36d8156a00b59199d0e9bc8914aeff49a22dbf28c90425fd223e8a2b8ba8b058ded984b8bcfa5a3556ded9fe7997d482f81c7c78e60f0cc5f745d53e59c91c76fff749ca3babb7a72f8ac84fe91394e73b1768a6eda9d6adf503eda72ca6b55144b40000000049454e44ae426082	\N	\N
+11	\N	test	test	200.00	\N	\N	\N	\N	0	0	2025-01-29 14:13:39.690023	2025-01-29 14:13:39.690023		10	\\x89504e470d0a1a0a0000000d49484452000000640000006401000000005899a8f9000000bf49444154785ee5d3310ec3200c0550570c1d7b0124aed1ad572a1748d40b842b79f335907281b23120b944859005873d569637207f1b027ca82f5c4d08374c6f80f954c42126cb694060495bd4635ac3a0d08c8903e7af25eb2acf47fa386d57b9a2d97726095520e36a165130539a9e7bbfbea2b75143cd22097390f4603f200f2fe5a89e13c4dbda5c54fff924e59d317fc89c6b7b2fb949c9220a6c54edfe64112ff7b57438d1ba40b931511cd01fff80aeb6f70213b44d74d5ead2fa0155cb1c3e8a42fe3f0000000049454e44ae426082	9993866597344	3
 \.
 
 
@@ -822,7 +879,8 @@ COPY public.types_mouvement_stock (id, code, nom, description, type_mouvement, d
 --
 
 COPY public.ventes (id_ventes, client_id, date_vente, montant_total, created_at, updated_at, employe_id) FROM stdin;
-2	1	\N	500.00	\N	2025-01-12 09:58:19.65	1
+18	23	\N	0.00	\N	2025-01-30 03:08:02.317202	2
+19	18	\N	0.00	\N	2025-01-30 03:11:52.124854	2
 \.
 
 
@@ -830,7 +888,7 @@ COPY public.ventes (id_ventes, client_id, date_vente, montant_total, created_at,
 -- Name: achats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.achats_id_seq', 1, true);
+SELECT pg_catalog.setval('public.achats_id_seq', 5, true);
 
 
 --
@@ -844,7 +902,7 @@ SELECT pg_catalog.setval('public.categorie_id_seq', 8, true);
 -- Name: clients_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.clients_id_seq', 1, true);
+SELECT pg_catalog.setval('public.clients_id_seq', 23, true);
 
 
 --
@@ -865,14 +923,21 @@ SELECT pg_catalog.setval('public.fournisseurs_id_seq', 1, false);
 -- Name: lignes_achats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.lignes_achats_id_seq', 11, true);
+SELECT pg_catalog.setval('public.lignes_achats_id_seq', 29, true);
 
 
 --
 -- Name: lignes_ventes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.lignes_ventes_id_seq', 6, true);
+SELECT pg_catalog.setval('public.lignes_ventes_id_seq', 14, true);
+
+
+--
+-- Name: mouvement_stock_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
+--
+
+SELECT pg_catalog.setval('public.mouvement_stock_id_seq', 19, true);
 
 
 --
@@ -886,7 +951,7 @@ SELECT pg_catalog.setval('public.paiements_id_seq', 1, false);
 -- Name: produits_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.produits_id_seq', 10, true);
+SELECT pg_catalog.setval('public.produits_id_seq', 11, true);
 
 
 --
@@ -914,7 +979,7 @@ SELECT pg_catalog.setval('public.types_mouvement_stock_id_seq', 10, true);
 -- Name: ventes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.ventes_id_seq', 2, true);
+SELECT pg_catalog.setval('public.ventes_id_seq', 19, true);
 
 
 --
@@ -931,14 +996,6 @@ ALTER TABLE ONLY public.achats
 
 ALTER TABLE ONLY public.categorie
     ADD CONSTRAINT categorie_pkey PRIMARY KEY (categorie_id);
-
-
---
--- Name: clients clients_email_key; Type: CONSTRAINT; Schema: public; Owner: root
---
-
-ALTER TABLE ONLY public.clients
-    ADD CONSTRAINT clients_email_key UNIQUE (email);
 
 
 --
@@ -987,6 +1044,14 @@ ALTER TABLE ONLY public.lignes_achats
 
 ALTER TABLE ONLY public.lignes_ventes
     ADD CONSTRAINT lignes_ventes_pkey PRIMARY KEY (id_lignes_ventes);
+
+
+--
+-- Name: mouvement_stock mouvement_stock_pkey; Type: CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.mouvement_stock
+    ADD CONSTRAINT mouvement_stock_pkey PRIMARY KEY (id);
 
 
 --
@@ -1046,6 +1111,14 @@ ALTER TABLE ONLY public.types_mouvement_stock
 
 
 --
+-- Name: clients unique_telephone; Type: CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.clients
+    ADD CONSTRAINT unique_telephone UNIQUE (telephone);
+
+
+--
 -- Name: employes_roles utilisateurs_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
@@ -1067,6 +1140,14 @@ ALTER TABLE ONLY public.ventes
 
 ALTER TABLE ONLY public.achats
     ADD CONSTRAINT achats_employe_id_fkey FOREIGN KEY (employe_id) REFERENCES public.employes(id_employe) ON DELETE SET NULL;
+
+
+--
+-- Name: mouvement_stock fk_type_mouvement; Type: FK CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.mouvement_stock
+    ADD CONSTRAINT fk_type_mouvement FOREIGN KEY (type_mouvement_id) REFERENCES public.types_mouvement_stock(id) ON DELETE CASCADE;
 
 
 --
@@ -1099,6 +1180,14 @@ ALTER TABLE ONLY public.lignes_ventes
 
 ALTER TABLE ONLY public.lignes_ventes
     ADD CONSTRAINT lignes_ventes_vente_id_fkey FOREIGN KEY (vente_id) REFERENCES public.ventes(id_ventes) ON DELETE CASCADE;
+
+
+--
+-- Name: mouvement_stock mouvement_stock_produits_id_produit_fk; Type: FK CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.mouvement_stock
+    ADD CONSTRAINT mouvement_stock_produits_id_produit_fk FOREIGN KEY (produit_id) REFERENCES public.produits(id_produit);
 
 
 --
