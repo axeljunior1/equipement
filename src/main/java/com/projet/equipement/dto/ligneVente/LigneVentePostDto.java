@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LigneVentePostDto {
 
-    private Integer prixVenteUnitaire;
+    private Double prixVenteUnitaire;
 
     private Integer quantite;
 

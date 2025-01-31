@@ -10,7 +10,7 @@ public class LigneAchatGetDto {
 
     private Long id ;
 
-    private Integer prixUnitaire;
+    private Double prixUnitaire;
 
     private Integer quantite;
 

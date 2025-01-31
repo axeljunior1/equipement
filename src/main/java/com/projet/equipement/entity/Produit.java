@@ -43,7 +43,7 @@ public class Produit {
     @JsonIgnore
     private String image;
     @Column(name = "prix_achat")
-    private Integer prixUnitaire;
+    private Double prixUnitaire;
 
     @Column(name = "stock_initial")
     private Integer stockInitial;

@@ -21,7 +21,7 @@ public class LigneVente {
     private Long id;
 
     @Column(name = "prix_vente_unitaire")
-    private Integer prixVenteUnitaire;
+    private Double prixVenteUnitaire;
 
     @Column(name = "quantite")
     private Integer quantite;

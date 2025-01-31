@@ -9,7 +9,7 @@ import lombok.Setter;
 public class LigneVenteGetDto {
 
     private Long id;
-    private Integer prixUnitaire;
+    private Double prixUnitaire;
 
     private Integer quantite;
 

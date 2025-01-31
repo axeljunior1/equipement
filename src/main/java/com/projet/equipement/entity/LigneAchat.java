@@ -19,7 +19,7 @@ public class LigneAchat {
     private Long id;
 
     @Column(name = "prix_achat")
-    private Integer prixAchatUnitaire;
+    private Double prixAchatUnitaire;
 
     @Column(name = "quantite")
     private Integer quantite;

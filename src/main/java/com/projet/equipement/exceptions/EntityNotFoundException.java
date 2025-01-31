@@ -1,9 +1,13 @@
 package com.projet.equipement.exceptions;
 
+import java.time.LocalDateTime;
+
 public class EntityNotFoundException extends RuntimeException {
     public EntityNotFoundException(String entityName, Long id) {
-        super(entityName + " with ID " + id + " not found");
+        super("La resource " + entityName + " avec l'identifiant " + id + " n'a pas été trouvée");
     }
-    public EntityNotFoundException(String entityName, String ids) {
-        super(entityName + " with ID " + ids + " not found");
-    }}
+
+    public EntityNotFoundException(String entityName, String identifiant) {
+        super("La resource " + entityName + " avec l'identifiant " + identifiant + " n'a pas été trouvée");
+    }
+}

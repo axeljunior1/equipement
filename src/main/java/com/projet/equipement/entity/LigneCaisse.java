@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 public class LigneCaisse {
 
-    public Integer lVentePrixVenteUnitaire;
+    public Double lVentePrixVenteUnitaire;
     public Integer lVenteQuantite;
     public Integer lVenteProduitId;
 

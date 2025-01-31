@@ -17,7 +17,7 @@ public class ProduitPostDto {
     @NotNull(message = "La quantité est obligatoire")
     private Integer quantity;
     @NotNull(message = "Le prix unitaire est obligatoire")
-    private Integer prixUnitaire;
+    private Double prixUnitaire;
     private Integer categorieId;
 
     private Integer stockInitial;
