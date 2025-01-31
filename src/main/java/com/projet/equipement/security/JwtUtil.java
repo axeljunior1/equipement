@@ -21,7 +21,8 @@ public class JwtUtil {
     private long expiration;
 
     // Générer un token
-    junior
+
+
     public  String generateToken(String username) {
         return Jwts.builder()
                 .subject(username)
