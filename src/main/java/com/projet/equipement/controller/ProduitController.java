@@ -3,11 +3,9 @@ package com.projet.equipement.controller;
 import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
-import com.projet.equipement.entity.MouvementStock;
 import com.projet.equipement.entity.Produit;
-import com.projet.equipement.entity.enumeration.TypeMouvement;
-import com.projet.equipement.repository.MouvementStockRepository;
 import com.projet.equipement.services.ProduitService;
+import com.projet.equipement.services.StockCourantService;
 import com.projet.equipement.specifications.ProduitSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,47 +21,29 @@ public class ProduitController {
 
 
     private final ProduitService produitService;
-    private final MouvementStockRepository mouvementStockRepository;
 
-    public ProduitController(ProduitService produitService, MouvementStockRepository mouvementStockRepository) {
+    public ProduitController(ProduitService produitService) {
         this.produitService = produitService;
-        this.mouvementStockRepository = mouvementStockRepository;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProduitGetDto> findProduitById(@PathVariable Long id) {
-        Produit produit = produitService.findById(id);
-        return ResponseEntity.ok(new ProduitGetDto(produit));
+        ProduitGetDto produitGetDto = produitService.findProduitDtoById(id);
+        return ResponseEntity.ok(produitGetDto);
     }
+
     @GetMapping("/code-barre/{ean13}")
     public ResponseEntity<ProduitGetDto> findProduitByEan13(@PathVariable String ean13) {
         Produit produit = produitService.findByEan13(ean13);
         return ResponseEntity.ok(new ProduitGetDto(produit));
     }
 
-    @GetMapping
-    public ResponseEntity<Page<ProduitGetDto>> findAllProduit(Pageable pageable) {
-        Page<Produit> produits = produitService.findAll(pageable);
-        return ResponseEntity.ok(produits.map(produit -> {
-            ProduitGetDto produitGetDto = new ProduitGetDto(produit);
-
-            // Permet d'obtenir le stock du produit dans la recuperation de tous les produits.
-            // Je fais le calcul de ce stock
-            List<MouvementStock> mouvementStocks =  mouvementStockRepository.findAllMouvementStockByProductIdList(produit.getId());
-            Integer stock = produit.getStockInitial() ;
-            for (MouvementStock mouvementStock : mouvementStocks) {
-                if (mouvementStock.getTypeMouvement().getTypeMouvement() == TypeMouvement.ENTREE){
-                    stock =  stock + mouvementStock.getQuantite();
-                }
-                if (mouvementStock.getTypeMouvement().getTypeMouvement() == TypeMouvement.SORTIE){
-                    stock =  stock - mouvementStock.getQuantite();
-                }
-            }
-            produitGetDto.setStockCourant(stock);
-
-           return produitGetDto ;
-        }));
+    @GetMapping("")
+    public ResponseEntity<Page<ProduitGetDto>> findAllProduit( Pageable pageable) {
+        Page<ProduitGetDto> produitGetDtos = produitService.findByActif(true, pageable);
+        return ResponseEntity.ok(produitGetDtos);
     }
+
 
 
 

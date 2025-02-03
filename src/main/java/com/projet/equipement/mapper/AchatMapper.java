@@ -9,6 +9,8 @@ import com.projet.equipement.services.ClientService;
 import com.projet.equipement.services.EmployeService;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class AchatMapper {
 
@@ -24,6 +26,7 @@ public class AchatMapper {
         Achat achat = Achat.builder()
                 .montantTotal(achatPostDto.getMontantTotal())
                 .employe(employeService.findById(achatPostDto.getEmployeId()))
+                .dateCreation(LocalDateTime.now())
                 .build();
         return achat;
     }

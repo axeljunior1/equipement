@@ -23,14 +23,11 @@ public class Achat {
     @Column(name = "montant_total")
     private Integer montantTotal;
 
-
     @Column(name = "updated_at")
     private LocalDateTime dateDerniereMiseAJour;
 
-
     @Column(name = "created_at")
     private LocalDateTime dateCreation;
-
 
     @ManyToOne()
     @JoinColumn(name = "employe_id")

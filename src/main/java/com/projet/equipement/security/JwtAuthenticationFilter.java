@@ -1,6 +1,8 @@
 package com.projet.equipement.security;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.projet.equipement.exceptions.ApiError;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,12 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-
     private final EmployeeDetailsService employeeDetailsService;
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil, EmployeeDetailsService employeeDetailsService) {
@@ -36,29 +36,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
-        try{
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                token = authorizationHeader.substring(7); // Supprime "Bearer "
-                username = jwtUtil.getUsernameFromToken(token);
+
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7); // Supprime "Bearer "
+            try {
+                username = jwtUtil.getUsernameFromToken(token);  // Extraction du nom d'utilisateur à partir du token
+            } catch (ExpiredJwtException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token expiré. Veuillez vous reconnecter.");
+                return;  // Arrête le traitement de la requête si le token est expiré
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token invalide. Veuillez vous reconnecter.");
+                return;  // Arrête le traitement si le token est invalide
             }
+        }
 
-            // Si le token est valide et que l'utilisateur n'est pas encore authentifié
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = employeeDetailsService.loadUserByUsername(username);
+        // Si le token est valide et que l'utilisateur n'est pas encore authentifié
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = employeeDetailsService.loadUserByUsername(username);
 
-                if (jwtUtil.validateToken(token)) {
-                    // Crée une authentification et configure le contexte de sécurité
-                    var authenticationToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            if (jwtUtil.validateToken(token)) {
+                // Crée une authentification et configure le contexte de sécurité
+                var authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
-        }catch (ExpiredJwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token expiré. Veuillez vous reconnecter.");
-            return;  // On arrête le filtre ici
         }
 
         // Continue le traitement de la requête

@@ -1,10 +1,10 @@
 package com.projet.equipement.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.projet.equipement.utils.EAN13Generator;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -16,7 +16,6 @@ import java.util.List;
 @Table(name = "produits")
 public class Produit {
 
-    private static String EAN_CONST = new EAN13Generator().generateEAN13WithFirstThreeChars("999");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,13 +31,18 @@ public class Produit {
     @JoinColumn(name = "categorie_id")
     private Categorie categorie;
 
-    @Builder.Default
     @Column(name = "qr_code", columnDefinition="bytea")
-    private byte[] qrCode = new EAN13Generator().genAndSaveQrCodeByProduct(EAN_CONST);
+    private byte[] qrCode;
+
+    @Column(name = "ean13")
+    private String ean13 ;
 
     @Builder.Default
-    @Column(name = "ean13")
-    private String ean13 = EAN_CONST;
+    @Column(name = "actif")
+    private boolean actif = true ;
+
+    @Column(name = "created_at")
+    private LocalDateTime created_at ;
 
     @JsonIgnore
     private String image;

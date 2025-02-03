@@ -3,6 +3,8 @@ package com.projet.equipement.dto.produit;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
@@ -19,6 +21,7 @@ public class ProduitPostDto {
     @NotNull(message = "Le prix unitaire est obligatoire")
     private Double prixUnitaire;
     private Integer categorieId;
+    private LocalDateTime creationDate;
 
     private Integer stockInitial;
 
