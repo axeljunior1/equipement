@@ -26,6 +26,9 @@ public class Achat {
     @Column(name = "updated_at")
     private LocalDateTime dateDerniereMiseAJour;
 
+    @Column(name = "actif")
+    private Boolean actif;
+
     @Column(name = "created_at")
     private LocalDateTime dateCreation;
 

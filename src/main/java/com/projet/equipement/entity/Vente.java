@@ -19,8 +19,12 @@ public class Vente {
     @Id
     @Column(name = "id_ventes")
     private Long id;
+
     @Column(name = "montant_total")
     private Integer montantTotal;
+
+    @Column(name = "actif")
+    private Boolean actif;
 
     @Column(name = "created_at")
     private LocalDateTime dateCreation;

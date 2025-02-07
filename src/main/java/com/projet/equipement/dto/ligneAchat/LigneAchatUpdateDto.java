@@ -15,4 +15,7 @@ public class LigneAchatUpdateDto {
 
     private Integer produitId;
 
+    private Boolean actif;
+
+
 }

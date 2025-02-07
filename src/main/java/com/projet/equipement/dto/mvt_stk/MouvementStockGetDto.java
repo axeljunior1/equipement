@@ -25,6 +25,8 @@ public class MouvementStockGetDto {
 
     private String typeMouvementCode; // Relation Many-to-One vers types_mouvement_stock
 
+    private String typeMouvement; // Relation Many-to-One vers types_mouvement_stock
+
     private LocalDateTime dateMouvement; // Date du mouvement (par défaut : maintenant)
 
     private String commentaire; // Commentaire facultatif
@@ -47,6 +49,7 @@ public class MouvementStockGetDto {
         this.produitNom = mouvementStock.getProduit().getNom();
         this.idEvenementOrigine = mouvementStock.getIdEvenementOrigine();
         this.idLigneOrigine = mouvementStock.getIdLigneOrigine();
+        this.typeMouvement = String.valueOf(mouvementStock.getTypeMouvement().getTypeMouvement());
     }
 
 

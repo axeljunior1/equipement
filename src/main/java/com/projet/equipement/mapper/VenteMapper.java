@@ -12,24 +12,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class VenteMapper {
 
-    public void updateVenteFromDto(VenteUpdateDto venteUpdateDto, Vente vente, ClientService clientService, EmployeService employeService) {
+    public void updateVenteFromDto(VenteUpdateDto venteUpdateDto, Vente vente, Client client, Employe employe) {
         if (venteUpdateDto.getMontantTotal() != null) vente.setMontantTotal(venteUpdateDto.getMontantTotal());
-        if (venteUpdateDto.getClientId() != null) {
-            Client client = clientService.findById(Long.valueOf(venteUpdateDto.getClientId())) ;
-            vente.setClient(client);
-        }
-        if (venteUpdateDto.getEmployeId() != null) {
-            Employe employe = employeService.findById(Long.valueOf(venteUpdateDto.getEmployeId())) ;
-            vente.setEmploye(employe);
-        }
         if(venteUpdateDto.getDateDerniereMiseAjour() != null)vente.setDateDerniereMiseAJour(venteUpdateDto.getDateDerniereMiseAjour());
+        if (client != null) vente.setClient(client);
+        if (employe != null) vente.setEmploye(employe);
     }
 
-    public Vente postVenteDto(VentePostDto ventePostDto, ClientService clientService, EmployeService employeService) {
+    public Vente postVenteDto(VentePostDto ventePostDto, Client client, Employe employe) {
         Vente vente = new Vente();
         vente.setMontantTotal(ventePostDto.getMontantTotal());
-        vente.setClient(clientService.findById(ventePostDto.getClientId()));
-        vente.setEmploye(employeService.findById(ventePostDto.getEmployeId()));
+        vente.setClient(client);
+        vente.setEmploye(employe);
         vente.setDateDerniereMiseAJour(ventePostDto.getDateDerniereMiseAjour());
         return vente;
     }

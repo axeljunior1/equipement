@@ -16,6 +16,8 @@ public class LigneAchatGetDto {
 
     private Long achatId;
 
+    private Boolean actif;
+
     private Long produitId;
 
     private String  produitNom;
@@ -28,6 +30,7 @@ public class LigneAchatGetDto {
         this.quantite = ligneAchat.getQuantite();
         this.prixUnitaire = ligneAchat.getPrixAchatUnitaire();
         this.produitNom = ligneAchat.getProduit().getNom();
+        this.actif = ligneAchat.getActif();
     }
 
 }

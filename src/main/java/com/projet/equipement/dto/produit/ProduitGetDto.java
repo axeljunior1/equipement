@@ -23,13 +23,14 @@ public class ProduitGetDto {
     @NotNull(message = "La quantité est obligatoire")
     private Integer quantity;
     private Double prixUnitaire;
-    private boolean actif;
+    private Boolean actif;
     private LocalDateTime created_at ;
 
     private Integer categorieId;
     private String categorieNom;
 
     private Integer stockInitial;
+    private Integer seuilProduit;
     // mis en place dans le controlleur
     private Integer stockCourant;
     private byte[]  qrCode;
@@ -45,8 +46,9 @@ public class ProduitGetDto {
         this.stockInitial = produit.getStockInitial();
         this.ean13 = produit.getEan13();
         this.qrCode = produit.getQrCode();
-        this.actif = produit.isActif();
+        this.actif = produit.getActif();
         this.created_at = produit.getCreated_at();
+        this.seuilProduit = produit.getSeuilProduit();
         if (produit.getCategorie() != null) {
             this.categorieId = Math.toIntExact(produit.getCategorie().getId());
             this.categorieNom = produit.getCategorie().getNom();

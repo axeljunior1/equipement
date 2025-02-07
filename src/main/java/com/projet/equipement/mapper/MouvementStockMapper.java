@@ -2,15 +2,12 @@ package com.projet.equipement.mapper;
 
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockUpdateDto;
-import com.projet.equipement.entity.Categorie;
 import com.projet.equipement.entity.MouvementStock;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.entity.TypeMouvementStock;
 import com.projet.equipement.exceptions.EntityNotFoundException;
-import com.projet.equipement.repository.CategorieRepository;
-import com.projet.equipement.repository.MouvementStockRepository;
 import com.projet.equipement.repository.ProduitRepository;
-import com.projet.equipement.repository.TypeMouvementStockRepository;
+import com.projet.equipement.services.TypeMouvementStockService;
 import org.springframework.stereotype.Component;
 
 
@@ -19,13 +16,11 @@ public class MouvementStockMapper {
 
 
     private final ProduitRepository produitRepository;
-    private final MouvementStockRepository mouvementStockRepository;
-    private final TypeMouvementStockRepository typeMouvementStockRepository;
+    private final TypeMouvementStockService typeMouvementStockService;
 
-    public MouvementStockMapper(ProduitRepository produitRepository, MouvementStockRepository mouvementStockRepository, TypeMouvementStockRepository typeMouvementStockRepository) {
+    public MouvementStockMapper(ProduitRepository produitRepository, TypeMouvementStockService typeMouvementStockService) {
         this.produitRepository = produitRepository;
-        this.mouvementStockRepository = mouvementStockRepository;
-        this.typeMouvementStockRepository = typeMouvementStockRepository;
+        this.typeMouvementStockService = typeMouvementStockService;
     }
 
     public void updateMouvementStockFromDto(MouvementStockUpdateDto mouvementStockUpdateDto, MouvementStock mouvementStock){
@@ -42,8 +37,10 @@ public class MouvementStockMapper {
         };
     }
 
+
+
     public MouvementStock PostMouvementStockFromDto(MouvementStockPostDto mouvementStockPostDto ){
-        TypeMouvementStock typeMouvementStock = typeMouvementStockRepository.findByCode(mouvementStockPostDto.getTypeMouvementCode());
+        TypeMouvementStock typeMouvementStock = typeMouvementStockService.findByCode(mouvementStockPostDto.getTypeMouvementCode());
         return MouvementStock.builder()
                 .reference(mouvementStockPostDto.getReference())
                 .commentaire(mouvementStockPostDto.getCommentaire())
@@ -51,10 +48,9 @@ public class MouvementStockMapper {
                 .quantite(mouvementStockPostDto.getQuantite())
                 .idLigneOrigine(mouvementStockPostDto.getIdLigneOrigine())
                 .idEvenementOrigine(mouvementStockPostDto.getIdEvenementOrigine())
-                .produit(produitRepository.findById(mouvementStockPostDto.getProduitId()).orElseThrow(()->{
-                    return new EntityNotFoundException("Produit", mouvementStockPostDto.getProduitId());
-                }))
+                .produit(produitRepository.findById(mouvementStockPostDto.getProduitId()).orElseThrow(()-> new EntityNotFoundException("Produit", mouvementStockPostDto.getProduitId())))
                 .dateMouvement(mouvementStockPostDto.getDateMouvement())
+                .createdAt(mouvementStockPostDto.getCreatedAt())
                 .build();
     }
 

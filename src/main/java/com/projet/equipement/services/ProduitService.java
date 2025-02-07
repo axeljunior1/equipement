@@ -103,7 +103,11 @@ public class ProduitService{
         return produitRepository.save(produit);
     }
 
-    public void deleteById(Long id){
+    /**
+     * Soft delete d'un produit ok
+     * @param id id du produit
+     */
+    public void deleteByIdSoft(Long id){
         Produit produit = findById(id);
         produit.setActif(false);
         this.save(produit);

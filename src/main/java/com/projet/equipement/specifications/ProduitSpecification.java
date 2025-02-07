@@ -10,6 +10,11 @@ public class ProduitSpecification {
                 null :
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + description.toLowerCase() + "%");
     }
+
+    public static Specification<Produit> isActif(Boolean actif) {
+        return (root, query, criteriaBuilder) ->
+                (actif == null) ? null : criteriaBuilder.equal(root.get("actif"), actif);
+    }
     public static Specification<Produit> hasNom(String nom) {
         return (root, query, criteriaBuilder) -> nom == null ?
                 null :

@@ -2,6 +2,7 @@ package com.projet.equipement.dto.vente;
 
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Vente;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,8 @@ public class VenteGetDto {
     private Long clientId;
 
     private String clientNom;
+
+    private Boolean actif;
 
     private Long employeId;
 

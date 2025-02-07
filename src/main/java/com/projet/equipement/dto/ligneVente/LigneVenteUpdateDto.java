@@ -15,6 +15,8 @@ public class LigneVenteUpdateDto {
 
     private Integer venteId;
 
+    private Boolean actif;
+
     private Integer produitId;
 
 }

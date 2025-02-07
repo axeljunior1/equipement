@@ -24,6 +24,9 @@ public class LigneAchat {
     @Column(name = "quantite")
     private Integer quantite;
 
+    @Column(name = "actif")
+    private Boolean actif;
+
     @ManyToOne
     @JoinColumn(name = "achat_id")
     @JsonIgnore

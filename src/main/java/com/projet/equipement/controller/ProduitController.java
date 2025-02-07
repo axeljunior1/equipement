@@ -5,7 +5,6 @@ import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.services.ProduitService;
-import com.projet.equipement.services.StockCourantService;
 import com.projet.equipement.specifications.ProduitSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +56,7 @@ public class ProduitController {
     public List<Produit> filterProduits(
             @RequestParam(required = false) String nom,
             @RequestParam(required = false) String description,
+            @RequestParam(required = false) Boolean actif,
             @RequestParam(required = false) Integer stockInitialMin,
             @RequestParam(required = false) Integer stockInitialMax,
             @RequestParam(required = false) Double prixUnitaireMin,
@@ -64,11 +64,13 @@ public class ProduitController {
 
         Specification<Produit> spec = Specification.where(ProduitSpecification.hasDescription(description))
                 .and(ProduitSpecification.hasNom(nom))
+                .and(ProduitSpecification.isActif(actif))
                 .and(ProduitSpecification.hasStockBetween(stockInitialMin, stockInitialMax))
                 .and(ProduitSpecification.hasPrixBetween(prixUnitaireMin, prixUnitaireMax));
 
         return produitService.findBySpec(spec);
     }
+
     @PostMapping
     public ResponseEntity<Produit> addProduit( @RequestBody  ProduitPostDto produitPostDto) {
         Produit produit = produitService.save(produitPostDto);
@@ -84,7 +86,7 @@ public class ProduitController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduit(@PathVariable Long id) {
-        produitService.deleteById(id);
+        produitService.deleteByIdSoft(id);
         return ResponseEntity.ok("Produit deleted");
     }
 

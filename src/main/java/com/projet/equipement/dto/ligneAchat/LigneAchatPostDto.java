@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.ligneAchat;
 
+import com.projet.equipement.entity.LigneAchat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,5 @@ public class LigneAchatPostDto {
     private Integer achatId;
 
     private Integer produitId;
-
 
 }

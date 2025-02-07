@@ -14,18 +14,19 @@ import java.time.LocalDateTime;
 @Component
 public class AchatMapper {
 
-    public void updateAchatFromDto(AchatUpdateDto achatUpdateDto, Achat achat, EmployeService employeService) {
+    public void updateAchatFromDto(AchatUpdateDto achatUpdateDto, Achat achat, Employe employe) {
         if (achatUpdateDto.getMontantTotal() != null) achat.setMontantTotal(achatUpdateDto.getMontantTotal());
-        if (achatUpdateDto.getEmployeId() != null) {
-            Employe employe = employeService.findById(Long.valueOf(achatUpdateDto.getEmployeId())) ;
+        if (achatUpdateDto.getActif() != null) achat.setActif(achatUpdateDto.getActif());
+        if (employe != null) {
             achat.setEmploye(employe);
         }
     }
 
-    public Achat postAchatDto(AchatPostDto achatPostDto, EmployeService employeService) {
+    public Achat postAchatDto(AchatPostDto achatPostDto, Employe employe) {
         Achat achat = Achat.builder()
                 .montantTotal(achatPostDto.getMontantTotal())
-                .employe(employeService.findById(achatPostDto.getEmployeId()))
+                .employe(employe)
+                .actif(true)
                 .dateCreation(LocalDateTime.now())
                 .build();
         return achat;

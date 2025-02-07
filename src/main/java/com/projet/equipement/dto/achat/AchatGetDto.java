@@ -19,6 +19,9 @@ public class AchatGetDto {
 
     private String  employeNom;
 
+    private boolean  actif;
+
+
     private LocalDateTime dateCreation;
 
 
@@ -31,5 +34,6 @@ public class AchatGetDto {
         this.montantTotal = achat.getMontantTotal();
         this.dateCreation = achat.getDateCreation();
         this.employeNom = achat.getEmploye().getNom();
+        this.actif = achat.getActif();
     }
 }

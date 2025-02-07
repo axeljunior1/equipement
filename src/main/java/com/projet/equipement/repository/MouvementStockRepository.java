@@ -25,8 +25,6 @@ public interface MouvementStockRepository extends JpaRepository<MouvementStock, 
     List<MouvementStock> findByIdEvenementOrigine(Integer idEvenementOrigine);
 
 
-    List<MouvementStock> findAll(Specification<MouvementStock> spec);
-
     @Query("select mv from MouvementStock mv where mv.produit.id = :id")
     Page<MouvementStock> findAllMouvementStockByProductId(@Param("id") Long id, Pageable pageable);
 
@@ -45,5 +43,10 @@ public interface MouvementStockRepository extends JpaRepository<MouvementStock, 
     @Transactional
     @Query("delete from MouvementStock ms where ms.idEvenementOrigine = :idEveOri and ms.typeMouvement.code = :typeMvtCode ")
     void deleteByIdEvenementOrigineAndTypeMouvementCode(@Param("idEveOri") Long idEveOri, @Param("typeMvtCode") String typeMvtCode);
+
+    @Query("select ms from MouvementStock ms where ms.idEvenementOrigine = :idEveOri and ms.typeMouvement.code = :typeMvtCode ")
+    List<MouvementStock> findByIdEvenementOrigineAndTypeMouvementCode(@Param("idEveOri") Long idEveOri, @Param("typeMvtCode") String typeMvtCode);
+
+
 }
 

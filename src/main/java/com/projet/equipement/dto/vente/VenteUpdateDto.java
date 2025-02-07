@@ -17,4 +17,7 @@ public class VenteUpdateDto {
 
     private Integer employeId;
 
+    private Boolean actif;
+
+
 }

@@ -6,8 +6,7 @@ import com.projet.equipement.dto.achat.AchatUpdateDto;
 import com.projet.equipement.dto.ligneAchat.LigneAchatGetDto;
 import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.LigneAchat;
-import com.projet.equipement.services.AchatService;
-import com.projet.equipement.services.LigneAchatService;
+import com.projet.equipement.services.TransactionAchatAndLinesService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,35 +17,34 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AchatController {
 
-    private final AchatService achatService;
-    private final LigneAchatService ligneAchatService;
+    private final TransactionAchatAndLinesService transactionAchatAndLinesService;
 
-    public AchatController(AchatService achatService, LigneAchatService ligneAchatService) {
-        this.achatService = achatService;
-        this.ligneAchatService = ligneAchatService;
+    public AchatController(TransactionAchatAndLinesService transactionAchatAndLinesService) {
+
+        this.transactionAchatAndLinesService = transactionAchatAndLinesService;
     }
 
     @GetMapping("")
     public ResponseEntity<Page<AchatGetDto>> findAllAchats(Pageable pageable) {
-        Page<Achat> achats = achatService.findAll(pageable);
+        Page<Achat> achats = transactionAchatAndLinesService.findAllAchat(pageable);
         return ResponseEntity.ok(achats.map(AchatGetDto::new));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Achat> findAchat(@PathVariable Long id) {
-        Achat achat = achatService.findById(id);
+        Achat achat = transactionAchatAndLinesService.findByIdAchat(id);
         return ResponseEntity.ok(achat);
     }
 
     @GetMapping("/{id}/lignes")
     public ResponseEntity<Page<LigneAchatGetDto>> findAchatLineById(@PathVariable Long id, Pageable pageable) {
-        Page<LigneAchat> ligneAchats = ligneAchatService.findByAchatId(id, pageable);
+        Page<LigneAchat> ligneAchats = transactionAchatAndLinesService.findByAchatId(id, pageable);
         return ResponseEntity.ok(ligneAchats.map(LigneAchatGetDto::new));
     }
 
     @PostMapping()
     public ResponseEntity<AchatGetDto> save(@RequestBody AchatPostDto achatPostDto) {
-        Achat achat = achatService.save(achatPostDto);
+        Achat achat = transactionAchatAndLinesService.saveAchat(achatPostDto);
         return ResponseEntity.ok(new AchatGetDto(achat));
     }
 
@@ -54,13 +52,13 @@ public class AchatController {
     @PatchMapping("/{id}")
     public ResponseEntity<Achat> updateAchat(@PathVariable Long id, @Valid @RequestBody AchatUpdateDto achatUpdateDto) {
 
-        Achat achat = achatService.updateAchat(achatUpdateDto, id);
+        Achat achat = transactionAchatAndLinesService.updateAchat(achatUpdateDto, id);
         return ResponseEntity.ok(achat);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAchat(@PathVariable Long id) {
-        achatService.deleteById(id);
+        transactionAchatAndLinesService.softDeleteAchat(id);
         return ResponseEntity.ok("Achat deleted");
     }
 

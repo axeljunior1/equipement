@@ -15,6 +15,8 @@ public class LigneVenteGetDto {
 
     private Long venteId;
 
+    private Boolean actif;
+
     private Long produitId;
 
     private String  produitNom;
@@ -26,6 +28,7 @@ public class LigneVenteGetDto {
         this.produitId = ligneVente.getProduit().getId();
         this.venteId = ligneVente.getVente().getId();
         this.produitNom = ligneVente.getProduit().getNom();
+        this.actif = ligneVente.getActif();
     }
 
 }

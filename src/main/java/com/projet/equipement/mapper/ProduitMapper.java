@@ -27,6 +27,7 @@ public class ProduitMapper {
         if (produitUpdateDto.getPrixUnitaire() != null) produit.setPrixUnitaire(produitUpdateDto.getPrixUnitaire());
         if (produitUpdateDto.getStockInitial() != null) produit.setStockInitial(produitUpdateDto.getStockInitial());
         if (produitUpdateDto.getQrCode() != null) produit.setQrCode(produitUpdateDto.getQrCode());
+        if (produitUpdateDto.getSeuilProduit() !=null) produit.setSeuilProduit(produitUpdateDto.getSeuilProduit());
         if(produitUpdateDto.getCategorieId() != null) {
             Categorie categorie = categorieRepository.findById(Long.valueOf(produitUpdateDto.getCategorieId())).orElseThrow(
                     () -> new EntityNotFoundException("Produit", Long.valueOf(produitUpdateDto.getCategorieId()))
@@ -42,6 +43,7 @@ public class ProduitMapper {
                 .image(produitPostDto.getImage())
                 .prixUnitaire(produitPostDto.getPrixUnitaire())
                 .stockInitial(produitPostDto.getStockInitial())
+                .actif(true)
                 .categorie(categorieRepository.findById(Long.valueOf(produitPostDto.getCategorieId())).orElseThrow(
                         () -> new EntityNotFoundException("Produit", Long.valueOf(produitPostDto.getCategorieId()))
                 ))

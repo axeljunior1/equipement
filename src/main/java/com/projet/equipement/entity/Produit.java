@@ -37,9 +37,12 @@ public class Produit {
     @Column(name = "ean13")
     private String ean13 ;
 
+    @Column(name = "seuil_produit")
+    private Integer seuilProduit;
+
     @Builder.Default
     @Column(name = "actif")
-    private boolean actif = true ;
+    private Boolean actif = true ;
 
     @Column(name = "created_at")
     private LocalDateTime created_at ;

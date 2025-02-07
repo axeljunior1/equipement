@@ -6,11 +6,13 @@ import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
-import com.projet.equipement.entity.*;
+import com.projet.equipement.entity.Caisse;
+import com.projet.equipement.entity.Client;
+import com.projet.equipement.entity.LigneVente;
+import com.projet.equipement.entity.Vente;
 import com.projet.equipement.repository.ClientRepository;
 import com.projet.equipement.services.ClientService;
-import com.projet.equipement.services.LigneVenteService;
-import com.projet.equipement.services.VenteService;
+import com.projet.equipement.services.TransactionVenteAndLinesService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,59 +21,55 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @RequestMapping("/ventes")
 @RestController
 public class VenteController {
 
-    private final VenteService venteService;
     private final ClientService clientService;
     private final ClientRepository clientRepository;
-    private final LigneVenteService ligneVenteService;
+    private final TransactionVenteAndLinesService transactionVenteAndLinesService;
 
-    public VenteController(VenteService venteService, ClientService clientService, ClientRepository clientRepository, LigneVenteService ligneVenteService) {
-        this.venteService = venteService;
+    public VenteController(ClientService clientService, ClientRepository clientRepository, TransactionVenteAndLinesService transactionVenteAndLinesService) {
         this.clientService = clientService;
         this.clientRepository = clientRepository;
-        this.ligneVenteService = ligneVenteService;
+        this.transactionVenteAndLinesService = transactionVenteAndLinesService;
     }
 
     @GetMapping("")
     public ResponseEntity<Page<VenteGetDto>> findAllVentes(Pageable pageable) {
-        Page<Vente> ventes = venteService.findAll(pageable);
+        Page<Vente> ventes = transactionVenteAndLinesService.findAllVentes(pageable);
         return ResponseEntity.ok( ventes.map(VenteGetDto::new));
     }
     @GetMapping("/{id}/lignes")
     public ResponseEntity<Page<LigneVenteGetDto>> findAllLigneVentesByVenteId(@PathVariable Long id, Pageable pageable) {
-        Page<LigneVente> lineByVenteId = venteService.findLineByVenteId(id, pageable);
+        Page<LigneVente> lineByVenteId = transactionVenteAndLinesService.findByVenteId(id, pageable);
         return ResponseEntity.ok( lineByVenteId.map(LigneVenteGetDto::new));
     }
     
     @GetMapping("/{id}")
     public ResponseEntity< Vente> findVente(@PathVariable Long id) {
-         Vente vente = venteService.findById(id);
+         Vente vente = transactionVenteAndLinesService.findByIdVente(id);
         return ResponseEntity.ok(vente);
     }
     
     @PostMapping("")
     public ResponseEntity<Vente> addVente(@RequestBody VentePostDto ventePostDto) {
-       Vente vente = venteService.save(ventePostDto);
+       Vente vente = transactionVenteAndLinesService.saveVente(ventePostDto);
         return ResponseEntity.ok(vente);
     }
     
     @PatchMapping("/{id}")
     public ResponseEntity<Vente> updateVente(@PathVariable Long id , @Valid  @RequestBody VenteUpdateDto venteUpdateDto) {
 
-        Vente vente = venteService.updateVente(venteUpdateDto, id);
+        Vente vente = transactionVenteAndLinesService.updateVente(venteUpdateDto, id);
         return ResponseEntity.ok(vente);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteVente(@PathVariable Long id ) {
-        venteService.deleteById(id);
+        transactionVenteAndLinesService.SoftdeleteLineById(id);
         return ResponseEntity.ok("Vente deleted");
     }
 
@@ -99,7 +97,7 @@ public ResponseEntity<Vente> createVenteNLignes( @RequestBody Caisse caisse) {
             .employeId(caisse.getVenteEmployeId())
             .dateDerniereMiseAjour(LocalDateTime.now())
             .build();
-    Vente vente = venteService.save(ventePostDto);
+    Vente vente = transactionVenteAndLinesService.saveVente(ventePostDto);
 
     caisse.getLignesCaisses().forEach(ligneCaisse -> {
         LigneVentePostDto ligneVentePostDto = LigneVentePostDto.builder()
@@ -108,7 +106,7 @@ public ResponseEntity<Vente> createVenteNLignes( @RequestBody Caisse caisse) {
                 .produitId(ligneCaisse.getLVenteProduitId())
                 .quantite(ligneCaisse.getLVenteQuantite())
                 .build();
-        ligneVenteService.save(ligneVentePostDto);
+        transactionVenteAndLinesService.saveLigneVente(ligneVentePostDto);
     });
 
     return ResponseEntity.ok(vente);
