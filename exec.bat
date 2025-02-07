@@ -4,7 +4,7 @@ set CONTAINER_NAME=Postgresql
 set DB_USER=root
 set DB_NAME=dev
 set EXPORT_FILE=export.sql
-set DEST_PATH=C:\work\Dossier\equipement\src\main\resources\static
+set DEST_PATH=C:\work\Projets\Dossier\equipement\src\main\resources\static
 
 REM Informer de l'opération en cours
 echo Export de la base de donnees %DB_NAME% depuis le conteneur %CONTAINER_NAME%...
@@ -15,6 +15,7 @@ docker exec -it %CONTAINER_NAME% bash -c "pg_dump -U %DB_USER% %DB_NAME% > /%EXP
 REM Vérifier si l'export a réussi
 if errorlevel 1 (
     echo Echec de l'export de la base de donnees.
+    pause
     exit /b 1
 )
 
@@ -25,9 +26,13 @@ docker cp %CONTAINER_NAME%:/%EXPORT_FILE% %DEST_PATH%
 REM Vérifier si la copie a réussi
 if errorlevel 1 (
     echo Echec de la copie du fichier.
+    pause
     exit /b 1
 )
 
 REM Confirmation de la réussite
 echo Operation terminee avec succes. Le fichier est disponible dans %DEST_PATH%.
+
+REM Laisser l'utilisateur fermer la console manuellement
+pause
 exit /b 0
