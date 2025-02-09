@@ -17,6 +17,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -51,16 +53,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults()).csrf(c -> c.disable())// Si tu veux désactiver CSRF (utilisé généralement pour les API)
                 .authorizeHttpRequests(r -> r
-                        .requestMatchers( "/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Permet l'accès à /login sans authentification
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers(HttpMethod.POST, "login").permitAll()  // Permet l'accès à /login sans authentification
+                        .requestMatchers("roles/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
+                        .requestMatchers("employes/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
                         .anyRequest().authenticated() // Toutes les autres requêtes nécessitent une authentification
                 )
-                .exceptionHandling(e->e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .exceptionHandling(ex -> ex.accessDeniedHandler(new CustomAccessDeniedHandler())
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();  // Renvoie la configuration de sécurité construite
     }
+
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -74,10 +81,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-
-
-
 
 
 }

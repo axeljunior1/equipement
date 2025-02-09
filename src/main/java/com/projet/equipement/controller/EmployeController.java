@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +38,6 @@ public class EmployeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<EmployeGetDto> findEmploye(@PathVariable Long id) {
         Employe employe = employeService.findById(id);
         return ResponseEntity.ok(new EmployeGetDto(employe));
@@ -51,7 +49,6 @@ public class EmployeController {
         return ResponseEntity.ok(authorities);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN1')")
     @GetMapping("/user/{username}")
     public ResponseEntity<Employe> findEmployeByUsername(@PathVariable String username) {
         Employe employe = employeService.findByUsername(username);
