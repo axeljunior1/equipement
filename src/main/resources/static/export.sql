@@ -30,31 +30,10 @@ CREATE TYPE public.type_mvt AS ENUM (
 ALTER TYPE public.type_mvt OWNER TO root;
 
 --
--- Name: type_role; Type: TYPE; Schema: public; Owner: root
---
-
-CREATE TYPE public.type_role AS ENUM (
-    'super_admin',
-    'admin',
-    'user',
-    'guest'
-);
-
-
-ALTER TYPE public.type_role OWNER TO root;
-
---
 -- Name: CAST (character varying AS public.type_mvt); Type: CAST; Schema: -; Owner: -
 --
 
 CREATE CAST (character varying AS public.type_mvt) WITH INOUT AS IMPLICIT;
-
-
---
--- Name: CAST (character varying AS public.type_role); Type: CAST; Schema: -; Owner: -
---
-
-CREATE CAST (character varying AS public.type_role) WITH INOUT AS IMPLICIT;
 
 
 SET default_tablespace = '';
@@ -99,6 +78,33 @@ ALTER SEQUENCE public.achats_id_seq OWNER TO root;
 
 ALTER SEQUENCE public.achats_id_seq OWNED BY public.achats.id_achat;
 
+
+--
+-- Name: authority_id_seq; Type: SEQUENCE; Schema: public; Owner: root
+--
+
+CREATE SEQUENCE public.authority_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.authority_id_seq OWNER TO root;
+
+--
+-- Name: authority; Type: TABLE; Schema: public; Owner: root
+--
+
+CREATE TABLE public.authority (
+    id integer DEFAULT nextval('public.authority_id_seq'::regclass) NOT NULL,
+    nom character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.authority OWNER TO root;
 
 --
 -- Name: categorie; Type: TABLE; Schema: public; Owner: root
@@ -188,7 +194,8 @@ CREATE TABLE public.employes (
     role character varying(255),
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    password character varying(255) NOT NULL
+    password character varying(255) NOT NULL,
+    actif boolean DEFAULT true NOT NULL
 );
 
 
@@ -531,31 +538,56 @@ ALTER SEQUENCE public.retours_id_seq OWNED BY public.retours.id_retour;
 
 
 --
--- Name: roles; Type: TABLE; Schema: public; Owner: root
+-- Name: role_authority; Type: TABLE; Schema: public; Owner: root
 --
 
-CREATE TABLE public.roles (
-    id_role bigint NOT NULL,
-    nom public.type_role NOT NULL,
-    description text
+CREATE TABLE public.role_authority (
+    id_role integer NOT NULL,
+    id_authority integer NOT NULL
 );
 
 
-ALTER TABLE public.roles OWNER TO root;
+ALTER TABLE public.role_authority OWNER TO root;
+
+--
+-- Name: role_employe; Type: TABLE; Schema: public; Owner: root
+--
+
+CREATE TABLE public.role_employe (
+    id_employe integer NOT NULL,
+    id_role integer NOT NULL
+);
+
+
+ALTER TABLE public.role_employe OWNER TO root;
 
 --
 -- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: root
 --
 
-ALTER TABLE public.roles ALTER COLUMN id_role ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.roles_id_seq
+CREATE SEQUENCE public.roles_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
-    CACHE 1
+    CACHE 1;
+
+
+ALTER SEQUENCE public.roles_id_seq OWNER TO root;
+
+--
+-- Name: roles; Type: TABLE; Schema: public; Owner: root
+--
+
+CREATE TABLE public.roles (
+    id_role integer DEFAULT nextval('public.roles_id_seq'::regclass) NOT NULL,
+    nom character varying NOT NULL,
+    description text
 );
 
+
+ALTER TABLE public.roles OWNER TO root;
 
 --
 -- Name: types_mouvement_stock; Type: TABLE; Schema: public; Owner: root
@@ -759,6 +791,22 @@ COPY public.achats (id_achat, employe_id, montant_total, created_at, updated_at,
 20	4	0.00	2025-02-05 03:52:08.273209	\N	f
 21	4	0.00	2025-02-05 04:25:42.01304	\N	t
 22	4	0.00	2025-02-07 04:45:54.588682	\N	f
+23	4	0.00	2025-02-08 09:16:37.030306	\N	t
+24	4	0.00	2025-02-08 09:28:28.067179	\N	t
+\.
+
+
+--
+-- Data for Name: authority; Type: TABLE DATA; Schema: public; Owner: root
+--
+
+COPY public.authority (id, nom) FROM stdin;
+1	CREER_PRODUIT
+2	SUPPRIMER_PRODUIT
+3	VOIR_PRODUIT
+4	GERER_STOCK
+5	VALIDER_VENTE
+6	GENERER_RAPPORT
 \.
 
 
@@ -793,9 +841,9 @@ COPY public.clients (id_client, nom, prenom, email, telephone, adresse, created_
 -- Data for Name: employes; Type: TABLE DATA; Schema: public; Owner: root
 --
 
-COPY public.employes (id_employe, nom, prenom, role, created_at, updated_at, password) FROM stdin;
-2	user	prenom	user	2025-01-27 02:04:40.813077	2025-01-27 02:04:40.813077	$2a$10$WilGubwNhqkCTtjm3NI8O.WUny5BRaD7rgCnJ.h/krQSTYtU1uCFu
-4	admin	administrateur	admin	2025-01-28 00:23:49.933132	2025-01-28 00:23:49.933132	$2a$10$76WZfvrWTE5K0LUn9WWE9.ecnlZlAKyT.GI0i3Mk1YnIf8nEnjoUy
+COPY public.employes (id_employe, nom, prenom, role, created_at, updated_at, password, actif) FROM stdin;
+4	admin	administrateur	ADMIN	2025-01-28 00:23:49.933132	2025-01-28 00:23:49.933132	$2a$10$76WZfvrWTE5K0LUn9WWE9.ecnlZlAKyT.GI0i3Mk1YnIf8nEnjoUy	t
+2	user	prenom	USER	2025-01-27 02:04:40.813077	2025-01-27 02:04:40.813077	$2a$10$WilGubwNhqkCTtjm3NI8O.WUny5BRaD7rgCnJ.h/krQSTYtU1uCFu	t
 \.
 
 
@@ -828,6 +876,10 @@ COPY public.lignes_achats (id_lignes_achat, lot_id, prix_achat, quantite, create
 50	\N	15.00	2	2025-02-07 05:38:15.243491	2025-02-07 05:38:15.243491	16	20	f
 46	\N	12.00	2	2025-02-07 05:01:48.834816	2025-02-07 05:01:48.834816	21	22	f
 47	\N	12.00	2	2025-02-07 05:02:07.399272	2025-02-07 05:02:07.399272	21	22	f
+51	\N	32.00	3	2025-02-08 09:17:19.205409	2025-02-08 09:17:19.205409	20	23	t
+52	\N	32.00	7	2025-02-08 09:28:52.42039	2025-02-08 09:28:52.42039	20	24	t
+53	\N	30.00	10	2025-02-08 09:29:10.78148	2025-02-08 09:29:10.78148	17	24	f
+54	\N	32.00	10	2025-02-08 09:29:32.265185	2025-02-08 09:29:32.265185	20	24	t
 \.
 
 
@@ -875,6 +927,11 @@ COPY public.mouvement_stock (id, reference, produit_id, quantite, type_mouvement
 61	ACH_22_LIG_47_DEL	21	2	4	2025-02-07 05:58:14.859257	Eve inverse pour ajuster le stock 	2025-02-07 05:58:14.859257	\N	22	47
 62	ACH_22_LIG_49_DEL	17	1	4	2025-02-07 05:58:14.865194	Eve inverse pour ajuster le stock 	2025-02-07 05:58:14.865194	\N	22	49
 63	ACH_22_LIG_48_DEL	21	3	4	2025-02-07 05:58:14.86936	Eve inverse pour ajuster le stock 	2025-02-07 05:58:14.86936	\N	22	48
+64	ACH_23_LIG_51	20	3	1	2025-02-08 09:17:19.222704	Généré à partir de la ligne d'un achat	2025-02-08 09:17:19.222704	\N	23	51
+65	ACH_24_LIG_52	20	7	1	2025-02-08 09:28:52.426618	Généré à partir de la ligne d'un achat	2025-02-08 09:28:52.426618	\N	24	52
+66	ACH_24_LIG_53	17	10	1	2025-02-08 09:29:10.788519	Généré à partir de la ligne d'un achat	2025-02-08 09:29:10.788519	\N	24	53
+67	ACH_24_LIG_53_DEL	17	10	4	2025-02-08 09:29:25.480913	Eve inverse pour ajuster le stock 	2025-02-08 09:29:25.480913	\N	24	53
+68	ACH_24_LIG_54	20	10	1	2025-02-08 09:29:32.273042	Généré à partir de la ligne d'un achat	2025-02-08 09:29:32.273042	\N	24	54
 \.
 
 
@@ -910,10 +967,31 @@ COPY public.retours (id_retour, vente_id, produit_id, quantite, raison, created_
 
 
 --
+-- Data for Name: role_authority; Type: TABLE DATA; Schema: public; Owner: root
+--
+
+COPY public.role_authority (id_role, id_authority) FROM stdin;
+\.
+
+
+--
+-- Data for Name: role_employe; Type: TABLE DATA; Schema: public; Owner: root
+--
+
+COPY public.role_employe (id_employe, id_role) FROM stdin;
+\.
+
+
+--
 -- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: root
 --
 
 COPY public.roles (id_role, nom, description) FROM stdin;
+1	ADMIN	Administrateur ayant tous les droits
+2	GESTIONNAIRE_STOCK	Responsable de la gestion des stocks
+3	VENDEUR	Employé chargé des ventes
+4	COMPTABLE	Responsable des finances
+5	Role Test	\N
 \.
 
 
@@ -950,7 +1028,14 @@ COPY public.ventes (id_ventes, client_id, date_vente, montant_total, created_at,
 -- Name: achats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.achats_id_seq', 22, true);
+SELECT pg_catalog.setval('public.achats_id_seq', 24, true);
+
+
+--
+-- Name: authority_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
+--
+
+SELECT pg_catalog.setval('public.authority_id_seq', 8, true);
 
 
 --
@@ -985,7 +1070,7 @@ SELECT pg_catalog.setval('public.fournisseurs_id_seq', 1, false);
 -- Name: lignes_achats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.lignes_achats_id_seq', 50, true);
+SELECT pg_catalog.setval('public.lignes_achats_id_seq', 54, true);
 
 
 --
@@ -999,7 +1084,7 @@ SELECT pg_catalog.setval('public.lignes_ventes_id_seq', 28, true);
 -- Name: mouvement_stock_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.mouvement_stock_id_seq', 63, true);
+SELECT pg_catalog.setval('public.mouvement_stock_id_seq', 68, true);
 
 
 --
@@ -1027,7 +1112,7 @@ SELECT pg_catalog.setval('public.retours_id_seq', 1, false);
 -- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.roles_id_seq', 1, false);
+SELECT pg_catalog.setval('public.roles_id_seq', 5, true);
 
 
 --
@@ -1041,7 +1126,7 @@ SELECT pg_catalog.setval('public.types_mouvement_stock_id_seq', 10, true);
 -- Name: ventes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: root
 --
 
-SELECT pg_catalog.setval('public.ventes_id_seq', 26, true);
+SELECT pg_catalog.setval('public.ventes_id_seq', 27, true);
 
 
 --
@@ -1050,6 +1135,22 @@ SELECT pg_catalog.setval('public.ventes_id_seq', 26, true);
 
 ALTER TABLE ONLY public.achats
     ADD CONSTRAINT achats_pkey PRIMARY KEY (id_achat);
+
+
+--
+-- Name: authority authority_pk; Type: CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.authority
+    ADD CONSTRAINT authority_pk PRIMARY KEY (id);
+
+
+--
+-- Name: authority authority_pk_2; Type: CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.authority
+    ADD CONSTRAINT authority_pk_2 UNIQUE (nom);
 
 
 --
@@ -1157,11 +1258,27 @@ ALTER TABLE ONLY public.retours
 
 
 --
--- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: root
+-- Name: role_authority role_authority_pk; Type: CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.role_authority
+    ADD CONSTRAINT role_authority_pk PRIMARY KEY (id_authority, id_role);
+
+
+--
+-- Name: role_employe role_employe_pk; Type: CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.role_employe
+    ADD CONSTRAINT role_employe_pk PRIMARY KEY (id_employe, id_role);
+
+
+--
+-- Name: roles roles_pk; Type: CONSTRAINT; Schema: public; Owner: root
 --
 
 ALTER TABLE ONLY public.roles
-    ADD CONSTRAINT roles_pkey PRIMARY KEY (id_role);
+    ADD CONSTRAINT roles_pk PRIMARY KEY (id_role);
 
 
 --
@@ -1293,11 +1410,35 @@ ALTER TABLE ONLY public.retours
 
 
 --
--- Name: employes_roles utilisateurs_roles_id_role_fkey; Type: FK CONSTRAINT; Schema: public; Owner: root
+-- Name: role_authority role_authority_authority_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: root
 --
 
-ALTER TABLE ONLY public.employes_roles
-    ADD CONSTRAINT utilisateurs_roles_id_role_fkey FOREIGN KEY (id_role) REFERENCES public.roles(id_role) ON DELETE CASCADE;
+ALTER TABLE ONLY public.role_authority
+    ADD CONSTRAINT role_authority_authority_id_fk FOREIGN KEY (id_authority) REFERENCES public.authority(id);
+
+
+--
+-- Name: role_authority role_authority_roles_id_role_fk; Type: FK CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.role_authority
+    ADD CONSTRAINT role_authority_roles_id_role_fk FOREIGN KEY (id_role) REFERENCES public.roles(id_role);
+
+
+--
+-- Name: role_employe role_employe_id_employe_fk; Type: FK CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.role_employe
+    ADD CONSTRAINT role_employe_id_employe_fk FOREIGN KEY (id_employe) REFERENCES public.employes(id_employe);
+
+
+--
+-- Name: role_employe role_employe_roles_id_role_fk; Type: FK CONSTRAINT; Schema: public; Owner: root
+--
+
+ALTER TABLE ONLY public.role_employe
+    ADD CONSTRAINT role_employe_roles_id_role_fk FOREIGN KEY (id_role) REFERENCES public.roles(id_role);
 
 
 --
