@@ -14,14 +14,21 @@ import java.time.LocalDateTime;
 public class ProduitPostDto {
 
     private String nom;
+
     private String description;
+
     private String image;
+
     @NotNull(message = "La quantité est obligatoire")
     private Integer quantity;
+
     @NotNull(message = "Le prix unitaire est obligatoire")
     private Double prixUnitaire;
+
     private Integer categorieId;
+
     private Integer seuilProduit;
+
     private LocalDateTime creationDate;
 
     private Integer stockInitial;

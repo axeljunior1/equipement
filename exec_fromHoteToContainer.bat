@@ -1,10 +1,10 @@
 @echo off
 REM Définir des variables
-set CONTAINER_NAME=Postgresql
-set DB_USER=root
+set CONTAINER_NAME=dev
+set DB_USER=user
 set DB_NAME=dev
 set IMPORT_FILE=export.sql
-set SRC_PATH=C:\work\Projets\Dossier\equipement\src\main\resources\static
+set SRC_PATH=C:\Users\Axel\IdeaProjects\equipement\src\main\resources\static
 
 REM Informer de l'opération en cours
 echo Copie du fichier %IMPORT_FILE% vers le conteneur %CONTAINER_NAME%...
