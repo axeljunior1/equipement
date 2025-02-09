@@ -1,9 +1,11 @@
 package com.projet.equipement.dto.employe;
 
+import com.projet.equipement.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -12,4 +14,6 @@ public class EmployeUpdateDto {
     private String nom;
     private String prenom;
     private LocalDateTime dateCreation;
+    private Boolean actif;
+    private Set<Role> roles = new HashSet<>();
 }

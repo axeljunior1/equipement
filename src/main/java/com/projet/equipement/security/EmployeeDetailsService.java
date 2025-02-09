@@ -26,7 +26,7 @@ public class EmployeeDetailsService implements UserDetailsService {
         return User.builder()
                 .username(employe.getNom())
                 .password(employe.getPassword()) // Spring Security vérifiera automatiquement le mot de passe
-                .roles("user")
+                .roles("ADMIN")
                 .build();
     }
 }

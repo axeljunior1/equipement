@@ -32,7 +32,7 @@ public class AuthController {
             String token = jwtUtil.generateToken(loginRequest.getUsername());
             return ResponseEntity.ok().body( new JwtResponse(token, new EmployeGetDto(employeService.findByUsername(loginRequest.getUsername()))));
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(401).body("Nom ou mot de passe incorrect.");
+            return ResponseEntity.status(401).body("Nom ou mot de passe incorrect. =>"+ jwtUtil.generateToken(loginRequest.getUsername()));
         }
     }
 

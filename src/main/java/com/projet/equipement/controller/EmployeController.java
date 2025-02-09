@@ -2,10 +2,13 @@ package com.projet.equipement.controller;
 
 import com.projet.equipement.dto.employe.EmployePostDto;
 import com.projet.equipement.dto.employe.EmployeUpdateDto;
+import com.projet.equipement.entity.Authority;
 import com.projet.equipement.entity.Employe;
+import com.projet.equipement.repository.AuthorityRepository;
 import com.projet.equipement.services.EmployeService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +18,13 @@ import java.util.List;
 @RestController
 public class EmployeController {
 
-    @Autowired
-    private EmployeService employeService;
+    private final EmployeService employeService;
+    private final AuthorityRepository authorityRepository;
+
+    public EmployeController(EmployeService employeService, AuthorityRepository authorityRepository) {
+        this.employeService = employeService;
+        this.authorityRepository = authorityRepository;
+    }
 
     @GetMapping("")
     public ResponseEntity<List<Employe>> findAllEmployes() {
@@ -28,6 +36,11 @@ public class EmployeController {
          Employe employe = employeService.findById(id);
         return ResponseEntity.ok(employe);
     }
+    @GetMapping("auth")
+    public ResponseEntity<Page<Authority>> findEmployeTest(Pageable pageable) {
+         Page<Authority> authorities = authorityRepository.findAll(pageable);
+        return ResponseEntity.ok(authorities);
+    }
     @GetMapping("/user/{username}")
     public ResponseEntity< Employe> findEmployeByUsername(@PathVariable String username) {
          Employe employe = employeService.findByUsername(username);
@@ -38,6 +51,11 @@ public class EmployeController {
     public ResponseEntity<Employe> addEmploye(@RequestBody EmployePostDto employePostDto) {
        Employe employe = employeService.save(employePostDto);
         return ResponseEntity.ok(employe);
+    }
+    @PostMapping("auth")
+    public ResponseEntity<Authority> addEmploye(@RequestBody Authority authority) {
+       Authority authority1 = authorityRepository.save(authority);
+        return ResponseEntity.ok(authority1);
     }
     
     @PatchMapping("/{id}")
