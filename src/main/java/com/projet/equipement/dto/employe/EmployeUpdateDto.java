@@ -1,6 +1,5 @@
 package com.projet.equipement.dto.employe;
 
-import com.projet.equipement.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +12,8 @@ import java.util.Set;
 public class EmployeUpdateDto {
     private String nom;
     private String prenom;
+    private String password;
     private LocalDateTime dateCreation;
     private Boolean actif;
-    private Set<Role> roles = new HashSet<>();
+    private Set<Long> rolesIds = new HashSet<>();
 }

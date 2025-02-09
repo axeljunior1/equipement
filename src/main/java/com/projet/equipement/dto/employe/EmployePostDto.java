@@ -17,6 +17,6 @@ public class EmployePostDto {
     @NotBlank(message = "Entre le mot de passe")
     private String password;
 
-    private Set<String> roles = new HashSet<>();
+    private Set<Long> rolesIds = new HashSet<>();
     private LocalDateTime dateCreation;
 }

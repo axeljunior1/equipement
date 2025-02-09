@@ -23,6 +23,8 @@ public class Role {
     @Column(nullable = false, unique = true, name = "nom")
     private String nom;  // ex: ROLE_ADMIN, ROLE_USER
 
+    private String description;  // ex: ROLE_ADMIN, ROLE_USER
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_authority",

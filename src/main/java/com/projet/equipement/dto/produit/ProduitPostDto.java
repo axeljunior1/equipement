@@ -29,9 +29,9 @@ public class ProduitPostDto {
 
     private Integer seuilProduit;
 
-    private LocalDateTime creationDate;
 
     private Integer stockInitial;
+    private LocalDateTime creationDate;
 
 
 
