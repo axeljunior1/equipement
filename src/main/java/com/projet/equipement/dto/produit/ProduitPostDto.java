@@ -25,7 +25,7 @@ public class ProduitPostDto {
     @NotNull(message = "Le prix unitaire est obligatoire")
     private Double prixUnitaire;
 
-    private Integer categorieId;
+    private Long categorieId;
 
     private Integer seuilProduit;
 

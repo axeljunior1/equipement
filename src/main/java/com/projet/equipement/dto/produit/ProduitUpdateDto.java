@@ -20,8 +20,7 @@ public class ProduitUpdateDto {
     @NotNull(message = "Le prix unitaire est obligatoire")
     private Double prixUnitaire;
     private Integer seuilProduit;
-    private Integer categorieId;
-
+    private Long categorieId;
 
     private byte[] qrCode;
 
