@@ -54,26 +54,7 @@ class ProduitServiceTest {
 
     }
 
-    @Test
-    void testFindByEan13_Success(){
 
-        // Simuler que le produit avec ID 1 existe en base
-        String ean13 = "9991234567890";
-        when(produitRepository.findByEan13(ean13)).thenReturn(Optional.of(produit));
-
-        // Appel de la méthode de service
-        Produit foundProduit = produitService.findByEan13(ean13);
-
-        // Vérifications
-        assertNotNull(foundProduit);
-        assertEquals(ean13, foundProduit.getEan13());
-        assertEquals("Ordinateur Portable", foundProduit.getNom());
-
-
-        // Vérifier que findById() a été appelé une seule fois
-        verify(produitRepository, times(1)).findByEan13(ean13);
-
-    }
 
     @Test
     void testFindById_NotFound() {

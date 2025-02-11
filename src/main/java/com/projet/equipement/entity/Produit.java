@@ -24,6 +24,7 @@ public class Produit {
 
     @Column(nullable = false)
     private String nom;
+
     @Column(nullable = false)
     private String description;
 

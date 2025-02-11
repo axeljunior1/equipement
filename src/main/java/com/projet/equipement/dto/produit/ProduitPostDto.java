@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.produit;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -13,18 +14,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ProduitPostDto {
 
+    @NotBlank
     private String nom;
 
+    @NotBlank
     private String description;
 
     private String image;
 
-    @NotNull(message = "La quantité est obligatoire")
-    private Integer quantity;
-
     @NotNull(message = "Le prix unitaire est obligatoire")
     private Double prixUnitaire;
 
+    @NotNull
     private Long categorieId;
 
     private Integer seuilProduit;

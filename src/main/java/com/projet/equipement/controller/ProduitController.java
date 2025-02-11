@@ -6,6 +6,7 @@ import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.services.ProduitService;
 import com.projet.equipement.specifications.ProduitSpecification;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,8 +34,8 @@ public class ProduitController {
 
     @GetMapping("/code-barre/{ean13}")
     public ResponseEntity<ProduitGetDto> findProduitByEan13(@PathVariable String ean13) {
-        Produit produit = produitService.findByEan13(ean13);
-        return ResponseEntity.ok(new ProduitGetDto(produit));
+        ProduitGetDto produit = produitService.findByEan13(ean13);
+        return ResponseEntity.ok(produit);
     }
 
 
@@ -49,13 +50,13 @@ public class ProduitController {
 
 
     @GetMapping("/recherche")
-    public ResponseEntity<List<Produit>> rechercherProduits(@RequestParam String motCle) {
-        List<Produit> produits = produitService.rechercherProduits(motCle);
+    public ResponseEntity<List<ProduitGetDto>> rechercherProduits(@RequestParam String motCle) {
+        List<ProduitGetDto> produits = produitService.rechercherProduits(motCle);
         return ResponseEntity.ok(produits);
     }
 
     @GetMapping("/recherche-dynamique")
-    public List<Produit> filterProduits(
+    public List<ProduitGetDto> filterProduits(
             @RequestParam(required = false) String nom,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Boolean actif,
@@ -74,15 +75,14 @@ public class ProduitController {
     }
 
     @PostMapping
-    public ResponseEntity<Produit> addProduit( @RequestBody  ProduitPostDto produitPostDto) {
-        Produit produit = produitService.save(produitPostDto);
+    public ResponseEntity<ProduitGetDto> addProduit(@Valid @RequestBody  ProduitPostDto produitPostDto) {
+        ProduitGetDto produit = produitService.save(produitPostDto);
         return ResponseEntity.ok(produit);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Produit> updateProduit(@PathVariable Long id, @RequestBody ProduitUpdateDto produitUpdateDto) {
-        Produit produit = produitService.updateProduit(produitUpdateDto, id);
-        System.out.println(produit);
+    public ResponseEntity<ProduitGetDto> updateProduit(@PathVariable Long id, @RequestBody ProduitUpdateDto produitUpdateDto) {
+        ProduitGetDto produit = produitService.updateProduit(produitUpdateDto, id);
         return ResponseEntity.ok(produit);
     }
 

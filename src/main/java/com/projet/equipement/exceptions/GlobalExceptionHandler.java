@@ -31,18 +31,27 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    // ✅ Gestion des erreurs de validation -> 400
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
+    public ResponseEntity<ApiError> handleValidationExceptions(
+            MethodArgumentNotValidException ex, WebRequest request) {
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation Error",
+                "Des erreurs de validation ont été détectées",
+                request.getDescription(false),
+                errors
+        );
+
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }
+
+
 
     // ✅ Gestion des autres exceptions -> 500
     @ExceptionHandler(Exception.class)
