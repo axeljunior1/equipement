@@ -13,7 +13,7 @@ public class AchatGetDto {
 
     private Long id ;
 
-    private Integer montantTotal;
+    private Double montantTotal;
 
     private Long employeId;
 

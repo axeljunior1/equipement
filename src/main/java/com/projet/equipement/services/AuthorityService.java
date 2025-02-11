@@ -4,6 +4,8 @@ package com.projet.equipement.services;
 import com.projet.equipement.entity.Authority;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.AuthorityRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +18,8 @@ public class AuthorityService {
         this.authorityRepository = authorityRepository;
     }
 
-    public List<Authority> findAll() {
-        return authorityRepository.findAll();
+    public Page<Authority> findAll(Pageable pageable) {
+        return authorityRepository.findAll(pageable);
     }
 
     public Authority findById(Long id) {
@@ -25,14 +27,13 @@ public class AuthorityService {
                 .orElseThrow(() -> new EntityNotFoundException("Authority", id));
     }
 
-    public Authority findById(String nom) {
+    public Authority findByNom(String nom) {
         return authorityRepository.findByNom(nom)
                 .orElseThrow(() -> new EntityNotFoundException("Authority", String.valueOf(nom)));
     }
 
 
     public Authority save(Authority authority) {
-        System.out.println(authorityRepository.findByNom(authority.getNom()));
         return authorityRepository.save(authority);
     }
 

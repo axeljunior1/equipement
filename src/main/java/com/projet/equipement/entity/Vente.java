@@ -21,7 +21,7 @@ public class Vente {
     private Long id;
 
     @Column(name = "montant_total")
-    private Integer montantTotal;
+    private Double montantTotal;
 
     @Column(name = "actif")
     private Boolean actif;

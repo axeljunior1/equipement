@@ -24,6 +24,7 @@ public class VenteMapper {
         vente.setMontantTotal(ventePostDto.getMontantTotal());
         vente.setClient(client);
         vente.setEmploye(employe);
+        vente.setActif(true);
         vente.setDateDerniereMiseAJour(ventePostDto.getDateDerniereMiseAjour());
         return vente;
     }

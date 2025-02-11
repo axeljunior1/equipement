@@ -1,5 +1,6 @@
 package com.projet.equipement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -33,6 +34,11 @@ public class Role {
     )
     @NotNull(message = "Entre les autorisations")
     private Set<Authority> authorities = new HashSet<>();
+
+
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
+    private Set<Employe> employes = new HashSet<>();
 
 
 }

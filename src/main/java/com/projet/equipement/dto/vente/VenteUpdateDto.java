@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class VenteUpdateDto {
 
-    private Integer montantTotal;
+    private Double montantTotal;
 
     private LocalDateTime dateDerniereMiseAjour;
 

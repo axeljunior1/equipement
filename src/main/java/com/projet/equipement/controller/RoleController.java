@@ -1,12 +1,16 @@
 package com.projet.equipement.controller;
 
+import com.projet.equipement.dto.role.achat.RoleGetDto;
 import com.projet.equipement.dto.role.achat.RolePostDto;
+import com.projet.equipement.dto.role.achat.RoleUpdateDto;
 import com.projet.equipement.entity.Authority;
 import com.projet.equipement.entity.Role;
 import com.projet.equipement.mapper.RoleMapper;
 import com.projet.equipement.repository.RoleRepository;
 import com.projet.equipement.services.AuthorityService;
 import com.projet.equipement.services.RoleService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,27 +23,27 @@ import java.util.stream.Collectors;
 public class RoleController {
 
     private final RoleService roleService;
-    private final AuthorityService authorityService;
-    private final RoleMapper roleMapper;
-    private final RoleRepository roleRepository;
 
-    public RoleController(RoleService roleService, AuthorityService authorityService, RoleMapper roleMapper, RoleRepository roleRepository) {
+    public RoleController(RoleService roleService) {
         this.roleService = roleService;
-        this.authorityService = authorityService;
-        this.roleMapper = roleMapper;
-        this.roleRepository = roleRepository;
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Role>> findAllRoles() {
-        List<Role> roles = roleService.findAll();
+    public ResponseEntity<Page<Role>> findAllRoles(Pageable pageable) {
+        Page<Role> roles = roleService.findAll(pageable);
         return ResponseEntity.ok(roles);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Role> findRole(@PathVariable Long id) {
+    public ResponseEntity<RoleGetDto> findRole(@PathVariable Long id) {
         Role role = roleService.findById(id);
-        return ResponseEntity.ok(role);
+        return ResponseEntity.ok(new RoleGetDto(role));
+    }
+
+    @GetMapping("/name/{nom}")
+    public ResponseEntity<RoleGetDto> findRoleByNom(@PathVariable String nom) {
+        Role role = roleService.findByNom(nom);
+        return ResponseEntity.ok(new RoleGetDto(role));
     }
 
 
@@ -47,6 +51,18 @@ public class RoleController {
     public ResponseEntity<Role> addRole(@RequestBody RolePostDto rolePostDto) {
         Role role = roleService.save(rolePostDto);
         return ResponseEntity.ok(role);
+    }
+
+    @PatchMapping("/patch/{id}")
+    public ResponseEntity<Role> updateRole(@RequestBody RoleUpdateDto roleUpdateDto, @PathVariable Long id) {
+//        Role role = roleService.update(id, roleUpdateDto);
+        return ResponseEntity.ok(new Role());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Role> updateRolePut(@RequestBody RoleUpdateDto roleUpdateDto, @PathVariable Long id) {
+        Role role = roleService.put(id, roleUpdateDto);
+        return ResponseEntity.ok(new Role());
     }
 
 

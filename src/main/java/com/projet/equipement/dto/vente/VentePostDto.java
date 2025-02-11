@@ -6,6 +6,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,12 +18,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class VentePostDto {
 
-    private Integer montantTotal;
+    @NotNull
+    private Double montantTotal;
 
     private LocalDateTime dateDerniereMiseAjour;
 
+    @NotNull
     private Long clientId;
+    @NotNull
 
+    @NotNull
     private Long employeId;
+
+    private Boolean actif ;
 
 }

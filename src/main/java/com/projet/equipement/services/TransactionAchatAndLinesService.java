@@ -43,6 +43,19 @@ public class TransactionAchatAndLinesService {
         this.employeService = employeService;
     }
 
+
+    @Transactional
+    public void updateTotalAchat(Long achatId) {
+        Achat achat = achatRepository.findById(achatId)
+                .orElseThrow(() -> new EntityNotFoundException("Achat", achatId));
+
+        Double total = ligneAchatRepository.sumTotalByAchatId(achatId);
+        achat.setMontantTotal(total != null ? total : 0.0);
+
+        achatRepository.save(achat);
+    }
+
+
     @Transactional
     public void softDeleteAchat(Long id){
 
@@ -149,6 +162,10 @@ public class TransactionAchatAndLinesService {
 
         LigneAchat saveLigneAchat = ligneAchatRepository.save(ligneAchatToPost);
 
+        // Modifie le total de l'achat lors de la save d'une ligne
+
+        updateTotalAchat(saveLigneAchat.getAchat().getId());
+
         LocalDateTime dateCreate = LocalDateTime.now();
         // Enregistrement du mouvement de stock via le service dédié
         mouvementStockService.save(MouvementStockPostDto.builder()
@@ -167,6 +184,7 @@ public class TransactionAchatAndLinesService {
         return saveLigneAchat;
     }
 
+    @Transactional
     public Achat saveAchat(AchatPostDto achatPostDto) {
 //        Set<Role> roles = achat.getRoles();
         Employe employe = null;
@@ -175,9 +193,15 @@ public class TransactionAchatAndLinesService {
         }
         Achat achat =  achatMapper.postAchatDto(achatPostDto, employe);
 
-        return achatRepository.save(achat);
+        // Sauvegarde de l'achat pour obtenir l'id
+        Achat achatSansTotal = achatRepository.save(achat);
+        // Mise a jour du total
+        updateTotalAchat(achatSansTotal.getId());
+
+        return achatSansTotal;
     }
 
+    @Transactional
     public LigneAchat updateLigneAchat(LigneAchatUpdateDto ligneAchatUpdateDto, Long id) {
         LigneAchat ligneAchat = this.findByIdLine(id);
 
@@ -190,7 +214,10 @@ public class TransactionAchatAndLinesService {
             produit = produitService.findById(Long.valueOf(ligneAchatUpdateDto.getProduitId())) ;
         }
         ligneAchatMapper.updateLigneAchatFromDto(ligneAchatUpdateDto, ligneAchat, achat, produit);
-        return ligneAchatRepository.save(ligneAchat);
+        LigneAchat savedLine = ligneAchatRepository.save(ligneAchat);
+        //mise a jour du total
+        updateTotalAchat(savedLine.getAchat().getId());
+        return savedLine;
     }
 
 

@@ -978,7 +978,7 @@ COPY public.role_authority (id_role, id_authority) FROM stdin;
 -- Data for Name: role_employe; Type: TABLE DATA; Schema: public; Owner: root
 --
 
-COPY public.role_employe (id_employe, id_role) FROM stdin;
+COPY public.role_employe (id_employ, id_role) FROM stdin;
 \.
 
 
@@ -1270,7 +1270,7 @@ ALTER TABLE ONLY public.role_authority
 --
 
 ALTER TABLE ONLY public.role_employe
-    ADD CONSTRAINT role_employe_pk PRIMARY KEY (id_employe, id_role);
+    ADD CONSTRAINT role_employe_pk PRIMARY KEY (id_employ, id_role);
 
 
 --
@@ -1430,7 +1430,7 @@ ALTER TABLE ONLY public.role_authority
 --
 
 ALTER TABLE ONLY public.role_employe
-    ADD CONSTRAINT role_employe_id_employe_fk FOREIGN KEY (id_employe) REFERENCES public.employes(id_employe);
+    ADD CONSTRAINT role_employe_id_employe_fk FOREIGN KEY (id_employ) REFERENCES public.employes(id_employe);
 
 
 --

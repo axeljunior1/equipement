@@ -17,7 +17,7 @@ public class EmployeGetDto {
     private String prenom;
     private Boolean actif;
     private Set<Long> rolesIds = new HashSet<>();
-    private Set<String> rolesNames = new HashSet<>();
+    private Set<String> rolesNoms = new HashSet<>();
     private Set<Role> roles = new HashSet<>();
 
 //    private String role;
@@ -35,12 +35,12 @@ public class EmployeGetDto {
         }
         if (employe.getRoles() != null) {
             for (Role role : employe.getRoles()) {
-                rolesIds.add(role.getId());
+                this.rolesIds.add(role.getId());
             }
         }
         if (employe.getRoles() != null) {
             for (Role role : employe.getRoles()) {
-                rolesNames.add(role.getNom());
+                this.rolesNoms.add(role.getNom());
             }
         }
     }

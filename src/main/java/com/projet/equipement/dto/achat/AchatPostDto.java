@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class AchatPostDto {
 
-    private Integer montantTotal;
+    private Double montantTotal;
 
     private Long employeId;
 

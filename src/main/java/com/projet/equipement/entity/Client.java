@@ -2,6 +2,7 @@ package com.projet.equipement.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,10 +21,14 @@ public class Client {
     @Id
     @Column(name = "id_client")
     private Long id;
+    @NotBlank(message = "Le nom d'utilisateur ne peut pas être vide")
+    @Column(name = "nom", nullable = false, length = 50)
     private String nom;
     private String prenom;
     @Column()
     private String email;
+
+    @NotBlank(message = "Le telephone doit etre renseigné !")
     private String telephone;
 
 

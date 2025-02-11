@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AchatUpdateDto {
 
-    private Integer montantTotal;
+    private Double montantTotal;
 
 //    private LocalDateTime dateDerniereMiseAjour;
 

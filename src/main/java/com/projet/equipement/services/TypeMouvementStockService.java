@@ -30,6 +30,14 @@ public class TypeMouvementStockService {
         return typeMouvementStockRepository.findByCode(code).orElseThrow(() -> new EntityNotFoundException("TypeMouvementStock", code));
     }
 
+    public TypeMouvementStock save(TypeMouvementStock entity) {
+        return typeMouvementStockRepository.save(entity);
+    }
+
+    public void delete(TypeMouvementStock entity) {
+        typeMouvementStockRepository.delete(entity);
+    }
+
 
 
 }

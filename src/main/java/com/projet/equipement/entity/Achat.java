@@ -21,7 +21,7 @@ public class Achat {
     private Long id;
 
     @Column(name = "montant_total")
-    private Integer montantTotal;
+    private Double montantTotal;
 
     @Column(name = "updated_at")
     private LocalDateTime dateDerniereMiseAJour;

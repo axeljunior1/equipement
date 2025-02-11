@@ -1,8 +1,6 @@
 package com.projet.equipement.dto.mvt_stk;
 
 import com.projet.equipement.entity.TypeMouvementStock;
-import com.projet.equipement.entity.enumeration.TypeMouvement;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;

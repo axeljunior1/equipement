@@ -2,10 +2,10 @@ package com.projet.equipement.controller;
 
 import com.projet.equipement.entity.Authority;
 import com.projet.equipement.services.AuthorityService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequestMapping("/autorisations")
 @RestController
@@ -18,13 +18,20 @@ public class AuthorityController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Authority>> findAllAuthorities() {
-        List<Authority> authorities = authorityService.findAll();
+    public ResponseEntity<Page<Authority>> findAllAuthorities(Pageable pageable) {
+        Page<Authority> authorities = authorityService.findAll(pageable);
         return ResponseEntity.ok( authorities) ;
     }
+
     @GetMapping("/{id}")
     public ResponseEntity< Authority> findAuthority(@PathVariable Long id) {
          Authority authority = authorityService.findById(id);
+        return ResponseEntity.ok(authority);
+    }
+
+    @GetMapping("/nom/{nom}")
+    public ResponseEntity< Authority> findAuthorityByNom(@PathVariable String nom) {
+         Authority authority = authorityService.findByNom(nom);
         return ResponseEntity.ok(authority);
     }
 

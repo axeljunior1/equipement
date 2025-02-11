@@ -37,6 +37,13 @@ public class VenteController {
         this.transactionVenteAndLinesService = transactionVenteAndLinesService;
     }
 
+    @PostMapping("/test")
+    public ResponseEntity<String> poste(@Valid @RequestBody ClientPostDto clientPostDto){
+
+        System.out.println("test");
+        return ResponseEntity.ok("Ok");
+    }
+
     @GetMapping("")
     public ResponseEntity<Page<VenteGetDto>> findAllVentes(Pageable pageable) {
         Page<Vente> ventes = transactionVenteAndLinesService.findAllVentes(pageable);
@@ -76,15 +83,19 @@ public class VenteController {
 
 @PostMapping("/createVenteNLignes")
 @Transactional // Active la gestion transactionnelle
-public ResponseEntity<Vente> createVenteNLignes( @RequestBody Caisse caisse) {
+public ResponseEntity<Vente> createVenteNLignes( @Valid @RequestBody Caisse caisse) {
 
     Optional<Client> cli = clientRepository.findByTelephone(caisse.getClientTelephone());
     if (cli.isEmpty()) {
+        if(caisse.clientTelephone.isEmpty() || caisse.clientTelephone.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
         ClientPostDto clientPostDto = ClientPostDto.builder()
                 .telephone(caisse.getClientTelephone())
                 .nom(caisse.getClientNom())
                 .pronom(caisse.getClientPrenom())
                 .email(caisse.getClientEmail())
+
                 .build();
         cli = Optional.ofNullable(clientService.save(clientPostDto));
     }
@@ -96,6 +107,7 @@ public ResponseEntity<Vente> createVenteNLignes( @RequestBody Caisse caisse) {
             .montantTotal(caisse.getVenteMontantTotal())
             .employeId(caisse.getVenteEmployeId())
             .dateDerniereMiseAjour(LocalDateTime.now())
+            .actif(true)
             .build();
     Vente vente = transactionVenteAndLinesService.saveVente(ventePostDto);
 

@@ -66,7 +66,14 @@ public class EmployeService {
 //        Set<Role> roles = new HashSet<>();
         Set<Role> roles = employeUpdateDto.getRolesIds().stream().map(roleService::findById).collect(Collectors.toSet());
         employeMapper.updateEmployeFromDto(employeUpdateDto, employe, roles);
-        employe.setPassword(passwordEncoder.encode(employe.getPassword()));
+        return employeRepository.save(employe);
+    }
+
+    public Employe putEmploye(EmployeUpdateDto employeUpdateDto, Long id) {
+        Employe employe = findById(id);
+//        Set<Role> roles = new HashSet<>();
+        Set<Role> roles = employeUpdateDto.getRolesNoms().stream().map(roleService::findByNom).collect(Collectors.toSet());
+        employeMapper.updateEmployeFromDto(employeUpdateDto, employe, roles);
 
         return employeRepository.save(employe);
     }

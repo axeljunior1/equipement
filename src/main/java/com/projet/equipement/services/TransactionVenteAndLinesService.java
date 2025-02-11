@@ -46,6 +46,18 @@ public class TransactionVenteAndLinesService {
     }
 
 
+    @Transactional
+    public void updateTotalVente(Long venteId) {
+        Vente vente = venteRepository.findById(venteId)
+                .orElseThrow(() -> new EntityNotFoundException("Vente", venteId));
+
+        Double total = ligneVenteRepository.sumTotalByVenteId(venteId);
+        vente.setMontantTotal(total != null ? total : 0.0);
+
+        venteRepository.save(vente);
+    }
+
+
     public Page<LigneVente> findByVenteId(Long id, Pageable pageable) {
         return ligneVenteRepository.findByVenteId(id, pageable);
     }
@@ -99,6 +111,9 @@ public class TransactionVenteAndLinesService {
         LigneVente ligneVenteToPost = ligneVenteMapper.postLigneVenteFromDto(ligneVentePostDto, vente, produit);
 
         LigneVente saveLigneVente = ligneVenteRepository.save(ligneVenteToPost);
+
+        updateTotalVente(saveLigneVente.getVente().getId());
+
 
         LocalDateTime dateCreate = LocalDateTime.now();
         // Enregistrement du mouvement de stock via le service dédié
@@ -172,7 +187,7 @@ public class TransactionVenteAndLinesService {
 
 
     public Page<LigneVente> findAllLine(Pageable pageable) {
-        return ligneVenteRepository.findAll(pageable);
+        return ligneVenteRepository.findAllLine(pageable);
     }
 
     public LigneVente findByIdLine(Long id) {

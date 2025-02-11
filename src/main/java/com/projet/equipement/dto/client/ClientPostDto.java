@@ -1,5 +1,7 @@
 package com.projet.equipement.dto.client;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,7 +12,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClientPostDto {
+    @NotBlank(message = "Le nom est vide ")
     private String nom;
+
+    @NotBlank(message = "Le nom est vide ")
+    @NotNull(message = "Le nom est vide ")
     private String pronom;
     private String email;
     private String telephone;

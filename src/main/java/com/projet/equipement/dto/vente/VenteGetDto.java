@@ -16,7 +16,7 @@ public class VenteGetDto {
 
     private Long id ;
 
-    private Integer montantTotal;
+    private Double montantTotal;
 
     private LocalDateTime dateDerniereMiseAjour;
 

@@ -23,12 +23,10 @@ public class EmployeController {
 
     private final EmployeService employeService;
     private final AuthorityRepository authorityRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public EmployeController(EmployeService employeService, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {
+    public EmployeController(EmployeService employeService, AuthorityRepository authorityRepository) {
         this.employeService = employeService;
         this.authorityRepository = authorityRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("")
@@ -64,8 +62,13 @@ public class EmployeController {
     @PatchMapping("/{id}")
     public ResponseEntity<Employe> updateEmploye(@PathVariable Long id, @Valid @RequestBody EmployeUpdateDto employeUpdateDto) {
         Employe employe = employeService.updateEmploye(employeUpdateDto, id);
-        employe.setPassword(passwordEncoder.encode(employe.getPassword()));
         return ResponseEntity.ok(employe);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeGetDto> updateEmployePut(@PathVariable Long id, @Valid @RequestBody EmployeUpdateDto employeUpdateDto) {
+        Employe employe = employeService.putEmploye(employeUpdateDto, id);
+        return ResponseEntity.ok(new EmployeGetDto(employe));
     }
 
     @DeleteMapping("/{id}")

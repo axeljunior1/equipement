@@ -2,6 +2,9 @@ package com.projet.equipement.dto.role.achat;
 
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Builder
@@ -12,5 +15,8 @@ public class RoleUpdateDto {
     private String nom;
 
     private String description;
+
+    private Set<String> authoritiesNoms = new HashSet<String>();
+
 
 }

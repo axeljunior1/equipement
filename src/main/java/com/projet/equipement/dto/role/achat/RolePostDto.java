@@ -3,6 +3,7 @@ package com.projet.equipement.dto.role.achat;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -14,5 +15,8 @@ public class RolePostDto {
     private String description;
 
     private Set<Long> autoritiesId;
+
+    private Set<String> authoritiesNoms = new HashSet<String>();
+
 
 }

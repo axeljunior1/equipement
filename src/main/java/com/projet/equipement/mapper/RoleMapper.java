@@ -1,6 +1,7 @@
 package com.projet.equipement.mapper;
 
 import com.projet.equipement.dto.role.achat.RolePostDto;
+import com.projet.equipement.dto.role.achat.RoleUpdateDto;
 import com.projet.equipement.entity.Authority;
 import com.projet.equipement.entity.Role;
 import jakarta.validation.constraints.NotNull;
@@ -11,13 +12,11 @@ import java.util.Set;
 @Component
 public class RoleMapper {
 
-//    public void updateRoleFromDto(RoleUpdateDto roleUpdateDto, Role role, Employe employe) {
-//        if (roleUpdateDto.getMontantTotal() != null) role.setMontantTotal(roleUpdateDto.getMontantTotal());
-//        if (roleUpdateDto.getActif() != null) role.setActif(roleUpdateDto.getActif());
-//        if (employe != null) {
-//            role.setEmploye(employe);
-//        }
-//    }
+    public void updateRoleFromDto(RoleUpdateDto roleUpdateDto, Role role, Set<Authority> authorities) {
+        if (roleUpdateDto.getNom() != null) role.setNom(roleUpdateDto.getNom());
+        if (roleUpdateDto.getDescription() != null) role.setDescription(roleUpdateDto.getDescription());
+        if(authorities != null) role.setAuthorities(authorities);
+    }
 
     public Role postRoleDto(RolePostDto rolePostDto, @NotNull Set<Authority> authorities) {
         return Role.builder()

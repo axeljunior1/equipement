@@ -1,12 +1,7 @@
 package com.projet.equipement.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.projet.equipement.entity.enumeration.TypeMouvement;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -32,12 +27,11 @@ public class TypeMouvementStock {
     private String description;
 
     @Column(nullable = false, length = 10)
-    @Enumerated(EnumType.STRING)
-    private TypeMouvement typeMouvement;
+    private String typeMouvement;
 
-    @OneToMany(mappedBy = "typeMouvement")
-    @JsonIgnore
-    private Set<TypeMouvementStock> typeMouvementStocks;
+//    @OneToMany(mappedBy = "typeMouvement")
+//    @JsonIgnore
+//    private Set<TypeMouvementStock> typeMouvementStocks;
 
 
 

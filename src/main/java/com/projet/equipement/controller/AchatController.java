@@ -31,9 +31,9 @@ public class AchatController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Achat> findAchat(@PathVariable Long id) {
+    public ResponseEntity<AchatGetDto> findAchat(@PathVariable Long id) {
         Achat achat = transactionAchatAndLinesService.findByIdAchat(id);
-        return ResponseEntity.ok(achat);
+        return ResponseEntity.ok(new AchatGetDto(achat));
     }
 
     @GetMapping("/{id}/lignes")
