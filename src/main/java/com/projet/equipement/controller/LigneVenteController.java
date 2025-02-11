@@ -47,7 +47,7 @@ public class LigneVenteController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteLigneVente(@PathVariable Long id ) {
-        transactionVenteAndLinesService.SoftdeleteLineById(id);
+        transactionVenteAndLinesService.deleteLinesByIdSoft(id);
         return ResponseEntity.ok("LigneVente deleted");
     }
 

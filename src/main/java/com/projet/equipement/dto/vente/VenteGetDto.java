@@ -40,6 +40,7 @@ public class VenteGetDto {
         this.employeId = vente.getEmploye().getId();
         this.clientNom = vente.getClient().getNom();
         this.employeNom = vente.getEmploye().getNom();
+        this.actif = vente.getActif();
         this.lignesVenteId =  vente.getLigneVentes().stream().map(LigneVente::getId).collect(Collectors.toList()) ;
     }
 }

@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VenteRepository extends JpaRepository<Vente, Long> {
 
+    @Query("select v from Vente v where v.actif = true")
+    Page<Vente> findAllActif(Pageable pageable);
 }

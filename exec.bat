@@ -1,10 +1,10 @@
 @echo off
 REM Définir des variables
-set CONTAINER_NAME=Postgresql
-set DB_USER=root
+set CONTAINER_NAME=dev
+set DB_USER=user
 set DB_NAME=dev
 set EXPORT_FILE=export.sql
-set DEST_PATH=C:\work\Projets\Dossier\equipement\src\main\resources\static
+set DEST_PATH=C:\Users\Axel\IdeaProjects\equipement\src\main\resources\static
 
 REM Informer de l'opération en cours
 echo Export de la base de donnees %DB_NAME% depuis le conteneur %CONTAINER_NAME%...

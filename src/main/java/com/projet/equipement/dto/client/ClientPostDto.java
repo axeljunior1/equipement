@@ -15,9 +15,8 @@ public class ClientPostDto {
     @NotBlank(message = "Le nom est vide ")
     private String nom;
 
-    @NotBlank(message = "Le nom est vide ")
     @NotNull(message = "Le nom est vide ")
-    private String pronom;
+    private String prenom;
     private String email;
     private String telephone;
 

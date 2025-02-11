@@ -37,12 +37,7 @@ public class VenteController {
         this.transactionVenteAndLinesService = transactionVenteAndLinesService;
     }
 
-    @PostMapping("/test")
-    public ResponseEntity<String> poste(@Valid @RequestBody ClientPostDto clientPostDto){
 
-        System.out.println("test");
-        return ResponseEntity.ok("Ok");
-    }
 
     @GetMapping("")
     public ResponseEntity<Page<VenteGetDto>> findAllVentes(Pageable pageable) {
@@ -76,12 +71,15 @@ public class VenteController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteVente(@PathVariable Long id ) {
-        transactionVenteAndLinesService.SoftdeleteLineById(id);
+
+        transactionVenteAndLinesService.softDeleteVente(id);
         return ResponseEntity.ok("Vente deleted");
     }
 
 
-@PostMapping("/createVenteNLignes")
+
+
+    @PostMapping("/createVenteNLignes")
 @Transactional // Active la gestion transactionnelle
 public ResponseEntity<Vente> createVenteNLignes( @Valid @RequestBody Caisse caisse) {
 
@@ -93,7 +91,7 @@ public ResponseEntity<Vente> createVenteNLignes( @Valid @RequestBody Caisse cais
         ClientPostDto clientPostDto = ClientPostDto.builder()
                 .telephone(caisse.getClientTelephone())
                 .nom(caisse.getClientNom())
-                .pronom(caisse.getClientPrenom())
+                .prenom(caisse.getClientPrenom())
                 .email(caisse.getClientEmail())
 
                 .build();

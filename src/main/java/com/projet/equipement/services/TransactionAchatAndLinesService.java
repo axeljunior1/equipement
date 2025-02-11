@@ -61,7 +61,7 @@ public class TransactionAchatAndLinesService {
 
         List<LigneAchat> ligneAchats = this.findByAchatId(id);
         for (LigneAchat ligneAchat : ligneAchats) {
-            this.deleteByIdSoftLine(ligneAchat.getId());
+            this.deleteLinesByIdSoft(ligneAchat.getId());
         }
 
         this.deleteAchatByIdSoft(id);
@@ -82,7 +82,7 @@ public class TransactionAchatAndLinesService {
      * @param id id de la ligne
      */
     @Transactional
-    public void deleteByIdSoftLine(Long id) {
+    public void deleteLinesByIdSoft(Long id) {
         // cet id est l'id de la ligne d'achat
         LigneAchat ligneAchat = this.findByIdLine(id);
         String reference = "ACH_" + ligneAchat.getAchat().getId() + "_LIG_" + ligneAchat.getId() + "_DEL";
@@ -107,6 +107,8 @@ public class TransactionAchatAndLinesService {
         // soft delete de la ligne
         ligneAchat.setActif(false);
         ligneAchatRepository.save(ligneAchat);
+        updateTotalAchat(ligneAchat.getAchat().getId());
+
     }
 
     /**

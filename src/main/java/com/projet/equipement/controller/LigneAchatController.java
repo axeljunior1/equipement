@@ -55,7 +55,7 @@ public class LigneAchatController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteLigneAchat(@PathVariable Long id ) {
-        transactionAchatAndLinesService.deleteByIdSoftLine(id);
+        transactionAchatAndLinesService.deleteLinesByIdSoft(id);
         return ResponseEntity.ok("LigneAchat deleted");
     }
 

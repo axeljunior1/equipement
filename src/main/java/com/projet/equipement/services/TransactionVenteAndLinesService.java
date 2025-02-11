@@ -87,13 +87,17 @@ public class TransactionVenteAndLinesService {
     @Transactional
     public void softDeleteVente(Long id){
 
-        this.SoftdeleteLineById(id);
+        List<LigneVente> ligneVentes = this.findByVenteId(id);
+        for (LigneVente ligneVente : ligneVentes) {
+            this.deleteLinesByIdSoft(ligneVente.getId());
+        }
+
 
         this.deleteVenteByIdSoft(id);
     }
 
     public Page<Vente> findAllVentes(Pageable pageable) {
-        return venteRepository.findAll(pageable);
+        return venteRepository.findAllActif(pageable);
     }
 
 
@@ -118,13 +122,13 @@ public class TransactionVenteAndLinesService {
         LocalDateTime dateCreate = LocalDateTime.now();
         // Enregistrement du mouvement de stock via le service dédié
         mouvementStockService.save(MouvementStockPostDto.builder()
-                .reference( "ACH_" + ligneVentePostDto.getVenteId() + "_LIG_" + saveLigneVente.getId())
+                .reference( "VTE_" + ligneVentePostDto.getVenteId() + "_LIG_" + saveLigneVente.getId())
                 .produitId(Long.valueOf(ligneVentePostDto.getProduitId()))
                 .quantite(ligneVentePostDto.getQuantite())
                 .commentaire("Généré à partir de la ligne d'un vente")
                 .createdAt(dateCreate)
                 .dateMouvement(dateCreate)
-                .typeMouvementCode("ACHAT_MARCHANDISE")
+                .typeMouvementCode("VENTE_PRODUIT")
                 .idEvenementOrigine(Math.toIntExact(saveLigneVente.getVente().getId()))
                 .idLigneOrigine(Math.toIntExact(saveLigneVente.getId()))
                 .build());
@@ -243,7 +247,7 @@ public class TransactionVenteAndLinesService {
 
 
     @Transactional
-    public void SoftdeleteLineById(Long id) {
+    public void deleteLinesByIdSoft(Long id) {
         // cet id est l'id de la ligne d'achat
         LigneVente ligneVente = this.findByIdLine(id);
         String reference = "ACH_" + ligneVente.getVente().getId() + "_LIG_" + ligneVente.getId() + "_DEL";
@@ -258,7 +262,7 @@ public class TransactionVenteAndLinesService {
                 .commentaire("Eve inverse pour ajuster le stock ")
                 .createdAt(dateCreate)
                 .dateMouvement(dateCreate)
-                .typeMouvementCode("RETOUR_FOURNISSEUR")
+                .typeMouvementCode("RETOUR_CLIENT")
                 .idEvenementOrigine(Math.toIntExact(ligneVente.getVente().getId()))
                 .idLigneOrigine(Math.toIntExact(ligneVente.getId()))
                 .build();
@@ -268,6 +272,7 @@ public class TransactionVenteAndLinesService {
         // soft delete de la ligne
         ligneVente.setActif(false);
         ligneVenteRepository.save(ligneVente);
+        updateTotalVente(ligneVente.getVente().getId());
     }
 
 

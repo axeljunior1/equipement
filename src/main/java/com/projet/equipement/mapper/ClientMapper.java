@@ -5,6 +5,8 @@ import com.projet.equipement.dto.client.ClientUpdateDto;
 import com.projet.equipement.entity.Client;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class ClientMapper {
 
@@ -20,9 +22,10 @@ public class ClientMapper {
     public Client postClientDto(ClientPostDto clientPostDto) {
         Client client = new Client();
         client.setNom(clientPostDto.getNom());
-        client.setPrenom(clientPostDto.getPronom());
+        client.setPrenom(clientPostDto.getPrenom());
         client.setEmail(clientPostDto.getEmail());
         client.setTelephone(clientPostDto.getTelephone());
+        client.setDateCreation(LocalDateTime.now());
        return client;
     }
 }
