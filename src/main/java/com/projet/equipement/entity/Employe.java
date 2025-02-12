@@ -26,7 +26,8 @@ public class Employe {
     private String nom;
     private String prenom;
     private String password;
-    private Boolean actif;
+    @Builder.Default
+    private Boolean actif = true;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

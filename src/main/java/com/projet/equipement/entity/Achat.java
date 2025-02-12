@@ -26,8 +26,9 @@ public class Achat {
     @Column(name = "updated_at")
     private LocalDateTime dateDerniereMiseAJour;
 
+    @Builder.Default
     @Column(name = "actif")
-    private Boolean actif;
+    private Boolean actif = true;
 
     @Column(name = "created_at")
     private LocalDateTime dateCreation;

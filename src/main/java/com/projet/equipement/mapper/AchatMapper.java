@@ -1,34 +1,44 @@
 package com.projet.equipement.mapper;
 
+import com.projet.equipement.dto.achat.AchatGetDto;
 import com.projet.equipement.dto.achat.AchatPostDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
-import com.projet.equipement.entity.Client;
-import com.projet.equipement.entity.Employe;
 import com.projet.equipement.entity.Achat;
-import com.projet.equipement.services.ClientService;
-import com.projet.equipement.services.EmployeService;
-import org.springframework.stereotype.Component;
+import com.projet.equipement.entity.Employe;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
-import java.time.LocalDateTime;
+@Mapper(componentModel = "spring", uses = EmployeMapper.class)
+public interface AchatMapper {
 
-@Component
-public class AchatMapper {
 
-    public void updateAchatFromDto(AchatUpdateDto achatUpdateDto, Achat achat, Employe employe) {
-        if (achatUpdateDto.getMontantTotal() != null) achat.setMontantTotal(achatUpdateDto.getMontantTotal());
-        if (achatUpdateDto.getActif() != null) achat.setActif(achatUpdateDto.getActif());
-        if (employe != null) {
-            achat.setEmploye(employe);
-        }
+    @Mapping(source = "employe", target = "employeId", qualifiedByName = "mapEmployeToId")
+    AchatGetDto toDto(Achat achat);
+
+    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
+    Achat toEntity(AchatGetDto achatGetDto);
+
+    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
+    Achat toEntity(AchatPostDto achatGetDto);
+
+
+    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
+    void updateDto( AchatUpdateDto achatUpdateDto, @MappingTarget Achat achat);
+
+
+    @Named("mapEmployeToId")
+    default Long mapEmployeToId(Employe employe){
+        return employe.getId();
     }
 
-    public Achat postAchatDto(AchatPostDto achatPostDto, Employe employe) {
-        Achat achat = Achat.builder()
-                .montantTotal(achatPostDto.getMontantTotal())
-                .employe(employe)
-                .actif(true)
-                .dateCreation(LocalDateTime.now())
-                .build();
-        return achat;
+    @Named("mapIdToEmploye")
+    default Employe mapIdToEmploye(Long id){
+        Employe employe = new Employe();
+        employe.setId(id);
+        return employe;
     }
+
+
 }

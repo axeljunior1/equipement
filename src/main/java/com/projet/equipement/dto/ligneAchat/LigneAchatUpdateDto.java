@@ -11,9 +11,9 @@ public class LigneAchatUpdateDto {
 
     private Integer quantite;
 
-    private Integer achatId;
+    private Long achatId;
 
-    private Integer produitId;
+    private Long produitId;
 
     private Boolean actif;
 

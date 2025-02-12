@@ -1,31 +1,44 @@
 package com.projet.equipement.mapper;
 
+import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
-import com.projet.equipement.entity.Client;
 import com.projet.equipement.entity.Employe;
 import com.projet.equipement.entity.Vente;
-import com.projet.equipement.services.ClientService;
-import com.projet.equipement.services.EmployeService;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
-@Component
-public class VenteMapper {
+@Mapper(componentModel = "spring", uses = EmployeMapper.class)
+public interface VenteMapper {
 
-    public void updateVenteFromDto(VenteUpdateDto venteUpdateDto, Vente vente, Client client, Employe employe) {
-        if (venteUpdateDto.getMontantTotal() != null) vente.setMontantTotal(venteUpdateDto.getMontantTotal());
-        if(venteUpdateDto.getDateDerniereMiseAjour() != null)vente.setDateDerniereMiseAJour(venteUpdateDto.getDateDerniereMiseAjour());
-        if (client != null) vente.setClient(client);
-        if (employe != null) vente.setEmploye(employe);
+
+    @Mapping(source = "employe", target = "employeId", qualifiedByName = "mapEmployeToId")
+    VenteGetDto toDto(Vente vente);
+
+    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
+    Vente toEntity(VenteGetDto venteGetDto);
+
+    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
+    Vente toEntity(VentePostDto venteGetDto);
+
+
+    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
+    void updateDto( VenteUpdateDto venteUpdateDto, @MappingTarget Vente vente);
+
+
+    @Named("mapEmployeToId")
+    default Long mapEmployeToId(Employe employe){
+        return employe.getId();
     }
 
-    public Vente postVenteDto(VentePostDto ventePostDto, Client client, Employe employe) {
-        Vente vente = new Vente();
-        vente.setMontantTotal(ventePostDto.getMontantTotal());
-        vente.setClient(client);
-        vente.setEmploye(employe);
-        vente.setActif(true);
-        vente.setDateDerniereMiseAJour(ventePostDto.getDateDerniereMiseAjour());
-        return vente;
+    @Named("mapIdToEmploye")
+    default Employe mapIdToEmploye(Long id){
+        Employe employe = new Employe();
+        employe.setId(id);
+        return employe;
     }
+
+
 }

@@ -30,15 +30,15 @@ public class EmployeController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<EmployeGetDto>> findAllEmployes() {
-        List<Employe> employes = employeService.findAll();
-        return ResponseEntity.ok(employes.stream().map(EmployeGetDto::new).collect(Collectors.toList()));
+    public ResponseEntity<Page<EmployeGetDto>> findAllEmployes(Pageable pageable) {
+        Page<EmployeGetDto> employes = employeService.findAll(pageable);
+        return ResponseEntity.ok(employes);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeGetDto> findEmploye(@PathVariable Long id) {
-        Employe employe = employeService.findById(id);
-        return ResponseEntity.ok(new EmployeGetDto(employe));
+        EmployeGetDto employe = employeService.findById(id);
+        return ResponseEntity.ok(employe);
     }
 
     @GetMapping("auth")
@@ -48,8 +48,8 @@ public class EmployeController {
     }
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<Employe> findEmployeByUsername(@PathVariable String username) {
-        Employe employe = employeService.findByUsername(username);
+    public ResponseEntity<EmployeGetDto> findEmployeByUsername(@PathVariable String username) {
+        EmployeGetDto employe = employeService.findByUsername(username);
         return ResponseEntity.ok(employe);
     }
 
@@ -60,15 +60,15 @@ public class EmployeController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Employe> updateEmploye(@PathVariable Long id, @Valid @RequestBody EmployeUpdateDto employeUpdateDto) {
-        Employe employe = employeService.updateEmploye(employeUpdateDto, id);
+    public ResponseEntity<EmployeGetDto> updateEmploye(@PathVariable Long id, @Valid @RequestBody EmployeUpdateDto employeUpdateDto) {
+        EmployeGetDto employe = employeService.updateEmploye(employeUpdateDto, id);
         return ResponseEntity.ok(employe);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<EmployeGetDto> updateEmployePut(@PathVariable Long id, @Valid @RequestBody EmployeUpdateDto employeUpdateDto) {
-        Employe employe = employeService.putEmploye(employeUpdateDto, id);
-        return ResponseEntity.ok(new EmployeGetDto(employe));
+        EmployeGetDto employe = employeService.putEmploye(employeUpdateDto, id);
+        return ResponseEntity.ok(employe);
     }
 
     @DeleteMapping("/{id}")

@@ -10,10 +10,13 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.repository.ProduitRepository;
 import com.projet.equipement.utils.EAN13Generator;
+import jakarta.persistence.EntityManager;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -25,11 +28,13 @@ public class ProduitService{
     private final ProduitRepository produitRepository;
     private final ProduitMapper produitMapper;
     private final StockCourantService stockCourantService;
+    private final EntityManager entityManager;
 
-    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, StockCourantService stockCourantService) {
+    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, StockCourantService stockCourantService, EntityManager entityManager) {
         this.produitRepository = produitRepository;
         this.produitMapper = produitMapper;
         this.stockCourantService = stockCourantService;
+        this.entityManager = entityManager;
     }
 
     public Page<ProduitGetDto> findByActif(boolean active, Pageable pageable){
@@ -54,6 +59,8 @@ public class ProduitService{
     public Page<Produit> findAll(Pageable pageable){
         return produitRepository.findAll( pageable);
     }
+
+
     public  Produit findById(Long id){
         return  produitRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
@@ -85,6 +92,7 @@ public class ProduitService{
         return produitList.stream().map(produitMapper::toGetDto).collect(Collectors.toList());
     }
 
+    @Transactional
     public ProduitGetDto save(ProduitPostDto produitPostDto){
         Produit produit = produitMapper.toEntity(produitPostDto);
         // Qrcode et code unique ean13
@@ -92,7 +100,11 @@ public class ProduitService{
         produit.setEan13(EAN_CONST);
         produit.setQrCode(new EAN13Generator().genAndSaveQrCodeByProduct(EAN_CONST));
 
-        Produit saved = produitRepository.save(produit);
+        Produit p = produitRepository.save(produit);
+        Produit saved = produitRepository.findById(p.getId()).orElseThrow(()->new EntityNotFoundException("Produit", p.getId()));
+        // Forcer le chargement de la catégorie (si LAZY)
+
+        entityManager.refresh(saved);
         return produitMapper.toGetDto(saved);
     }
 

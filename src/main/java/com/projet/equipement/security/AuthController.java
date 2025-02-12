@@ -30,7 +30,7 @@ public class AuthController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
             String token = jwtUtil.generateToken(loginRequest.getUsername());
-            return ResponseEntity.ok().body( new JwtResponse(token, new EmployeGetDto(employeService.findByUsername(loginRequest.getUsername()))));
+            return ResponseEntity.ok().body( new JwtResponse(token, employeService.findByUsername(loginRequest.getUsername())));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Nom ou mot de passe incorrect. =>"+ jwtUtil.generateToken(loginRequest.getUsername()));
         }

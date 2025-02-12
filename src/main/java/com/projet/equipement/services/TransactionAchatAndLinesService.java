@@ -1,19 +1,21 @@
 package com.projet.equipement.services;
 
+import com.projet.equipement.dto.achat.AchatGetDto;
 import com.projet.equipement.dto.achat.AchatPostDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
+import com.projet.equipement.dto.ligneAchat.LigneAchatGetDto;
 import com.projet.equipement.dto.ligneAchat.LigneAchatPostDto;
 import com.projet.equipement.dto.ligneAchat.LigneAchatUpdateDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.entity.Achat;
-import com.projet.equipement.entity.Employe;
 import com.projet.equipement.entity.LigneAchat;
-import com.projet.equipement.entity.Produit;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.AchatMapper;
 import com.projet.equipement.mapper.LigneAchatMapper;
 import com.projet.equipement.repository.AchatRepository;
+import com.projet.equipement.repository.EmployeRepository;
 import com.projet.equipement.repository.LigneAchatRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,22 +27,27 @@ import java.util.List;
 @Service
 public class TransactionAchatAndLinesService {
 
-    private final ProduitService produitService;
     private final LigneAchatMapper ligneAchatMapper;
     private final LigneAchatRepository ligneAchatRepository;
     private final MouvementStockService mouvementStockService;
     private final AchatMapper achatMapper;
     private final AchatRepository achatRepository;
-    private final EmployeService employeService;
+    private final EntityManager entityManager;
 
-    public TransactionAchatAndLinesService(ProduitService produitService, LigneAchatMapper ligneAchatMapper, LigneAchatRepository ligneAchatRepository, MouvementStockService mouvementStockService, AchatMapper achatMapper, AchatRepository achatRepository, EmployeService employeService) {
-        this.produitService = produitService;
+    public TransactionAchatAndLinesService(
+                                           LigneAchatMapper ligneAchatMapper,
+                                           LigneAchatRepository ligneAchatRepository,
+                                           MouvementStockService mouvementStockService,
+                                           AchatMapper achatMapper,
+                                           AchatRepository achatRepository,
+                                           EntityManager entityManager
+    ) {
         this.ligneAchatMapper = ligneAchatMapper;
         this.ligneAchatRepository = ligneAchatRepository;
         this.mouvementStockService = mouvementStockService;
         this.achatMapper = achatMapper;
         this.achatRepository = achatRepository;
-        this.employeService = employeService;
+        this.entityManager = entityManager;
     }
 
 
@@ -57,7 +64,7 @@ public class TransactionAchatAndLinesService {
 
 
     @Transactional
-    public void softDeleteAchat(Long id){
+    public void softDeleteAchat(Long id) {
 
         List<LigneAchat> ligneAchats = this.findByAchatId(id);
         for (LigneAchat ligneAchat : ligneAchats) {
@@ -67,24 +74,26 @@ public class TransactionAchatAndLinesService {
         this.deleteAchatByIdSoft(id);
     }
 
-    public Page<LigneAchat> findAllLine(Pageable pageable) {
-        return ligneAchatRepository.findAllLine(pageable);
+    public Page<LigneAchatGetDto> findAllLine(Pageable pageable) {
+        Page<LigneAchat> allLine = ligneAchatRepository.findAllLine(pageable);
+        return allLine.map(ligneAchatMapper::toDto);
     }
 
-    public LigneAchat findByIdLine(Long id) {
-        return ligneAchatRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("LigneAchat", id));
+    public LigneAchatGetDto findLigneAchatById(Long id) {
+        return ligneAchatMapper.toDto(ligneAchatRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("LigneAchat", id)));
     }
 
 
     /**
      * Soft delete
+     *
      * @param id id de la ligne
      */
     @Transactional
     public void deleteLinesByIdSoft(Long id) {
         // cet id est l'id de la ligne d'achat
-        LigneAchat ligneAchat = this.findByIdLine(id);
+        LigneAchat ligneAchat = ligneAchatRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("LigneAchat", id));
         String reference = "ACH_" + ligneAchat.getAchat().getId() + "_LIG_" + ligneAchat.getId() + "_DEL";
 
 
@@ -117,8 +126,9 @@ public class TransactionAchatAndLinesService {
      * @param id id achat
      * @return Page de lignes
      */
-    public Page<LigneAchat> findByAchatId(Long id, Pageable pageable) {
-        return ligneAchatRepository.findByAchatId(id, pageable);
+    public Page<LigneAchatGetDto> findByAchatId(Long id, Pageable pageable) {
+        Page<LigneAchat> byAchatId = ligneAchatRepository.findByAchatId(id, pageable);
+        return byAchatId.map(ligneAchatMapper::toDto);
     }
 
     /**
@@ -132,14 +142,16 @@ public class TransactionAchatAndLinesService {
     }
 
 
-    public Page<Achat> findAllAchat(Pageable pageable) {
-        return achatRepository.findAllPage(pageable);
+    public Page<AchatGetDto> findAllAchat(Pageable pageable) {
+        Page<Achat> allPage = achatRepository.findAllPage(pageable);
+        return allPage.map(achatMapper::toDto);
     }
 
-    public Achat findByIdAchat(Long id) {
-        return achatRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Achat", id));
+    public AchatGetDto findAchatById(Long id) {
+        return achatMapper.toDto(achatRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Achat", id)));
     }
+
 
     // Suppression de l'achat
     public void deleteAchatByIdSoft(Long id) {
@@ -150,29 +162,24 @@ public class TransactionAchatAndLinesService {
     }
 
     @Transactional
-    public LigneAchat saveLigneAchat(LigneAchatPostDto ligneAchatPostDto) {
-        Achat achat = null;
-        if(ligneAchatPostDto.getAchatId() != null) {
-            achat = this.findByIdAchat(Long.valueOf(ligneAchatPostDto.getAchatId()));
-        }
-        Produit produit = null;
-        if(ligneAchatPostDto.getProduitId() != null) {
-            produit = produitService.findById(Long.valueOf(ligneAchatPostDto.getProduitId()));
-        }
+    public LigneAchatGetDto saveLigneAchat(LigneAchatPostDto ligneAchatPostDto) {
+        Long achatId = ligneAchatPostDto.getAchatId();
 
-        LigneAchat ligneAchatToPost = ligneAchatMapper.postLigneAchatFromDto(ligneAchatPostDto, achat, produit);
+
+        LigneAchat ligneAchatToPost = ligneAchatMapper.toEntity(ligneAchatPostDto);
 
         LigneAchat saveLigneAchat = ligneAchatRepository.save(ligneAchatToPost);
 
         // Modifie le total de l'achat lors de la save d'une ligne
+        entityManager.refresh(saveLigneAchat);
 
         updateTotalAchat(saveLigneAchat.getAchat().getId());
 
         LocalDateTime dateCreate = LocalDateTime.now();
         // Enregistrement du mouvement de stock via le service dédié
         mouvementStockService.save(MouvementStockPostDto.builder()
-                .reference( "ACH_" + ligneAchatPostDto.getAchatId() + "_LIG_" + saveLigneAchat.getId())
-                .produitId(Long.valueOf(ligneAchatPostDto.getProduitId()))
+                .reference("ACH_" + achatId + "_LIG_" + saveLigneAchat.getId())
+                .produitId(ligneAchatPostDto.getProduitId())
                 .quantite(ligneAchatPostDto.getQuantite())
                 .commentaire("Généré à partir de la ligne d'un achat")
                 .createdAt(dateCreate)
@@ -183,59 +190,39 @@ public class TransactionAchatAndLinesService {
                 .build());
 
 
-        return saveLigneAchat;
+        return ligneAchatMapper.toDto(saveLigneAchat);
     }
 
     @Transactional
-    public Achat saveAchat(AchatPostDto achatPostDto) {
-//        Set<Role> roles = achat.getRoles();
-        Employe employe = null;
-        if (achatPostDto.getEmployeId() != null) {
-            employe = employeService.findById(achatPostDto.getEmployeId());
-        }
-        Achat achat =  achatMapper.postAchatDto(achatPostDto, employe);
+    public AchatGetDto saveAchat(AchatPostDto achatPostDto) {
 
+        Achat achat = achatMapper.toEntity(achatPostDto);
         // Sauvegarde de l'achat pour obtenir l'id
         Achat achatSansTotal = achatRepository.save(achat);
+        entityManager.refresh(achatSansTotal);
         // Mise a jour du total
         updateTotalAchat(achatSansTotal.getId());
 
-        return achatSansTotal;
+        return achatMapper.toDto(achatSansTotal);
     }
 
     @Transactional
-    public LigneAchat updateLigneAchat(LigneAchatUpdateDto ligneAchatUpdateDto, Long id) {
-        LigneAchat ligneAchat = this.findByIdLine(id);
+    public LigneAchatGetDto updateLigneAchat(LigneAchatUpdateDto ligneAchatUpdateDto, Long id) {
+        LigneAchat ligneAchat = ligneAchatRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("LigneAchat", id));
 
-        Achat achat = null;
-        if(ligneAchatUpdateDto.getAchatId() != null) {
-            achat = this.findByIdAchat(Long.valueOf(ligneAchatUpdateDto.getAchatId())) ;
-        }
-        Produit produit = null;
-        if(ligneAchatUpdateDto.getProduitId() != null) {
-            produit = produitService.findById(Long.valueOf(ligneAchatUpdateDto.getProduitId())) ;
-        }
-        ligneAchatMapper.updateLigneAchatFromDto(ligneAchatUpdateDto, ligneAchat, achat, produit);
+        ligneAchatMapper.updateLigneAchatFromDto(ligneAchatUpdateDto, ligneAchat);
         LigneAchat savedLine = ligneAchatRepository.save(ligneAchat);
         //mise a jour du total
         updateTotalAchat(savedLine.getAchat().getId());
-        return savedLine;
+        return ligneAchatMapper.toDto(savedLine);
     }
 
 
-    /**
-     * Pour la mise à jour d'un achat
-     * @param achatUpdateDto
-     * @param id
-     * @return
-     */
-    public Achat updateAchat(AchatUpdateDto achatUpdateDto, Long id) {
-        Achat achat = this.findByIdAchat(id);
-        Employe employe = null;
-        if (achatUpdateDto.getEmployeId() != null){
-            employe = employeService.findById(Long.valueOf(achatUpdateDto.getEmployeId()));
-        }
-        achatMapper.updateAchatFromDto(achatUpdateDto,achat, employe);
-        return achatRepository.save(achat);
+
+    public AchatGetDto updateAchat(AchatUpdateDto achatUpdateDto, Long id) {
+        Achat achat = achatRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Achat", id));
+       //Mapping
+        achatMapper.updateDto(achatUpdateDto, achat);
+        return achatMapper.toDto(achatRepository.save(achat));
     }
 }

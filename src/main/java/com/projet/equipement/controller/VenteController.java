@@ -10,6 +10,7 @@ import com.projet.equipement.entity.Caisse;
 import com.projet.equipement.entity.Client;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Vente;
+import com.projet.equipement.mapper.VenteMapper;
 import com.projet.equipement.repository.ClientRepository;
 import com.projet.equipement.services.ClientService;
 import com.projet.equipement.services.TransactionVenteAndLinesService;
@@ -41,13 +42,13 @@ public class VenteController {
 
     @GetMapping("")
     public ResponseEntity<Page<VenteGetDto>> findAllVentes(Pageable pageable) {
-        Page<Vente> ventes = transactionVenteAndLinesService.findAllVentes(pageable);
-        return ResponseEntity.ok( ventes.map(VenteGetDto::new));
+        Page<VenteGetDto> ventes = transactionVenteAndLinesService.findAllVentes(pageable);
+        return ResponseEntity.ok( ventes);
     }
     @GetMapping("/{id}/lignes")
     public ResponseEntity<Page<LigneVenteGetDto>> findAllLigneVentesByVenteId(@PathVariable Long id, Pageable pageable) {
-        Page<LigneVente> lineByVenteId = transactionVenteAndLinesService.findByVenteId(id, pageable);
-        return ResponseEntity.ok( lineByVenteId.map(LigneVenteGetDto::new));
+        Page<LigneVenteGetDto> lineByVenteId = transactionVenteAndLinesService.findByVenteId(id, pageable);
+        return ResponseEntity.ok(lineByVenteId);
     }
     
     @GetMapping("/{id}")

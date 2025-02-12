@@ -1,17 +1,22 @@
 package com.projet.equipement.services;
 
-import com.projet.equipement.dto.vente.VentePostDto;
-import com.projet.equipement.dto.vente.VenteUpdateDto;
+import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteUpdateDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
-import com.projet.equipement.entity.*;
+import com.projet.equipement.dto.vente.VenteGetDto;
+import com.projet.equipement.dto.vente.VentePostDto;
+import com.projet.equipement.dto.vente.VenteUpdateDto;
+import com.projet.equipement.entity.LigneVente;
+import com.projet.equipement.entity.StockCourant;
+import com.projet.equipement.entity.Vente;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.StockInsuffisantException;
 import com.projet.equipement.mapper.LigneVenteMapper;
 import com.projet.equipement.mapper.VenteMapper;
 import com.projet.equipement.repository.LigneVenteRepository;
 import com.projet.equipement.repository.VenteRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,26 +28,29 @@ import java.util.List;
 @Service
 public class TransactionVenteAndLinesService {
 
-    private final ProduitService produitService;
     private final LigneVenteMapper ligneVenteMapper;
     private final LigneVenteRepository ligneVenteRepository;
     private final MouvementStockService mouvementStockService;
     private final VenteMapper venteMapper;
     private final VenteRepository venteRepository;
-    private final EmployeService employeService;
-    private final ClientService clientService;
     private final StockCourantService stockCourantService;
+    private final EntityManager entityManager;
 
-    public TransactionVenteAndLinesService(ProduitService produitService, LigneVenteMapper ligneVenteMapper, LigneVenteRepository ligneVenteRepository, MouvementStockService mouvementStockService, VenteMapper venteMapper, VenteRepository venteRepository, EmployeService employeService, ClientService clientService, StockCourantService stockCourantService) {
-        this.produitService = produitService;
+    public TransactionVenteAndLinesService(
+                                           LigneVenteMapper ligneVenteMapper,
+                                           LigneVenteRepository ligneVenteRepository,
+                                           MouvementStockService mouvementStockService,
+                                           VenteMapper venteMapper,
+                                           VenteRepository venteRepository,
+                                           StockCourantService stockCourantService,
+                                           EntityManager entityManagerFactory) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
         this.venteMapper = venteMapper;
         this.venteRepository = venteRepository;
-        this.employeService = employeService;
-        this.clientService = clientService;
         this.stockCourantService = stockCourantService;
+        this.entityManager = entityManagerFactory;
     }
 
 
@@ -58,8 +66,9 @@ public class TransactionVenteAndLinesService {
     }
 
 
-    public Page<LigneVente> findByVenteId(Long id, Pageable pageable) {
-        return ligneVenteRepository.findByVenteId(id, pageable);
+    public Page<LigneVenteGetDto> findByVenteId(Long id, Pageable pageable) {
+        Page<LigneVente> byVenteId = ligneVenteRepository.findByVenteId(id, pageable);
+        return byVenteId.map(ligneVenteMapper::toDto);
     }
 
     public List<LigneVente> findByVenteId(Long id) {
@@ -96,25 +105,20 @@ public class TransactionVenteAndLinesService {
         this.deleteVenteByIdSoft(id);
     }
 
-    public Page<Vente> findAllVentes(Pageable pageable) {
-        return venteRepository.findAllActif(pageable);
+    public Page<VenteGetDto> findAllVentes(Pageable pageable) {
+        Page<Vente> allActif = venteRepository.findAllActif(pageable);
+        return allActif.map(venteMapper::toDto);
     }
 
 
     @Transactional
     public LigneVente saveLigneVente(LigneVentePostDto ligneVentePostDto) {
-        Vente vente = null;
-        if(ligneVentePostDto.getVenteId() != null) {
-            vente = this.findByIdVente(Long.valueOf(ligneVentePostDto.getVenteId()));
-        }
-        Produit produit = null;
-        if(ligneVentePostDto.getProduitId() != null) {
-            produit = produitService.findById(Long.valueOf(ligneVentePostDto.getProduitId()));
-        }
 
-        LigneVente ligneVenteToPost = ligneVenteMapper.postLigneVenteFromDto(ligneVentePostDto, vente, produit);
+        LigneVente ligneVenteToPost = ligneVenteMapper.toEntity(ligneVentePostDto);
 
         LigneVente saveLigneVente = ligneVenteRepository.save(ligneVenteToPost);
+
+        entityManager.refresh(saveLigneVente);
 
         updateTotalVente(saveLigneVente.getVente().getId());
 
@@ -138,16 +142,10 @@ public class TransactionVenteAndLinesService {
     }
 
     public Vente saveVente(VentePostDto ventePostDto) {
-//        Set<Role> roles = vente.getRoles();
-        Employe employe = null;
-        if (ventePostDto.getEmployeId() != null) {
-            employe = employeService.findById(ventePostDto.getEmployeId());
-        }
-        Client client = null;
-        if (ventePostDto.getClientId() != null) {
-            client = clientService.findById(ventePostDto.getClientId());
-        }
-        Vente vente =  venteMapper.postVenteDto(ventePostDto, client, employe);
+
+        Vente vente =  venteMapper.toEntity(ventePostDto);
+
+        entityManager.refresh(vente);
 
         return venteRepository.save(vente);
     }
@@ -155,36 +153,24 @@ public class TransactionVenteAndLinesService {
     public LigneVente updateLigneVente(LigneVenteUpdateDto ligneVenteUpdateDto, Long id) {
         LigneVente ligneVente = this.findByIdLine(id);
 
-        Vente vente = null;
-        if(ligneVenteUpdateDto.getVenteId() != null) {
-            vente = this.findByIdVente(Long.valueOf(ligneVenteUpdateDto.getVenteId())) ;
-        }
-        Produit produit = null;
-        if(ligneVenteUpdateDto.getProduitId() != null) {
-            produit = produitService.findById(Long.valueOf(ligneVenteUpdateDto.getProduitId())) ;
-        }
-        ligneVenteMapper.updateLigneVenteFromDto(ligneVenteUpdateDto, ligneVente, vente, produit);
-        return ligneVenteRepository.save(ligneVente);
+        ligneVenteMapper.updateLigneVenteFromDto(ligneVenteUpdateDto, ligneVente);
+        LigneVente save = ligneVenteRepository.save(ligneVente);
+
+        entityManager.refresh(save);
+        return save;
     }
 
 
     /**
      * Pour la mise à jour d'un vente
-     * @param venteUpdateDto
-     * @param id
-     * @return
      */
     public Vente updateVente(VenteUpdateDto venteUpdateDto, Long id) {
         Vente vente = this.findByIdVente(id);
-        Employe employe = null;
-        if (venteUpdateDto.getEmployeId() != null) {
-            employe = employeService.findById(Long.valueOf(venteUpdateDto.getEmployeId()));
-        }
-        Client client = null;
-        if (venteUpdateDto.getClientId() != null) {
-            client = clientService.findById(Long.valueOf(venteUpdateDto.getClientId()));
-        }
-        venteMapper.updateVenteFromDto(venteUpdateDto,vente, client , employe);
+
+        venteMapper.updateDto(venteUpdateDto,vente);
+
+        entityManager.refresh(vente);
+
         return venteRepository.save(vente);
     }
 
@@ -221,17 +207,12 @@ public class TransactionVenteAndLinesService {
         }
 
 
-        Vente vente = null;
-        if (ligneVentePostDto.getVenteId() != null) {
-            vente = this.findByIdVente(Long.valueOf(ligneVentePostDto.getVenteId()));
-        }
 
-        Produit produit = null;
-        if (ligneVentePostDto.getProduitId() != null) {
-            produit = produitService.findById(Long.valueOf(ligneVentePostDto.getProduitId()));
-        }
-        LigneVente ligneVente = ligneVenteMapper.postLigneVenteFromDto(ligneVentePostDto, vente, produit);
+        LigneVente ligneVente = ligneVenteMapper.toEntity(ligneVentePostDto);
+
         LigneVente saveLigneVente = ligneVenteRepository.save(ligneVente);
+
+        entityManager.refresh(saveLigneVente);
         // Gestion du mvt de stock
         mouvementStockService.enregistrerMouvementStock(
                 produitId,

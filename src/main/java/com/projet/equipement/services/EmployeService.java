@@ -1,6 +1,7 @@
 package com.projet.equipement.services;
 
 
+import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.employe.EmployePostDto;
 import com.projet.equipement.dto.employe.EmployeUpdateDto;
 import com.projet.equipement.entity.Employe;
@@ -8,7 +9,8 @@ import com.projet.equipement.entity.Role;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.EmployeMapper;
 import com.projet.equipement.repository.EmployeRepository;
-import com.projet.equipement.repository.RoleRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,37 +22,35 @@ import java.util.stream.Collectors;
 public class EmployeService {
     private final EmployeRepository employeRepository;
     private final EmployeMapper employeMapper;
-    private final RoleRepository roleRepository;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
-    public EmployeService(EmployeRepository employeRepository, EmployeMapper employeMapper, RoleRepository roleRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public EmployeService(EmployeRepository employeRepository, EmployeMapper employeMapper, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.employeRepository = employeRepository;
         this.employeMapper = employeMapper;
-        this.roleRepository = roleRepository;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<Employe> findAll() {
-        return employeRepository.findAll();
+    public Page<EmployeGetDto> findAll(Pageable pageable) {
+        return employeRepository.findAll(pageable).map(employeMapper::toDto);
     }
 
-    public Employe findById(Long id) {
-        return employeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Employe", id));
+    public EmployeGetDto findById(Long id) {
+        return employeMapper.toDto(employeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employe", id)));
     }
 
 
-    public Employe findByUsername(String username) {
-        return employeRepository.findByNom(username)
-                .orElseThrow(() -> new EntityNotFoundException("Employe", username));
+    public EmployeGetDto findByUsername(String username) {
+        return employeMapper.toDto(employeRepository.findByNom(username)
+                .orElseThrow(() -> new EntityNotFoundException("Employe", username)));
     }
 
     public Employe save(EmployePostDto employePostDto) {
         Set<Role> roles = employePostDto.getRolesIds().stream().map(roleService::findById).collect(Collectors.toSet());
 
-        Employe employe = employeMapper.postEmployeDto(employePostDto, roles);
+        Employe employe = employeMapper.toEmploye(employePostDto);
         employe.setPassword(passwordEncoder.encode(employe.getPassword()));
 
         return employeRepository.save(employe);
@@ -61,21 +61,16 @@ public class EmployeService {
     }
 
 
-    public Employe updateEmploye(EmployeUpdateDto employeUpdateDto, Long id) {
-        Employe employe = findById(id);
-//        Set<Role> roles = new HashSet<>();
-        Set<Role> roles = employeUpdateDto.getRolesIds().stream().map(roleService::findById).collect(Collectors.toSet());
-        employeMapper.updateEmployeFromDto(employeUpdateDto, employe, roles);
-        return employeRepository.save(employe);
+    public EmployeGetDto updateEmploye(EmployeUpdateDto employeUpdateDto, Long id) {
+        Employe employe = employeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Employe", id));
+        employeMapper.updateEmployeFromDto(employeUpdateDto, employe);
+        return employeMapper.toDto(employeRepository.save(employe));
     }
 
-    public Employe putEmploye(EmployeUpdateDto employeUpdateDto, Long id) {
-        Employe employe = findById(id);
-//        Set<Role> roles = new HashSet<>();
-        Set<Role> roles = employeUpdateDto.getRolesNoms().stream().map(roleService::findByNom).collect(Collectors.toSet());
-        employeMapper.updateEmployeFromDto(employeUpdateDto, employe, roles);
-
-        return employeRepository.save(employe);
+    public EmployeGetDto putEmploye(EmployeUpdateDto employeUpdateDto, Long id) {
+        Employe employe = employeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Employe", id));
+        employeMapper.updateEmployeFromDto(employeUpdateDto, employe);
+        return employeMapper.toDto(employeRepository.save(employe));
     }
 
     // Add a role to a user

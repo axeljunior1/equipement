@@ -17,7 +17,7 @@ public class AchatUpdateDto {
 
 //    private Integer clientId;
 
-    private Integer employeId;
+    private Long employeId;
 
     private Boolean actif;
 

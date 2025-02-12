@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.achat;
 
+import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.entity.Achat;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,21 +20,11 @@ public class AchatGetDto {
 
     private String  employeNom;
 
-    private boolean  actif;
+    private EmployeGetDto employe;
 
+    private boolean  actif;
 
     private LocalDateTime dateCreation;
 
 
-
-
-
-    public AchatGetDto(Achat achat) {
-        this.id = achat.getId();
-        this.employeId = achat.getEmploye().getId();
-        this.montantTotal = achat.getMontantTotal();
-        this.dateCreation = achat.getDateCreation();
-        this.employeNom = achat.getEmploye().getNom();
-        this.actif = achat.getActif();
-    }
 }

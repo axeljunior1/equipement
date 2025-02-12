@@ -21,35 +21,35 @@ public class LigneAchatController {
         this.transactionAchatAndLinesService = transactionAchatAndLinesService;
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<Page<LigneAchat>> findAllLigneAchats(Pageable pageable) {
-        Page<LigneAchat> ligneAchats = transactionAchatAndLinesService.findAllLine(pageable);
-        return ResponseEntity.ok( ligneAchats) ;
-    }
+//    @GetMapping("/all")
+//    public ResponseEntity<Page<LigneAchatGetDto>> findAllLigneAchats(Pageable pageable) {
+//        Page<LigneAchat> ligneAchats = transactionAchatAndLinesService.findAllLine(pageable);
+//        return ResponseEntity.ok( ligneAchats) ;
+//    }
 
     @GetMapping("")
     public ResponseEntity<Page<LigneAchatGetDto>> findAllLigneAchatsDto(Pageable pageable) {
-        Page<LigneAchat> ligneAchats = transactionAchatAndLinesService.findAllLine(pageable);
-        return ResponseEntity.ok(ligneAchats.map(LigneAchatGetDto::new));
+        Page<LigneAchatGetDto> ligneAchats = transactionAchatAndLinesService.findAllLine(pageable);
+        return ResponseEntity.ok(ligneAchats);
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<LigneAchatGetDto> findLigneAchat(@PathVariable Long id) {
-         LigneAchat ligneAchat = transactionAchatAndLinesService.findByIdLine(id);
+        LigneAchatGetDto ligneAchat = transactionAchatAndLinesService.findLigneAchatById(id);
 
-        return ResponseEntity.ok(new LigneAchatGetDto(ligneAchat));
+        return ResponseEntity.ok(ligneAchat);
     }
     @PostMapping("")
-    public ResponseEntity<LigneAchat> addLigneAchat(@RequestBody LigneAchatPostDto ligneAchatPostDto) {
-       LigneAchat ligneAchat = transactionAchatAndLinesService.saveLigneAchat(ligneAchatPostDto);
+    public ResponseEntity<LigneAchatGetDto> addLigneAchat(@RequestBody LigneAchatPostDto ligneAchatPostDto) {
+        LigneAchatGetDto ligneAchat = transactionAchatAndLinesService.saveLigneAchat(ligneAchatPostDto);
         return ResponseEntity.ok(ligneAchat);
     }
     
     @PatchMapping("/{id}")
-    public ResponseEntity<LigneAchat> updateLigneAchat(@PathVariable Long id , @Valid  @RequestBody LigneAchatUpdateDto ligneAchatUpdateDto) {
+    public ResponseEntity<LigneAchatGetDto> updateLigneAchat(@PathVariable Long id , @Valid  @RequestBody LigneAchatUpdateDto ligneAchatUpdateDto) {
 
-        LigneAchat ligneAchat = transactionAchatAndLinesService.updateLigneAchat(ligneAchatUpdateDto, id);
+        LigneAchatGetDto ligneAchat = transactionAchatAndLinesService.updateLigneAchat(ligneAchatUpdateDto, id);
         return ResponseEntity.ok(ligneAchat);
     }
 

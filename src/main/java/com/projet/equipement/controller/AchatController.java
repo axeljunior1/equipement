@@ -26,33 +26,33 @@ public class AchatController {
 
     @GetMapping("")
     public ResponseEntity<Page<AchatGetDto>> findAllAchats(Pageable pageable) {
-        Page<Achat> achats = transactionAchatAndLinesService.findAllAchat(pageable);
-        return ResponseEntity.ok(achats.map(AchatGetDto::new));
+        Page<AchatGetDto> achats = transactionAchatAndLinesService.findAllAchat(pageable);
+        return ResponseEntity.ok(achats);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AchatGetDto> findAchat(@PathVariable Long id) {
-        Achat achat = transactionAchatAndLinesService.findByIdAchat(id);
-        return ResponseEntity.ok(new AchatGetDto(achat));
+        AchatGetDto achat = transactionAchatAndLinesService.findAchatById(id);
+        return ResponseEntity.ok(achat);
     }
 
     @GetMapping("/{id}/lignes")
     public ResponseEntity<Page<LigneAchatGetDto>> findAchatLineById(@PathVariable Long id, Pageable pageable) {
-        Page<LigneAchat> ligneAchats = transactionAchatAndLinesService.findByAchatId(id, pageable);
-        return ResponseEntity.ok(ligneAchats.map(LigneAchatGetDto::new));
+        Page<LigneAchatGetDto> ligneAchats = transactionAchatAndLinesService.findByAchatId(id, pageable);
+        return ResponseEntity.ok(ligneAchats);
     }
 
     @PostMapping()
     public ResponseEntity<AchatGetDto> save(@RequestBody AchatPostDto achatPostDto) {
-        Achat achat = transactionAchatAndLinesService.saveAchat(achatPostDto);
-        return ResponseEntity.ok(new AchatGetDto(achat));
+        AchatGetDto achat = transactionAchatAndLinesService.saveAchat(achatPostDto);
+        return ResponseEntity.ok(achat);
     }
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Achat> updateAchat(@PathVariable Long id, @Valid @RequestBody AchatUpdateDto achatUpdateDto) {
+    public ResponseEntity<AchatGetDto> updateAchat(@PathVariable Long id, @Valid @RequestBody AchatUpdateDto achatUpdateDto) {
 
-        Achat achat = transactionAchatAndLinesService.updateAchat(achatUpdateDto, id);
+        AchatGetDto achat = transactionAchatAndLinesService.updateAchat(achatUpdateDto, id);
         return ResponseEntity.ok(achat);
     }
 

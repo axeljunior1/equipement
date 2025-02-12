@@ -1,34 +1,55 @@
 package com.projet.equipement.mapper;
 
+import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.employe.EmployePostDto;
 import com.projet.equipement.dto.employe.EmployeUpdateDto;
 import com.projet.equipement.entity.Employe;
 import com.projet.equipement.entity.Role;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-@Component
-public class EmployeMapper {
+@Mapper(componentModel = "spring")
+public interface EmployeMapper {
 
 
+    @Mapping(target = "rolesNoms", source = "roles", qualifiedByName = "mapRolesToNoms")
+    @Mapping(target = "rolesIds", source = "roles", qualifiedByName = "mapRolesToIds")
+    EmployeGetDto toDto(Employe employe);
 
-    public void updateEmployeFromDto(EmployeUpdateDto employeUpdateDto, Employe employe, Set<Role> roles){
-        if (employeUpdateDto.getNom() != null) employe.setNom(employeUpdateDto.getNom());
-        if (employeUpdateDto.getPrenom() != null) employe.setPrenom(employeUpdateDto.getPrenom());
-        if (roles != null) employe.setRoles(roles);
+    @Mapping(target = "roles", source = "rolesIds", qualifiedByName = "mapIdToRoles")
+    Employe toEmploye(EmployeGetDto employeGetDto);
+
+    @Mapping(target = "roles", source = "rolesIds", qualifiedByName = "mapIdToRoles")
+    Employe toEmploye(EmployePostDto employePostDto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "roles", source = "rolesIds", qualifiedByName = "mapIdToRoles")
+    void updateEmployeFromDto(EmployeUpdateDto employeUpdateDto, @MappingTarget Employe employe);
+
+
+    @Named("mapRolesToNoms")
+    default Set<String> mapRolesToNoms(Set<Role> roles) {
+        return roles.stream().map(Role::getNom).collect(Collectors.toSet());
     }
 
-    public Employe postEmployeDto(EmployePostDto employePostDto, Set<Role> roles) {
-        Employe employe = new Employe();
-        employe.setNom(employePostDto.getNom());
-        employe.setPrenom(employePostDto.getPrenom());
-        employe.setPassword(employePostDto.getPassword());
-        employe.setDateCreation(LocalDateTime.now());
-        employe.setActif(true);
-        employe.setRoles(roles != null ? roles : new HashSet<Role>());
-        return employe;
+    @Named("mapRolesToIds")
+    default Set<Long> mapRolesToIds(Set<Role> roles) {
+        return roles.stream().map(Role::getId).collect(Collectors.toSet());
     }
+
+
+    @Named("mapIdToRoles")
+    default Set<Role> mapIdToRoles(Set<Long> ids) {
+        Set<Role> roles = new HashSet<>();
+        ids.forEach(roleId -> {
+            Role roleEntity = new Role();
+            roleEntity.setId(roleId);
+            roles.add(roleEntity);
+        });
+        return roles;
+    }
+
 }

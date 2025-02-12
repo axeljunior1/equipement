@@ -1,6 +1,9 @@
 package com.projet.equipement.dto.ligneAchat;
 
+import com.projet.equipement.dto.achat.AchatGetDto;
+import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.entity.LigneAchat;
+import com.projet.equipement.entity.Produit;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,21 +19,15 @@ public class LigneAchatGetDto {
 
     private Long achatId;
 
+    private AchatGetDto achat;
+
     private Boolean actif;
 
     private Long produitId;
 
+    private ProduitGetDto produit;
+
     private String  produitNom;
 
-
-    public LigneAchatGetDto(LigneAchat ligneAchat) {
-        this.id = ligneAchat.getId();
-        this.achatId = ligneAchat.getAchat().getId();
-        this.produitId = ligneAchat.getProduit().getId();
-        this.quantite = ligneAchat.getQuantite();
-        this.prixUnitaire = ligneAchat.getPrixAchatUnitaire();
-        this.produitNom = ligneAchat.getProduit().getNom();
-        this.actif = ligneAchat.getActif();
-    }
 
 }

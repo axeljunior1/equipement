@@ -24,24 +24,4 @@ public class EmployeGetDto {
 
     private LocalDateTime dateCreation;
 
-    public EmployeGetDto(Employe employe) {
-        this.id = employe.getId();
-        this.nom = employe.getNom();
-        this.prenom = employe.getPrenom();
-        this.dateCreation = employe.getDateCreation();
-        this.actif = employe.getActif();
-        if(employe.getRoles() != null) {
-            this.roles = employe.getRoles();
-        }
-        if (employe.getRoles() != null) {
-            for (Role role : employe.getRoles()) {
-                this.rolesIds.add(role.getId());
-            }
-        }
-        if (employe.getRoles() != null) {
-            for (Role role : employe.getRoles()) {
-                this.rolesNoms.add(role.getNom());
-            }
-        }
-    }
 }

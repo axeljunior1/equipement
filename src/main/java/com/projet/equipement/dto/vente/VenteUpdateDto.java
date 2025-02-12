@@ -13,9 +13,9 @@ public class VenteUpdateDto {
 
     private LocalDateTime dateDerniereMiseAjour;
 
-    private Integer clientId;
+    private Long clientId;
 
-    private Integer employeId;
+    private Long employeId;
 
     private Boolean actif;
 

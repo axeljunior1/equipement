@@ -11,6 +11,8 @@ import com.projet.equipement.services.AuthorityService;
 import com.projet.equipement.services.RoleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +31,7 @@ public class RoleController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Page<Role>> findAllRoles(Pageable pageable) {
+    public ResponseEntity<Page<Role>> findAllRoles(@PageableDefault(sort = "nom", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<Role> roles = roleService.findAll(pageable);
         return ResponseEntity.ok(roles);
     }

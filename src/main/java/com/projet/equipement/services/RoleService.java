@@ -11,6 +11,8 @@ import com.projet.equipement.mapper.RoleMapper;
 import com.projet.equipement.repository.RoleRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +33,7 @@ public class RoleService {
         this.roleMapper = roleMapper;
     }
 
-    public Page<Role> findAll(Pageable pageable) {
+    public Page<Role> findAll(@PageableDefault(sort = "nom", direction = Sort.Direction.ASC) Pageable pageable) {
         return roleRepository.findAll(pageable);
     }
 

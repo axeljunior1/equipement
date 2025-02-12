@@ -27,7 +27,8 @@ public class LigneVente {
     private Integer quantite;
 
     @Column(name = "actif")
-    private Boolean actif;
+    @Builder.Default
+    private Boolean actif = true;
 
     @ManyToOne
     @JoinColumn(name = "vente_id")
@@ -37,7 +38,6 @@ public class LigneVente {
     @ManyToOne()
     @JoinColumn(name = "produit_id")
     private Produit produit;
-
 
 
 }

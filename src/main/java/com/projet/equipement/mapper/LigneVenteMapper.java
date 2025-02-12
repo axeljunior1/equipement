@@ -1,35 +1,57 @@
 package com.projet.equipement.mapper;
 
+import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteUpdateDto;
+import com.projet.equipement.entity.Vente;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Produit;
-import com.projet.equipement.entity.Vente;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
-@Component
-public class LigneVenteMapper {
+@Mapper(componentModel = "spring", uses = {ProduitMapper.class, VenteMapper.class})
+public interface LigneVenteMapper {
 
+    @Mapping(source = "produit", target = "produitId", qualifiedByName = "mapProduitToId")
+    @Mapping(source = "vente", target = "venteId", qualifiedByName = "mapVenteToId")
+    LigneVenteGetDto toDto(LigneVente ligneVente);
 
-    public void updateLigneVenteFromDto(LigneVenteUpdateDto ligneVenteUpdateDto, LigneVente ligneVente, Vente vente, Produit produit) {
-        if (ligneVenteUpdateDto.getPrixVenteUnitaire() != null) ligneVente.setPrixVenteUnitaire(ligneVenteUpdateDto.getPrixVenteUnitaire());
-        if (ligneVenteUpdateDto.getActif() != null) ligneVente.setActif(ligneVenteUpdateDto.getActif());
-        if (vente != null) {
-            ligneVente.setVente(vente);
-        }
-        if (produit != null) {
-            ligneVente.setProduit(produit);
-        }
-        if(ligneVenteUpdateDto.getQuantite() != null)ligneVente.setQuantite(ligneVenteUpdateDto.getQuantite());
+    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
+    @Mapping(source = "venteId", target = "vente", qualifiedByName = "mapIdToVente")
+    LigneVente toEntity(LigneVenteGetDto ligneVenteGetDto);
+
+    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
+    @Mapping(source = "venteId", target = "vente", qualifiedByName = "mapIdToVente")
+    LigneVente toEntity(LigneVentePostDto ligneVentePostDto);
+
+    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
+    @Mapping(source = "venteId", target = "vente", qualifiedByName = "mapIdToVente")
+    void updateLigneVenteFromDto(LigneVenteUpdateDto ligneVenteUpdateDto, @MappingTarget LigneVente ligneVente);
+
+    @Named("mapIdToProduit")
+    default Produit mapIdToProduit(Long id) {
+        Produit produit = new Produit();
+        produit.setId(id);
+        return produit;
     }
 
-    public LigneVente postLigneVenteFromDto(LigneVentePostDto ligneVentePostDto, Vente vente, Produit produit) {
-        return LigneVente.builder()
-                .prixVenteUnitaire(ligneVentePostDto.getPrixVenteUnitaire())
-                .produit(produit)
-                .vente(vente)
-                .quantite(ligneVentePostDto.getQuantite())
-                .actif(true)
-                .build();
+    @Named("mapProduitToId")
+    default Long mapProduitToId(Produit produit) {
+        return produit.getId();
+    }
+
+
+    @Named("mapVenteToId")
+    default Long mapVenteToId(Vente vente) {
+        return vente.getId();
+    }
+
+    @Named("mapIdToVente")
+    default Vente mapIdToVente(Long id) {
+        Vente vente = new Vente();
+        vente.setId(id);
+        return vente;
     }
 }

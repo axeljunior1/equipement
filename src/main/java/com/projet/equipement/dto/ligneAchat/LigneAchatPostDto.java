@@ -12,8 +12,8 @@ public class LigneAchatPostDto {
 
     private Integer quantite;
 
-    private Integer achatId;
+    private Long achatId;
 
-    private Integer produitId;
+    private Long produitId;
 
 }

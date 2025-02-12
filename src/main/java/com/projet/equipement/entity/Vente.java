@@ -24,7 +24,8 @@ public class Vente {
     private Double montantTotal;
 
     @Column(name = "actif")
-    private Boolean actif;
+    @Builder.Default
+    private Boolean actif = true;
 
     @Column(name = "created_at")
     private LocalDateTime dateCreation;

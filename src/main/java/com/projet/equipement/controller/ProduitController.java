@@ -4,6 +4,8 @@ import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.entity.Produit;
+import com.projet.equipement.exceptions.EntityNotFoundException;
+import com.projet.equipement.repository.ProduitRepository;
 import com.projet.equipement.services.ProduitService;
 import com.projet.equipement.specifications.ProduitSpecification;
 import jakarta.validation.Valid;
@@ -21,9 +23,11 @@ public class ProduitController {
 
 
     private final ProduitService produitService;
+    private final ProduitRepository produitRepository;
 
-    public ProduitController(ProduitService produitService) {
+    public ProduitController(ProduitService produitService, ProduitRepository produitRepository) {
         this.produitService = produitService;
+        this.produitRepository = produitRepository;
     }
 
     @GetMapping("/{id}")
@@ -77,6 +81,7 @@ public class ProduitController {
     @PostMapping
     public ResponseEntity<ProduitGetDto> addProduit(@Valid @RequestBody  ProduitPostDto produitPostDto) {
         ProduitGetDto produit = produitService.save(produitPostDto);
+        Produit p = produitRepository.findById(produit.getId()).orElseThrow(()->new EntityNotFoundException("Produit", produit.getId()));
         return ResponseEntity.ok(produit);
     }
 

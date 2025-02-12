@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.produit;
 
+import com.projet.equipement.dto.categorie.CategorieGetDto;
 import com.projet.equipement.entity.Categorie;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.entity.StockCourant;
@@ -21,7 +22,7 @@ public class ProduitGetDto {
     private String nom;
     private String description;
     private Integer categorieId;
-    private Categorie categorie;
+    private CategorieGetDto categorie;
     private byte[]  qrCode;
     private String  ean13;
     private Integer seuilProduit;
