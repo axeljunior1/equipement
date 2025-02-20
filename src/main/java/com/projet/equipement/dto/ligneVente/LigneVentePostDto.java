@@ -13,13 +13,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class LigneVentePostDto {
 
-    private Double prixVenteUnitaire;
+    private Double prixVente;
 
     private Integer quantite;
 
     private Integer venteId;
 
     private Integer produitId;
+
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
 
 }

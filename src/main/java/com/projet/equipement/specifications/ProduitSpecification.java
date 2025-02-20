@@ -40,11 +40,11 @@ public class ProduitSpecification {
             if (min == null && max == null) {
                 return null;
             } else if (min == null) {
-                return criteriaBuilder.lessThanOrEqualTo(root.get("prixUnitaire"), max);
+                return criteriaBuilder.lessThanOrEqualTo(root.get("prixVente"), max);
             } else if (max == null) {
-                return criteriaBuilder.greaterThanOrEqualTo(root.get("prixUnitaire"), min);
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("prixVente"), min);
             } else {
-                return criteriaBuilder.between(root.get("prixUnitaire"), min, max);
+                return criteriaBuilder.between(root.get("prixVente"), min, max);
             }
         };
     }

@@ -1,0 +1,34 @@
+spring.application.name=equipement
+spring.datasource.url=jdbc:postgresql://localhost:${db_port}/${db_name}
+#spring.jpa.properties.hibernate.default_schema=dev
+spring.datasource.username=${db_user}
+spring.datasource.password=${db_pass}
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#Loggingd
+logging.level.org.springframework.web=ERROR
+logging.level.org.hibernate=ERROR
+
+
+# JWT Configuration
+jwt.secret=${jwt_secret}
+jwt.expiration=${jwt_expiration}
+
+# Activer le logging des requêtes SQL générées par Hibernate
+spring.jpa.show-sql=true
+
+# Afficher les paramètres de requêtes SQL (format lisible)
+spring.jpa.properties.hibernate.format_sql=true
+
+# Activer le logging de Hibernate pour afficher les logs de ses opérations (niveau TRACE)
+logging.level.org.hibernate.SQL=DEBUG
+
+# Activer le logging pour les paramètres des requêtes préparées (pour voir les valeurs des variables liées)
+logging.level.org.hibernate.type.descriptor.sql=TRACE
+
+
+# Configurer le certificat SSL
+#server.ssl.key-store-type=PKCS12
+#server.ssl.key-store=classpath:keystore.p12
+#server.ssl.key-store-password=junior
+#server.ssl.key-alias=springboot

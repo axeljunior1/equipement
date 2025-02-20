@@ -1,11 +1,5 @@
 package com.projet.equipement.dto.vente;
 
-import com.projet.equipement.entity.Client;
-import com.projet.equipement.entity.Employe;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -21,7 +15,6 @@ public class VentePostDto {
     @NotNull
     private Double montantTotal;
 
-    private LocalDateTime dateDerniereMiseAjour;
 
     @NotNull
     private Long clientId;
@@ -31,5 +24,9 @@ public class VentePostDto {
     private Long employeId;
 
     private Boolean actif ;
+
+
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
 }

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class LigneAchatPostDto {
 
-    private Double prixAchatUnitaire;
+    private Double prixAchat;
 
     private Integer quantite;
 

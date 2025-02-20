@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.ligneVente;
 
+import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.entity.LigneVente;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 public class LigneVenteGetDto {
 
     private Long id;
-    private Double prixUnitaire;
+    private Double prixVente;
 
     private Integer quantite;
 
@@ -21,14 +22,8 @@ public class LigneVenteGetDto {
 
     private String  produitNom;
 
-    public LigneVenteGetDto(LigneVente ligneVente) {
-        this.id = ligneVente.getId();
-        this.prixUnitaire = ligneVente.getPrixVenteUnitaire();
-        this.quantite = ligneVente.getQuantite();
-        this.produitId = ligneVente.getProduit().getId();
-        this.venteId = ligneVente.getVente().getId();
-        this.produitNom = ligneVente.getProduit().getNom();
-        this.actif = ligneVente.getActif();
-    }
+    private ProduitGetDto produit;
+
+
 
 }

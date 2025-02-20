@@ -44,7 +44,7 @@ class ProduitControllerTest {
                 .description("Horloge connecté")
                 .image("")
                 .stockInitial(10)
-                .prixUnitaire(29.99)
+                .prixVente(29.99)
                 .ean13("9994384219015")
                 .qrCode("iVBORw0KGgoAAAANSUhEUgAAAGQAAABkAQAAAABYmaj5AAAAv0lEQVR4XuXSsQ3EIAwFUJ8orswCSKyRLiuFBS66BY6V3HkNpCwQOgokH9EdIQ0OfSyaV9n+BvhUG9xNCA9MM8ByKeIQk+XUIbCkLeo+raFTaPrEgfOrkzWV9yN93rapXNEcmUlCFci4MosoP3B6jaWfIOLtmaDeoS1Wn1EPsUPkZ1gddoj3Ji6q336ScmZs3liSELTfAWDyZQdBYFltY720JOQPrP8OF1Iumg5xyGFMR9Zt7f/FL1STaKrWrfUFsIoVnBVamIsAAAAASUVORK5CYII=".getBytes())
                 .build();

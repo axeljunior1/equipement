@@ -22,6 +22,6 @@ public interface LigneVenteRepository extends JpaRepository<LigneVente, Long> {
     @Query("select l from LigneVente l where l.actif = true")
     Page<LigneVente> findAllLine(Pageable pageable);
 
-    @Query("SELECT SUM(l.prixVenteUnitaire * l.quantite) FROM LigneVente l WHERE l.vente.id = :venteId and l.actif=true ")
+    @Query("SELECT SUM(l.prixVente * l.quantite) FROM LigneVente l WHERE l.vente.id = :venteId and l.actif=true ")
     Double sumTotalByVenteId(@Param("venteId") Long venteId);
 }

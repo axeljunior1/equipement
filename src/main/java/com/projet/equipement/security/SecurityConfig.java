@@ -55,6 +55,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(r -> r
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers(HttpMethod.POST, "login").permitAll()  // Permet l'accès à /login sans authentification
+                        .requestMatchers( "test").permitAll()  // Permet l'accès à /login sans authentification
+                        .requestMatchers(HttpMethod.GET, "/").permitAll()  // Permet l'accès à /login sans authentification
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("roles/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
                         .requestMatchers("employes/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
                         .anyRequest().authenticated() // Toutes les autres requêtes nécessitent une authentification
@@ -63,6 +66,8 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        // Enforce HTTPS (optional but recommended)
 
         return http.build();  // Renvoie la configuration de sécurité construite
     }

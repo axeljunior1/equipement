@@ -24,14 +24,16 @@ public class Achat {
     private Double montantTotal;
 
     @Column(name = "updated_at")
-    private LocalDateTime dateDerniereMiseAJour;
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Builder.Default
     @Column(name = "actif")
     private Boolean actif = true;
 
     @Column(name = "created_at")
-    private LocalDateTime dateCreation;
+    @Builder.Default
+    private LocalDateTime dateCreation =LocalDateTime.now();
 
     @ManyToOne()
     @JoinColumn(name = "employe_id")

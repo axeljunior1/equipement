@@ -66,14 +66,14 @@ public class ProduitController {
             @RequestParam(required = false) Boolean actif,
             @RequestParam(required = false) Integer stockInitialMin,
             @RequestParam(required = false) Integer stockInitialMax,
-            @RequestParam(required = false) Double prixUnitaireMin,
-            @RequestParam(required = false) Double prixUnitaireMax) {
+            @RequestParam(required = false) Double prixVenteMin,
+            @RequestParam(required = false) Double prixVenteMax) {
 
         Specification<Produit> spec = Specification.where(ProduitSpecification.hasDescription(description))
                 .and(ProduitSpecification.hasNom(nom))
                 .and(ProduitSpecification.isActif(actif))
                 .and(ProduitSpecification.hasStockBetween(stockInitialMin, stockInitialMax))
-                .and(ProduitSpecification.hasPrixBetween(prixUnitaireMin, prixUnitaireMax));
+                .and(ProduitSpecification.hasPrixBetween(prixVenteMin, prixVenteMax));
 
         return produitService.findBySpec(spec);
     }

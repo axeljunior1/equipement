@@ -23,7 +23,7 @@ public class ProduitPostDto {
     private String image;
 
     @NotNull(message = "Le prix unitaire est obligatoire")
-    private Double prixUnitaire;
+    private Double prixVente;
 
     @NotNull
     private Long categorieId;
@@ -32,7 +32,12 @@ public class ProduitPostDto {
 
 
     private Integer stockInitial;
-    private LocalDateTime creationDate;
+
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
 
 

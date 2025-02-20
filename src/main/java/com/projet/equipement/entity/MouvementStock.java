@@ -38,16 +38,19 @@ public class MouvementStock  {
     private TypeMouvementStock typeMouvement; // Relation Many-to-One vers types_mouvement_stock
 
     @Column(name = "date_mouvement")
-    private LocalDateTime dateMouvement; // Date du mouvement (par défaut : maintenant)
+    @Builder.Default
+    private LocalDateTime dateMouvement = LocalDateTime.now(); // Date du mouvement (par défaut : maintenant)
 
     @Column(name = "commentaire")
     private String commentaire; // Commentaire facultatif
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt; // Date de création
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now(); // Date de création
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt; // Date de mise à jour
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now(); // Date de mise à jour
 
 }
 

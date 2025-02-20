@@ -33,7 +33,8 @@ public class Client {
 
 
     @Column(name = "created_at")
-    private LocalDateTime dateCreation;
+    @Builder.Default
+    private LocalDateTime dateCreation =LocalDateTime.now();
 
     @OneToMany(mappedBy = "client")
     @JsonIgnore

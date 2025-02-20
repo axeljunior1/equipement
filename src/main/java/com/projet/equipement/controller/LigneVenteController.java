@@ -24,8 +24,8 @@ public class LigneVenteController {
 
     @GetMapping("")
     public ResponseEntity<Page<LigneVenteGetDto>> findAllLigneVentes(Pageable pageable) {
-        Page<LigneVente> ligneVentes = transactionVenteAndLinesService.findAllLine(pageable);
-        return ResponseEntity.ok(ligneVentes.map(LigneVenteGetDto::new));
+        Page<LigneVenteGetDto> ligneVentes = transactionVenteAndLinesService.findAllLine(pageable);
+        return ResponseEntity.ok(ligneVentes);
     }
     @GetMapping("/{id}")
     public ResponseEntity< LigneVente> findLigneVente(@PathVariable Long id) {

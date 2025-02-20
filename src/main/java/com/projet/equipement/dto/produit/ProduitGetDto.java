@@ -1,10 +1,6 @@
 package com.projet.equipement.dto.produit;
 
 import com.projet.equipement.dto.categorie.CategorieGetDto;
-import com.projet.equipement.entity.Categorie;
-import com.projet.equipement.entity.Produit;
-import com.projet.equipement.entity.StockCourant;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -29,14 +25,15 @@ public class ProduitGetDto {
     private Boolean actif;
     @NotNull(message = "La quantité est obligatoire")
     private Integer quantity;
-    private LocalDateTime created_at ;
+    private LocalDateTime createdAt ;
+    private LocalDateTime updatedAt ;
     private String image;
-    private Double prixUnitaire;
+    private Double prixVente;
 
     private String categorieNom;
 
     private Integer stockInitial;
-    // mis en place dans le controlleur
+    // mis en place dans le controller
     private Integer stockCourant;
 
 

@@ -75,9 +75,9 @@ public class TransactionVenteAndLinesService {
         return ligneVenteRepository.findByVenteId(id);
     }
 
-    public Vente findByIdVente(Long id) {
-        return venteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Vente", id));
+    public VenteGetDto findByIdVente(Long id) {
+        return venteMapper.toDto(venteRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Vente", id)));
     }
 
     // Suppression de l'vente
@@ -145,9 +145,9 @@ public class TransactionVenteAndLinesService {
 
         Vente vente =  venteMapper.toEntity(ventePostDto);
 
-        entityManager.refresh(vente);
-
-        return venteRepository.save(vente);
+        Vente save = venteRepository.save(vente);
+        entityManager.refresh(save);
+        return save;
     }
 
     public LigneVente updateLigneVente(LigneVenteUpdateDto ligneVenteUpdateDto, Long id) {
@@ -165,19 +165,21 @@ public class TransactionVenteAndLinesService {
      * Pour la mise à jour d'un vente
      */
     public Vente updateVente(VenteUpdateDto venteUpdateDto, Long id) {
-        Vente vente = this.findByIdVente(id);
+        Vente vente = venteRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Vente", id));
 
         venteMapper.updateDto(venteUpdateDto,vente);
 
-        entityManager.refresh(vente);
 
-        return venteRepository.save(vente);
+        Vente save = venteRepository.save(vente);
+        entityManager.refresh(save);
+        return save;
     }
 
 
 
-    public Page<LigneVente> findAllLine(Pageable pageable) {
-        return ligneVenteRepository.findAllLine(pageable);
+    public Page<LigneVenteGetDto> findAllLine(Pageable pageable) {
+        Page<LigneVente> allLine = ligneVenteRepository.findAllLine(pageable);
+        return allLine.map(ligneVenteMapper::toDto);
     }
 
     public LigneVente findByIdLine(Long id) {

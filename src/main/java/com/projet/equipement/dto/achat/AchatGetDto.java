@@ -26,5 +26,7 @@ public class AchatGetDto {
 
     private LocalDateTime dateCreation;
 
+    private LocalDateTime updatedAt;
+
 
 }

@@ -1,6 +1,7 @@
 package com.projet.equipement.dto.vente;
 
 import com.projet.equipement.dto.employe.EmployeGetDto;
+import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.entity.Client;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,8 @@ public class VenteGetDto {
 
     private Double montantTotal;
 
-    private LocalDateTime dateDerniereMiseAjour;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     private Long clientId;
 
@@ -33,6 +35,8 @@ public class VenteGetDto {
     private EmployeGetDto employe;
 
     private List<Long> lignesVenteId;
+
+    private List<LigneVenteGetDto> ligneVentes;
 
 
 }

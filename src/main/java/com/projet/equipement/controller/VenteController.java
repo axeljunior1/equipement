@@ -8,9 +8,7 @@ import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
 import com.projet.equipement.entity.Caisse;
 import com.projet.equipement.entity.Client;
-import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Vente;
-import com.projet.equipement.mapper.VenteMapper;
 import com.projet.equipement.repository.ClientRepository;
 import com.projet.equipement.services.ClientService;
 import com.projet.equipement.services.TransactionVenteAndLinesService;
@@ -52,8 +50,8 @@ public class VenteController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity< Vente> findVente(@PathVariable Long id) {
-         Vente vente = transactionVenteAndLinesService.findByIdVente(id);
+    public ResponseEntity< VenteGetDto> findVente(@PathVariable Long id) {
+        VenteGetDto vente = transactionVenteAndLinesService.findByIdVente(id);
         return ResponseEntity.ok(vente);
     }
     
@@ -105,7 +103,7 @@ public ResponseEntity<Vente> createVenteNLignes( @Valid @RequestBody Caisse cais
             .clientId(client.getId())
             .montantTotal(caisse.getVenteMontantTotal())
             .employeId(caisse.getVenteEmployeId())
-            .dateDerniereMiseAjour(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
             .actif(true)
             .build();
     Vente vente = transactionVenteAndLinesService.saveVente(ventePostDto);
@@ -113,7 +111,7 @@ public ResponseEntity<Vente> createVenteNLignes( @Valid @RequestBody Caisse cais
     caisse.getLignesCaisses().forEach(ligneCaisse -> {
         LigneVentePostDto ligneVentePostDto = LigneVentePostDto.builder()
                 .venteId(Math.toIntExact(vente.getId()))
-                .prixVenteUnitaire(ligneCaisse.getLVentePrixVenteUnitaire())
+                .prixVente(ligneCaisse.getLVentePrixVenteUnitaire())
                 .produitId(ligneCaisse.getLVenteProduitId())
                 .quantite(ligneCaisse.getLVenteQuantite())
                 .build();

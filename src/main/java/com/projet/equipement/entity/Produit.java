@@ -46,12 +46,17 @@ public class Produit {
     private Boolean actif = true ;
 
     @Column(name = "created_at")
-    private LocalDateTime created_at ;
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "updated_at")
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @JsonIgnore
     private String image;
-    @Column(name = "prix_achat")
-    private Double prixUnitaire;
+    @Column(name = "prix_vente")
+    private Double prixVente;
 
     @Column(name = "stock_initial")
     private Integer stockInitial;

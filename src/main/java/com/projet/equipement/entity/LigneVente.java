@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Builder
@@ -21,7 +19,7 @@ public class LigneVente {
     private Long id;
 
     @Column(name = "prix_vente_unitaire")
-    private Double prixVenteUnitaire;
+    private Double prixVente;
 
     @Column(name = "quantite")
     private Integer quantite;

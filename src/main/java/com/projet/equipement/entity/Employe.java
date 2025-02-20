@@ -39,7 +39,8 @@ public class Employe {
     private Set<Role> roles = new HashSet<>();
 
     @Column(name = "created_at")
-    private LocalDateTime dateCreation;
+    @Builder.Default
+    private LocalDateTime dateCreation =LocalDateTime.now();
 
     @OneToMany(mappedBy = "employe")
     @JsonIgnore

@@ -28,10 +28,12 @@ public class Vente {
     private Boolean actif = true;
 
     @Column(name = "created_at")
-    private LocalDateTime dateCreation;
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
-    private LocalDateTime dateDerniereMiseAJour;
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @ManyToOne()
     @JoinColumn(name = "client_id")

@@ -25,7 +25,7 @@ public interface LigneAchatRepository extends JpaRepository<LigneAchat, Long> {
     Page<LigneAchat> findAllLine(Pageable pageable);
 
     //On somme les montatns pour les lignes actives
-    @Query("SELECT SUM(l.prixAchatUnitaire * l.quantite) FROM LigneAchat l WHERE l.achat.id = :achatId and l.actif=true ")
+    @Query("SELECT SUM(l.prixAchat * l.quantite) FROM LigneAchat l WHERE l.achat.id = :achatId and l.actif=true ")
     Double sumTotalByAchatId(@Param("achatId") Long achatId);
 
 }

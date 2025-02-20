@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class LigneVenteUpdateDto {
 
-    private Double prixVenteUnitaire;
+    private Double prixVente;
 
     private Integer quantite;
 
