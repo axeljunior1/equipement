@@ -21,7 +21,7 @@ public class PanierProduitGetDto {
 
     private ProduitGetDto produit;
 
-    private Double quantite;
+    private Integer quantite;
 
 
 }

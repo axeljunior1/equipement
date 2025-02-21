@@ -1,17 +1,23 @@
 package com.projet.equipement.dto.client;
 
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class ClientUpdateDto {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ClientGetDto {
+
+    private Long id;
     private String nom;
     private String prenom;
     private String email;
     private String telephone;
     private Boolean actif;
     private LocalDateTime dateCreation;
+
 }

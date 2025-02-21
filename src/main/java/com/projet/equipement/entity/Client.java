@@ -25,8 +25,15 @@ public class Client {
     @Column(name = "nom", nullable = false, length = 50)
     private String nom;
     private String prenom;
+
     @Column()
     private String email;
+
+
+
+    @Builder.Default
+    @Column(name = "actif")
+    private Boolean actif = true ;
 
     @NotBlank(message = "Le telephone doit etre renseigné !")
     private String telephone;

@@ -20,5 +20,8 @@ public class ClientPostDto {
     private String email;
     private String telephone;
 
+    @Builder.Default
+    private Boolean actif = true;
+
     private LocalDateTime dateCreation;
 }

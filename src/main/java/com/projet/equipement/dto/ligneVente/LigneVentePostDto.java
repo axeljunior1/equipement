@@ -1,7 +1,5 @@
 package com.projet.equipement.dto.ligneVente;
 
-import com.projet.equipement.entity.Produit;
-import com.projet.equipement.entity.Vente;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,9 +15,9 @@ public class LigneVentePostDto {
 
     private Integer quantite;
 
-    private Integer venteId;
+    private Long venteId;
 
-    private Integer produitId;
+    private Long produitId;
 
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();

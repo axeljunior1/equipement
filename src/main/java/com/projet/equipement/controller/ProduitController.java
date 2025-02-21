@@ -8,6 +8,7 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.ProduitRepository;
 import com.projet.equipement.services.ProduitService;
 import com.projet.equipement.specifications.ProduitSpecification;
+import com.projet.equipement.utils.PaginationUtil;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,20 +55,23 @@ public class ProduitController {
 
 
     @GetMapping("/recherche")
-    public ResponseEntity<List<ProduitGetDto>> rechercherProduits(@RequestParam String motCle) {
+    public ResponseEntity<Page<ProduitGetDto>> rechercherProduits(@RequestParam String motCle, Pageable pageable) {
+
         List<ProduitGetDto> produits = produitService.rechercherProduits(motCle);
-        return ResponseEntity.ok(produits);
+        Page<ProduitGetDto> produitGetDtos = PaginationUtil.toPage(produits, pageable);
+
+        return ResponseEntity.ok(produitGetDtos);
     }
 
     @GetMapping("/recherche-dynamique")
-    public List<ProduitGetDto> filterProduits(
+    public ResponseEntity<Page<ProduitGetDto>> filterProduits(
             @RequestParam(required = false) String nom,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Boolean actif,
             @RequestParam(required = false) Integer stockInitialMin,
             @RequestParam(required = false) Integer stockInitialMax,
             @RequestParam(required = false) Double prixVenteMin,
-            @RequestParam(required = false) Double prixVenteMax) {
+            @RequestParam(required = false) Double prixVenteMax, Pageable pageable) {
 
         Specification<Produit> spec = Specification.where(ProduitSpecification.hasDescription(description))
                 .and(ProduitSpecification.hasNom(nom))
@@ -75,7 +79,9 @@ public class ProduitController {
                 .and(ProduitSpecification.hasStockBetween(stockInitialMin, stockInitialMax))
                 .and(ProduitSpecification.hasPrixBetween(prixVenteMin, prixVenteMax));
 
-        return produitService.findBySpec(spec);
+        List<ProduitGetDto> bySpec = produitService.findBySpec(spec);
+        Page<ProduitGetDto> produits = PaginationUtil.toPage(bySpec, pageable);
+        return ResponseEntity.ok(produits);
     }
 
     @PostMapping

@@ -15,8 +15,8 @@ import java.util.Optional;
 @Repository
 public interface ProduitRepository extends JpaRepository<Produit,  Long>, JpaSpecificationExecutor<Produit> {
     @Query("SELECT p FROM Produit p WHERE p.actif = true and " +
-            "LOWER(p.nom) LIKE LOWER(CONCAT('%', :motCle, '%')) OR " +
-            "LOWER(p.description) LIKE LOWER(CONCAT('%', :motCle, '%'))")
+            "(LOWER(p.nom) LIKE LOWER(CONCAT('%', :motCle, '%')) OR " +
+            "LOWER(p.description) LIKE LOWER(CONCAT('%', :motCle, '%')))")
     List<Produit> rechercherProduits(@Param("motCle") String motCle);
 
     Page<Produit> findByActif(boolean actif, Pageable pageable);

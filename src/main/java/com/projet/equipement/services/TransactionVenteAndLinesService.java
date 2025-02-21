@@ -1,19 +1,22 @@
 package com.projet.equipement.services;
 
+import com.projet.equipement.dto.client.ClientGetDto;
+import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteUpdateDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
+import com.projet.equipement.dto.panierProduit.PanierProduitGetDto;
+import com.projet.equipement.dto.validerPanier.ValiderPanierDTO;
 import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
-import com.projet.equipement.entity.LigneVente;
-import com.projet.equipement.entity.StockCourant;
-import com.projet.equipement.entity.Vente;
+import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.StockInsuffisantException;
 import com.projet.equipement.mapper.LigneVenteMapper;
 import com.projet.equipement.mapper.VenteMapper;
+import com.projet.equipement.repository.ClientRepository;
 import com.projet.equipement.repository.LigneVenteRepository;
 import com.projet.equipement.repository.VenteRepository;
 import jakarta.persistence.EntityManager;
@@ -35,15 +38,20 @@ public class TransactionVenteAndLinesService {
     private final VenteRepository venteRepository;
     private final StockCourantService stockCourantService;
     private final EntityManager entityManager;
+    private final PanierProduitService panierProduitService;
+    private final ClientRepository clientRepository;
+    private final ClientService clientService;
+    private final EmployeService employeService;
+    private final PanierService panierService;
 
     public TransactionVenteAndLinesService(
-                                           LigneVenteMapper ligneVenteMapper,
-                                           LigneVenteRepository ligneVenteRepository,
-                                           MouvementStockService mouvementStockService,
-                                           VenteMapper venteMapper,
-                                           VenteRepository venteRepository,
-                                           StockCourantService stockCourantService,
-                                           EntityManager entityManagerFactory) {
+            LigneVenteMapper ligneVenteMapper,
+            LigneVenteRepository ligneVenteRepository,
+            MouvementStockService mouvementStockService,
+            VenteMapper venteMapper,
+            VenteRepository venteRepository,
+            StockCourantService stockCourantService,
+            EntityManager entityManagerFactory, PanierProduitService panierProduitService, ClientRepository clientRepository, ClientService clientService, EmployeService employeService, PanierService panierService) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -51,6 +59,11 @@ public class TransactionVenteAndLinesService {
         this.venteRepository = venteRepository;
         this.stockCourantService = stockCourantService;
         this.entityManager = entityManagerFactory;
+        this.panierProduitService = panierProduitService;
+        this.clientRepository = clientRepository;
+        this.clientService = clientService;
+        this.employeService = employeService;
+        this.panierService = panierService;
     }
 
 
@@ -63,6 +76,45 @@ public class TransactionVenteAndLinesService {
         vente.setMontantTotal(total != null ? total : 0.0);
 
         venteRepository.save(vente);
+    }
+
+
+    @Transactional
+    public VenteGetDto validerVenteDansPanier(ValiderPanierDTO validerPanierDTO) {
+        Client client = clientService.findById(validerPanierDTO.getIdClient());
+        EmployeGetDto employe = employeService.findById(validerPanierDTO.getIdEmploye());
+        Panier panier = panierService.findById(validerPanierDTO.getIdPanier());
+
+        List<PanierProduitGetDto> panierProduits = panierProduitService.findAllByPanierId(panier.getId());
+//        Double mTotal = 0D ;
+        Double montantTotal = panierProduits.stream()
+                .mapToDouble(ligneCaisse -> ligneCaisse.getQuantite() * ligneCaisse.getPrixVente())
+                .sum();
+
+
+        VentePostDto ventePostDto = VentePostDto.builder()
+                .clientId(client.getId())
+                .montantTotal(montantTotal)
+                .employeId(employe.getId())
+                .updatedAt(LocalDateTime.now())
+                .actif(true)
+                .build();
+        Vente vente = this.saveVente(ventePostDto);
+
+
+
+        panierProduits.forEach(ligneCaisse -> {
+
+            LigneVentePostDto ligneVentePostDto = LigneVentePostDto.builder()
+                    .venteId(vente.getId())
+                    .prixVente(ligneCaisse.getPrixVente())
+                    .produitId(ligneCaisse.getProduit().getId())
+                    .quantite(ligneCaisse.getQuantite())
+                    .build();
+            this.saveLigneVente(ligneVentePostDto);
+        });
+
+        return venteMapper.toDto(vente);
     }
 
 

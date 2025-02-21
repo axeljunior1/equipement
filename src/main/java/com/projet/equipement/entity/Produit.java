@@ -55,8 +55,12 @@ public class Produit {
 
     @JsonIgnore
     private String image;
+
     @Column(name = "prix_vente")
     private Double prixVente;
+
+    @Column(name = "prix_achat")
+    private Double prixAchat;
 
     @Column(name = "stock_initial")
     private Integer stockInitial;

@@ -1,31 +1,28 @@
 package com.projet.equipement.mapper;
 
+import com.projet.equipement.dto.client.ClientGetDto;
 import com.projet.equipement.dto.client.ClientPostDto;
 import com.projet.equipement.dto.client.ClientUpdateDto;
 import com.projet.equipement.entity.Client;
-import org.springframework.stereotype.Component;
+import com.projet.equipement.entity.Employe;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
-import java.time.LocalDateTime;
-
-@Component
-public class ClientMapper {
+@Mapper(componentModel = "spring")
+public interface ClientMapper {
 
 
+    ClientGetDto toDto(Client client);
 
-    public void updateClientFromDto(ClientUpdateDto clientUpdateDto, Client client){
-        if (clientUpdateDto.getNom() != null) client.setNom(clientUpdateDto.getNom());
-        if (clientUpdateDto.getPrenom() != null) client.setPrenom(clientUpdateDto.getPrenom());
-        if (clientUpdateDto.getEmail() != null) client.setEmail(clientUpdateDto.getEmail());
-        if (clientUpdateDto.getTelephone() != null) client.setTelephone(clientUpdateDto.getTelephone());
-    }
+    Client toEntity(ClientGetDto clientGetDto);
 
-    public Client postClientDto(ClientPostDto clientPostDto) {
-        Client client = new Client();
-        client.setNom(clientPostDto.getNom());
-        client.setPrenom(clientPostDto.getPrenom());
-        client.setEmail(clientPostDto.getEmail());
-        client.setTelephone(clientPostDto.getTelephone());
-        client.setDateCreation(LocalDateTime.now());
-       return client;
-    }
+    Client toEntity(ClientPostDto clientGetDto);
+
+
+    void updateDto( ClientUpdateDto clientUpdateDto, @MappingTarget Client client);
+
+
+
 }
