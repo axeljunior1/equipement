@@ -23,5 +23,6 @@ public class ClientPostDto {
     @Builder.Default
     private Boolean actif = true;
 
-    private LocalDateTime dateCreation;
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

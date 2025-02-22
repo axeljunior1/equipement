@@ -13,5 +13,4 @@ public class ClientUpdateDto {
     private String email;
     private String telephone;
     private Boolean actif;
-    private LocalDateTime dateCreation;
 }

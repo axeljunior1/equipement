@@ -41,7 +41,7 @@ public class Client {
 
     @Column(name = "created_at")
     @Builder.Default
-    private LocalDateTime dateCreation =LocalDateTime.now();
+    private LocalDateTime createdAt =LocalDateTime.now();
 
     @OneToMany(mappedBy = "client")
     @JsonIgnore

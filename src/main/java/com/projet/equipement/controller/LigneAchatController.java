@@ -41,7 +41,7 @@ public class LigneAchatController {
         return ResponseEntity.ok(ligneAchat);
     }
     @PostMapping("")
-    public ResponseEntity<LigneAchatGetDto> addLigneAchat(@RequestBody LigneAchatPostDto ligneAchatPostDto) {
+    public ResponseEntity<LigneAchatGetDto> addLigneAchat(@Valid @RequestBody LigneAchatPostDto ligneAchatPostDto) {
         LigneAchatGetDto ligneAchat = transactionAchatAndLinesService.saveLigneAchat(ligneAchatPostDto);
         return ResponseEntity.ok(ligneAchat);
     }

@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.webjars.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -86,6 +87,10 @@ public class TransactionVenteAndLinesService {
         Panier panier = panierService.findById(validerPanierDTO.getIdPanier());
 
         List<PanierProduitGetDto> panierProduits = panierProduitService.findAllByPanierId(panier.getId());
+
+        if (panierProduits.isEmpty()){
+            throw new NotFoundException("Panier vide ");
+        }
 //        Double mTotal = 0D ;
         Double montantTotal = panierProduits.stream()
                 .mapToDouble(ligneCaisse -> ligneCaisse.getQuantite() * ligneCaisse.getPrixVente())
