@@ -7,7 +7,6 @@ import com.projet.equipement.entity.Panier;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.PanierMapper;
 import com.projet.equipement.repository.PanierRepository;
-import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

@@ -3,6 +3,7 @@ package com.projet.equipement.dto.vente;
 import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.entity.Client;
+import com.projet.equipement.entity.EtatVente;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +30,10 @@ public class VenteGetDto {
     private Boolean actif;
 
     private Long employeId;
+
+    private Long etatId;
+
+    private EtatVente etat;
 
     private String employeNom;
 

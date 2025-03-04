@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -13,9 +14,17 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class FacturePostDTO {
 
-    private Long venteId;
-    private Double montantTotal;
     @Builder.Default
-    private String statut = "CREEE";
-    private String modePaiement;
+    private Double montantRestant = 0.0;
+    @Builder.Default
+    private Double montantTotal = 0.0;
+    private String numeroFacture;
+    private Long venteId;
+    private Long etatId ;
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+
 }

@@ -1,11 +1,9 @@
 package com.projet.equipement.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -24,6 +22,10 @@ public class Vente {
 
     @Column(name = "montant_total")
     private Double montantTotal;
+
+    @ManyToOne
+    @JoinColumn(name = "etat_id", nullable = false)
+    private EtatVente etat;
 
     @Column(name = "actif")
     @Builder.Default

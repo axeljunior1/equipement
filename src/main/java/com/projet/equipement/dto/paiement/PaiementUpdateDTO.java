@@ -10,4 +10,6 @@ public class PaiementUpdateDTO {
     private BigDecimal montantPaye;
     private String modePaiement;
     private String reference;
+    private Long etatId;
+
 }

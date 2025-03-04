@@ -9,11 +9,12 @@ public class FactureGetDTO {
 
     private Long idFacture;
     private Long venteId;
+    private Long etatId;
+    private String etatNom;
     private String numeroFacture;
     private LocalDateTime dateFacture;
     private BigDecimal montantTotal;
-    private String statut;
-    private String modePaiement;
+    private BigDecimal montantRestant;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -64,10 +64,7 @@ public class FactureService {
     }
 
     // Obtenir une liste paginée de toutes les factures
-    public Page<FactureGetDTO> getAllFactures(int page, int size) {
-        // Créer un objet Pageable pour la pagination
-        Pageable pageable = PageRequest.of(page, size);
-
+    public Page<FactureGetDTO> getAllFactures(Pageable pageable) {
         // Récupérer une page de factures à partir du repository
         Page<Facture> facturePage = factureRepository.findAll(pageable);
 
@@ -75,16 +72,4 @@ public class FactureService {
         return facturePage.map(factureMapper::toDto);
     }
 
-    // Obtenir une liste paginée de factures par statut
-    public Page<FactureGetDTO> getFacturesByStatut(String statut, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        // Récupérer une page de factures avec le statut spécifié
-        Page<Facture> facturePage = factureRepository.findByStatut(statut, pageable);
-
-        // Convertir la page d'entités Facture en une page de DTOs FactureGetDTO
-        return facturePage.map(factureMapper::toDto);
-    }
-
-    // Autres méthodes de service, selon vos besoins...
 }

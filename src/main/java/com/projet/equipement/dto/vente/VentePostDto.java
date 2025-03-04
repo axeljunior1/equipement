@@ -25,6 +25,8 @@ public class VentePostDto {
 
     private Boolean actif ;
 
+    private Long etatId ;
+
 
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();

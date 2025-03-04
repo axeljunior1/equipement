@@ -10,8 +10,8 @@ public class PaiementGetDTO {
 
     private Long idPaiement;
     private Long factureId;
+    private Long etatId;
     private BigDecimal montantPaye;
-    private LocalDateTime datePaiement;
     private String modePaiement;
     private String reference;
     private LocalDateTime createdAt;

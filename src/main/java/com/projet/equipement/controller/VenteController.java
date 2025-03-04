@@ -1,6 +1,5 @@
 package com.projet.equipement.controller;
 
-import com.projet.equipement.dto.client.ClientGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.validerPanier.ValiderPanierDTO;
 import com.projet.equipement.dto.vente.VenteGetDto;
@@ -69,21 +68,27 @@ public class VenteController {
     @Transactional // Active la gestion transactionnelle
     public ResponseEntity<VenteGetDto> createVenteNLignes(@Valid @RequestBody ValiderPanierDTO validerPanierDTO
                                                           ) {
-
-        /*
-         * jai le client c'est ok
-         * je cree la vente
-         * je prens les lignes dans le panier a partir de l'id de panier quon me donne
-         * je cree les lignes
-         * je retourne la vente
-         *
-         * */
-
-
         VenteGetDto venteGetDto = transactionVenteAndLinesService.validerVenteDansPanier(validerPanierDTO);
 
-
         return ResponseEntity.ok(venteGetDto);
+    }
+
+    @GetMapping("/{venteId}/payer")
+    public ResponseEntity<String> payerVente(@PathVariable Long venteId) {
+         transactionVenteAndLinesService.payer(venteId);
+         return ResponseEntity.ok("payed");
+    }
+
+    @GetMapping("/{venteId}/rembourser")
+    public ResponseEntity<String> rembourser(@PathVariable Long venteId) {
+         transactionVenteAndLinesService.rembourser(venteId);
+         return ResponseEntity.ok("refund");
+    }
+
+    @GetMapping("/{venteId}/annuler")
+    public ResponseEntity<String> annuler(@PathVariable Long venteId) {
+         transactionVenteAndLinesService.annuler(venteId);
+         return ResponseEntity.ok("cancel");
     }
 
 

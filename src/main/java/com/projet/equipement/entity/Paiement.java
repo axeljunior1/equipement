@@ -26,11 +26,13 @@ public class Paiement {
     @JoinColumn(name = "facture_id", nullable = false)
     private Facture facture;
 
+    @ManyToOne
+    @JoinColumn(name = "etat_id", nullable = false)
+    private EtatPaiement etat;
+
     @Column(name = "montant_paye", nullable = false)
     private BigDecimal montantPaye;
 
-    @Column(name = "date_paiement", nullable = false)
-    private LocalDateTime datePaiement = LocalDateTime.now();
 
     @Column(name = "mode_paiement")
     private String modePaiement;

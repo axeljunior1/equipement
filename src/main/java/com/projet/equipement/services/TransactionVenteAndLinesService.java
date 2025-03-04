@@ -1,33 +1,39 @@
 package com.projet.equipement.services;
 
-import com.projet.equipement.dto.client.ClientGetDto;
 import com.projet.equipement.dto.employe.EmployeGetDto;
+import com.projet.equipement.dto.facture.FactureGetDTO;
+import com.projet.equipement.dto.facture.FacturePostDTO;
 import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteUpdateDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
+import com.projet.equipement.dto.paiement.PaiementPostDTO;
 import com.projet.equipement.dto.panierProduit.PanierProduitGetDto;
 import com.projet.equipement.dto.validerPanier.ValiderPanierDTO;
 import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
 import com.projet.equipement.entity.*;
+import com.projet.equipement.enumeration.VenteEnum;
+import com.projet.equipement.enumeration.VenteTransitionEnum;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.StockInsuffisantException;
 import com.projet.equipement.mapper.LigneVenteMapper;
 import com.projet.equipement.mapper.VenteMapper;
-import com.projet.equipement.repository.ClientRepository;
-import com.projet.equipement.repository.LigneVenteRepository;
-import com.projet.equipement.repository.VenteRepository;
+import com.projet.equipement.repository.*;
+import com.projet.equipement.utils.FactureNumeroGenerator;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
 
 @Service
 public class TransactionVenteAndLinesService {
@@ -44,6 +50,13 @@ public class TransactionVenteAndLinesService {
     private final ClientService clientService;
     private final EmployeService employeService;
     private final PanierService panierService;
+    private final StateMachine<VenteEnum, String> stateMachine;
+    private final EtatVenteRepository etatVenteRepository;
+    private final EtatFactureRepository etatFactureRepository;
+    private final EtatFactureService etatFactureService;
+    private final FactureService factureService;
+    private final PaiementService paiementService;
+    private final EtatPaiementService etatPaiementService;
 
     public TransactionVenteAndLinesService(
             LigneVenteMapper ligneVenteMapper,
@@ -52,7 +65,13 @@ public class TransactionVenteAndLinesService {
             VenteMapper venteMapper,
             VenteRepository venteRepository,
             StockCourantService stockCourantService,
-            EntityManager entityManagerFactory, PanierProduitService panierProduitService, ClientRepository clientRepository, ClientService clientService, EmployeService employeService, PanierService panierService) {
+            EntityManager entityManagerFactory,
+            PanierProduitService panierProduitService,
+            ClientRepository clientRepository,
+            ClientService clientService,
+            EmployeService employeService,
+            PanierService panierService,
+            StateMachine<VenteEnum, String> stateMachine, EtatVenteRepository etatVenteRepository, EtatFactureRepository etatFactureRepository, EtatFactureService etatFactureService, FactureService factureService, PaiementService paiementService, EtatPaiementService etatPaiementService) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -65,6 +84,13 @@ public class TransactionVenteAndLinesService {
         this.clientService = clientService;
         this.employeService = employeService;
         this.panierService = panierService;
+        this.stateMachine = stateMachine;
+        this.etatVenteRepository = etatVenteRepository;
+        this.etatFactureRepository = etatFactureRepository;
+        this.etatFactureService = etatFactureService;
+        this.factureService = factureService;
+        this.paiementService = paiementService;
+        this.etatPaiementService = etatPaiementService;
     }
 
 
@@ -85,10 +111,11 @@ public class TransactionVenteAndLinesService {
         Client client = clientService.findById(validerPanierDTO.getIdClient());
         EmployeGetDto employe = employeService.findById(validerPanierDTO.getIdEmploye());
         Panier panier = panierService.findById(validerPanierDTO.getIdPanier());
+        EtatVente etatVente = etatVenteRepository.findByLibelle("CONFIRMEE").orElseThrow(()->new EntityNotFoundException("EtatVente", "CONFIRMEE" ));
 
         List<PanierProduitGetDto> panierProduits = panierProduitService.findAllByPanierId(panier.getId());
 
-        if (panierProduits.isEmpty()){
+        if (panierProduits.isEmpty()) {
             throw new NotFoundException("Panier vide ");
         }
 //        Double mTotal = 0D ;
@@ -101,23 +128,44 @@ public class TransactionVenteAndLinesService {
                 .clientId(client.getId())
                 .montantTotal(montantTotal)
                 .employeId(employe.getId())
+                .etatId(etatVente.getId())
                 .updatedAt(LocalDateTime.now())
                 .actif(true)
                 .build();
         Vente vente = this.saveVente(ventePostDto);
 
 
-
-        panierProduits.forEach(ligneCaisse -> {
+        panierProduits.forEach(lignePanier -> {
 
             LigneVentePostDto ligneVentePostDto = LigneVentePostDto.builder()
                     .venteId(vente.getId())
-                    .prixVente(ligneCaisse.getPrixVente())
-                    .produitId(ligneCaisse.getProduit().getId())
-                    .quantite(ligneCaisse.getQuantite())
+                    .prixVente(lignePanier.getPrixVente())
+                    .produitId(lignePanier.getProduit().getId())
+                    .quantite(lignePanier.getQuantite())
                     .build();
             this.saveLigneVente(ligneVentePostDto);
         });
+
+        //gen facture CREE
+
+        FacturePostDTO facturePostDTO = FacturePostDTO.builder()
+                .venteId(vente.getId())
+                .numeroFacture(FactureNumeroGenerator.generateNumeroFacture())
+                .etatId(etatFactureService.findByLibelle("CREEE").getId())
+                .build();
+
+        FactureGetDTO facture = factureService.createFacture(facturePostDTO);
+
+        //gen paiement etat => EN_ATTENTE
+
+        PaiementPostDTO  paiementPostDTO = PaiementPostDTO.builder()
+                .factureId(facture.getIdFacture())
+                .modePaiement("")
+                .montantPaye(BigDecimal.valueOf(0.000))
+                .etatId(etatPaiementService.findByLibelle("EN_ATTENTE").getId())
+                .build();
+
+        paiementService.createPaiement(paiementPostDTO);
 
         return venteMapper.toDto(vente);
     }
@@ -151,7 +199,7 @@ public class TransactionVenteAndLinesService {
 
 
     @Transactional
-    public void softDeleteVente(Long id){
+    public void softDeleteVente(Long id) {
 
         List<LigneVente> ligneVentes = this.findByVenteId(id);
         for (LigneVente ligneVente : ligneVentes) {
@@ -183,8 +231,8 @@ public class TransactionVenteAndLinesService {
         LocalDateTime dateCreate = LocalDateTime.now();
         // Enregistrement du mouvement de stock via le service dédié
         mouvementStockService.save(MouvementStockPostDto.builder()
-                .reference( "VTE_" + ligneVentePostDto.getVenteId() + "_LIG_" + saveLigneVente.getId())
-                .produitId(Long.valueOf(ligneVentePostDto.getProduitId()))
+                .reference("VTE_" + ligneVentePostDto.getVenteId() + "_LIG_" + saveLigneVente.getId())
+                .produitId(ligneVentePostDto.getProduitId())
                 .quantite(ligneVentePostDto.getQuantite())
                 .commentaire("Généré à partir de la ligne d'un vente")
                 .createdAt(dateCreate)
@@ -200,7 +248,7 @@ public class TransactionVenteAndLinesService {
 
     public Vente saveVente(VentePostDto ventePostDto) {
 
-        Vente vente =  venteMapper.toEntity(ventePostDto);
+        Vente vente = venteMapper.toEntity(ventePostDto);
 
         Vente save = venteRepository.save(vente);
         entityManager.refresh(save);
@@ -222,16 +270,15 @@ public class TransactionVenteAndLinesService {
      * Pour la mise à jour d'un vente
      */
     public Vente updateVente(VenteUpdateDto venteUpdateDto, Long id) {
-        Vente vente = venteRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Vente", id));
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
 
-        venteMapper.updateDto(venteUpdateDto,vente);
+        venteMapper.updateDto(venteUpdateDto, vente);
 
 
         Vente save = venteRepository.save(vente);
         entityManager.refresh(save);
         return save;
     }
-
 
 
     public Page<LigneVenteGetDto> findAllLine(Pageable pageable) {
@@ -247,7 +294,7 @@ public class TransactionVenteAndLinesService {
     @Transactional
     public LigneVente saveLine(LigneVentePostDto ligneVentePostDto) {
         // Récupération du produit ID
-        Long produitId = Long.valueOf(ligneVentePostDto.getProduitId());
+        Long produitId = ligneVentePostDto.getProduitId();
 
         // Vérification de la quantité demandée
         Integer qte = ligneVentePostDto.getQuantite();
@@ -264,7 +311,6 @@ public class TransactionVenteAndLinesService {
         if (stockCourant.getStockCourant() < qte) {
             throw new StockInsuffisantException("Quantité demandée (" + qte + ") supérieure au stock disponible (" + stockCourant.getStockCourant() + ")");
         }
-
 
 
         LigneVente ligneVente = ligneVenteMapper.toEntity(ligneVentePostDto);
@@ -315,5 +361,60 @@ public class TransactionVenteAndLinesService {
         updateTotalVente(ligneVente.getVente().getId());
     }
 
+    // State Machine
+
+    public void payer(Long id) {
+
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+
+        // Démarrer le processus avec Spring State Machine
+        stateMachine.start();
+        stateMachine.sendEvent(String.valueOf(VenteTransitionEnum.CONFIRMEE_PAYEE));
+
+        System.out.println(stateMachine.getState());
+
+        // Mettre à jour l'état de la vente dans la base de données
+        String libelle = String.valueOf(stateMachine.getState().getId());
+        EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
+                .orElseThrow(() -> new EntityNotFoundException("EtatVente", libelle));
+
+        vente.setEtat(etatVente);
+        venteRepository.save(vente);
+    }
+
+    public void annuler(Long id) {
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+
+
+        stateMachine.start();
+        stateMachine.sendEvent(String.valueOf(VenteTransitionEnum.CONFIRMEE_ANNULEE));
+
+
+        // Mettre à jour l'état de la vente dans la base de données
+        String libelle = String.valueOf(stateMachine.getState().getId());
+        EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
+                .orElseThrow(() -> new EntityNotFoundException("EtatVente", libelle));
+
+        vente.setEtat(etatVente);
+        venteRepository.save(vente);
+    }
+
+
+    public void rembourser(Long id) {
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+
+
+        stateMachine.start();
+        stateMachine.sendEvent(String.valueOf(VenteTransitionEnum.PAYEE_REMBOURSEE));
+
+
+        // Mettre à jour l'état de la vente dans la base de données
+        String libelle = String.valueOf(stateMachine.getState().getId());
+        EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
+                .orElseThrow(() -> new EntityNotFoundException("EtatVente", libelle));
+
+        vente.setEtat(etatVente);
+        venteRepository.save(vente);
+    }
 
 }

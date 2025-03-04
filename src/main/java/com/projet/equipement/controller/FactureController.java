@@ -6,6 +6,7 @@ import com.projet.equipement.dto.facture.FacturePostDTO;
 import com.projet.equipement.dto.facture.FactureUpdateDTO;
 import com.projet.equipement.services.FactureService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,19 +42,10 @@ public class FactureController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<FactureGetDTO>> getAllFactures(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<FactureGetDTO> facturePage = factureService.getAllFactures(page, size);
+    public ResponseEntity<Page<FactureGetDTO>> getAllFactures(Pageable pageable) {
+        Page<FactureGetDTO> facturePage = factureService.getAllFactures(pageable);
         return ResponseEntity.ok(facturePage);
     }
 
-    @GetMapping("/statut")
-    public ResponseEntity<Page<FactureGetDTO>> getFacturesByStatut(
-            @RequestParam String statut,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<FactureGetDTO> facturePage = factureService.getFacturesByStatut(statut, page, size);
-        return ResponseEntity.ok(facturePage);
-    }
+
 }
