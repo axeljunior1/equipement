@@ -1,12 +1,9 @@
 package com.projet.equipement.security;
 
 
-import com.projet.equipement.entity.Authority;
 import com.projet.equipement.entity.Employe;
-import com.projet.equipement.entity.Role;
 import com.projet.equipement.repository.EmployeRepository;
 import com.projet.equipement.services.RoleService;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -15,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;

@@ -6,9 +6,7 @@ import com.projet.equipement.dto.client.ClientUpdateDto;
 import com.projet.equipement.entity.Client;
 import com.projet.equipement.entity.Employe;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
 public interface ClientMapper {

@@ -3,6 +3,7 @@ package com.projet.equipement.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,30 +12,28 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "panier")
-public class Panier {
+@Table(name = "tarif_achat")
+public class TarifAchat {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
     private Long id;
 
+    @OneToOne
+    @JoinColumn(name = "id_produit")
+    private Produit produit;
 
-    @Column(name = "created_at")
+    @Column(name = "PRIX_ACHAT")
+    private BigDecimal prixAchat;
+
     @Builder.Default
+    @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @ManyToOne()
-    @JoinColumn(name = "id_employe")
-    private Employe employe;
-
-    @ManyToOne()
-    @JoinColumn(name = "id_etat")
-    private EtatPanier etat;
-
-
-
-
+    @Builder.Default
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
 }
 

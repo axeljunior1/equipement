@@ -3,7 +3,6 @@ package com.projet.equipement.controller;
 import com.projet.equipement.dto.panierProduit.PanierProduitGetDto;
 import com.projet.equipement.dto.panierProduit.PanierProduitPostDto;
 import com.projet.equipement.dto.panierProduit.PanierProduitUpdateDto;
-import com.projet.equipement.entity.PanierProduit;
 import com.projet.equipement.services.PanierProduitService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

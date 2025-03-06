@@ -34,10 +34,10 @@ public interface PanierMapper {
     }
 
     @Named("mapIdToEtat")
-    default Etat mapIdToEtat(Long id){
-        Etat employe = new Etat();
-        employe.setId(id);
-        return employe;
+    default EtatPanier mapIdToEtat(Long id){
+        EtatPanier etat = new EtatPanier();
+        etat.setId(id);
+        return etat;
     }
 
     @Named("mapCategorieToId")

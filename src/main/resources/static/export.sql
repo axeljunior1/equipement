@@ -409,11 +409,10 @@ CREATE TABLE public.factures (
     numero_facture character varying(50) NOT NULL,
     date_facture timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     montant_total numeric(10,2) NOT NULL,
-    statut character varying(20) DEFAULT 'En attente'::character varying NOT NULL,
-    mode_paiement character varying(50),
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     etat_id integer DEFAULT 1 NOT NULL,
+    montant_restant numeric,
     CONSTRAINT factures_montant_total_check CHECK ((montant_total >= (0)::numeric))
 );
 
@@ -618,12 +617,10 @@ CREATE TABLE public.paiements (
     id_paiement integer NOT NULL,
     facture_id integer NOT NULL,
     montant_paye numeric(10,2) NOT NULL,
-    date_paiement timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     mode_paiement character varying(50),
     reference character varying(100),
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    etat_id integer DEFAULT 1 NOT NULL,
-    CONSTRAINT paiements_montant_paye_check CHECK ((montant_paye > (0)::numeric))
+    etat_id integer DEFAULT 1 NOT NULL
 );
 
 
@@ -1133,6 +1130,7 @@ ALTER TABLE ONLY public.ventes ALTER COLUMN id_ventes SET DEFAULT nextval('publi
 COPY public.achats (id_achat, employe_id, montant_total, created_at, updated_at, actif) FROM stdin;
 40	12	0.00	2025-02-21 22:33:47.736209	\N	f
 41	12	26.00	2025-02-22 16:32:31.918796	\N	t
+42	12	6000.00	2025-03-03 20:20:04.450507	\N	t
 \.
 
 
@@ -1183,6 +1181,8 @@ COPY public.clients (id_client, nom, prenom, email, telephone, adresse, created_
 COPY public.employes (id_employe, nom, prenom, created_at, updated_at, password, actif) FROM stdin;
 12	junior	junior	2025-02-10 22:39:42.907528	2025-02-10 22:39:43.047566	$2a$10$YLBqIlUvkMk6nOR9tKBPL.jf.H9bT1X8tbGHXx.Y7tVJVuNrgc..q	t
 13	men	men	\N	2025-02-12 22:31:27.194866	$2a$10$R55IW0OGltH2a5SIC5cDHuxq1tqhW9e2rMdoFrsIo2cxAHp1sd7yy	t
+14	vendeur	vendeur1	\N	2025-02-25 22:15:59.616995	$2a$10$QFilIPk5hy7YRdVEZbn2zuFAmWvCkqFbc/lvE8PXN3xt7J89tYSba	t
+15	Empl 1	Empl 1	\N	2025-03-03 20:16:23.222356	$2a$10$.L3DMTyoF6Ewjy9/V4wY4.xmBtKX1h0MjevQ.y1fIRA5G0KNE/VRm	t
 \.
 
 
@@ -1213,6 +1213,10 @@ COPY public.etat (id, nom, description, type) FROM stdin;
 COPY public.etat_facture (id, libelle, description) FROM stdin;
 1	GENEREE	La facture a été générée.
 2	NON_GENEREE	La facture n’a pas encore été générée.
+7	ANNULEE	Facture annulée avant paiement.
+8	PAYEE	Facture payée
+9	MODIFIEE	Facture modifiée.
+10	CREEE	Facture crée
 \.
 
 
@@ -1224,6 +1228,7 @@ COPY public.etat_paiement (id, libelle, description) FROM stdin;
 1	EN_ATTENTE	Paiement en attente.
 2	EFFECTUE	Paiement effectué avec succès.
 3	REFUSE	Paiement refusé.
+4	PARTIEL	Partiel
 \.
 
 
@@ -1256,8 +1261,12 @@ COPY public.etat_vente (id, libelle, description) FROM stdin;
 -- Data for Name: factures; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.factures (id_facture, vente_id, numero_facture, date_facture, montant_total, statut, mode_paiement, created_at, updated_at, etat_id) FROM stdin;
-1	46	FAC_TEST_2025	2025-02-21 02:42:33	145.00	CREEE	ESPECE	2025-02-21 02:43:36	2025-02-21 02:43:39	1
+COPY public.factures (id_facture, vente_id, numero_facture, date_facture, montant_total, created_at, updated_at, etat_id, montant_restant) FROM stdin;
+1	46	FAC_TEST_2025	2025-02-21 02:42:33	145.00	2025-02-21 02:43:36	2025-02-21 02:43:39	1	\N
+9	62	FAC-2025-0002	2025-03-01 01:10:04.365139	0.00	2025-03-01 01:10:04.364129	2025-03-01 01:10:04.364129	10	0.0
+11	64	FAC-2025-0004	2025-03-03 18:39:11.502747	0.00	2025-03-03 18:39:11.502747	2025-03-03 18:39:11.502747	10	0.0
+14	67	FAC-2025-0006	2025-03-03 20:10:04.826514	0.00	2025-03-03 20:10:04.825969	2025-03-03 20:10:04.825969	10	0.0
+15	68	FAC-2025-0008	2025-03-03 20:13:25.065655	0.00	2025-03-03 20:13:25.064918	2025-03-03 20:13:25.064918	10	0.0
 \.
 
 
@@ -1280,6 +1289,8 @@ COPY public.lignes_achats (id_lignes_achat, lot_id, prix_achat, quantite, create
 85	\N	5.00	2	2025-02-22 16:32:49.040257	2025-02-22 16:32:49.040257	31	41	t
 86	\N	4.00	2	2025-02-22 16:54:59.465585	2025-02-22 16:54:59.465585	55	41	t
 87	\N	4.00	2	2025-02-22 16:55:42.447971	2025-02-22 16:55:42.447971	54	41	t
+88	\N	1000.00	5	2025-03-03 20:20:27.597473	2025-03-03 20:20:27.597473	31	42	t
+89	\N	500.00	2	2025-03-03 20:20:58.971564	2025-03-03 20:20:58.971564	47	42	t
 \.
 
 
@@ -1294,6 +1305,12 @@ COPY public.lignes_ventes (id_lignes_ventes, vente_id, produit_id, quantite, pri
 75	46	56	2	10.00	f
 74	45	22	1	19.99	f
 79	51	56	1	13.00	t
+80	52	56	1	13.00	t
+99	62	54	1	15.00	t
+100	62	48	1	29.99	t
+102	64	54	1	15.00	t
+105	67	54	2	15.00	t
+106	68	54	1	15.00	t
 \.
 
 
@@ -1321,6 +1338,14 @@ COPY public.mouvement_stock (id, reference, produit_id, quantite, type_mouvement
 231	ACH_41_LIG_85	31	2	1	2025-02-22 16:32:49.057744	Généré à partir de la ligne d'un achat	2025-02-22 16:32:49.057744	2025-02-22 16:32:49.063762	41	85
 232	ACH_41_LIG_86	55	2	1	2025-02-22 16:54:59.479504	Généré à partir de la ligne d'un achat	2025-02-22 16:54:59.479504	2025-02-22 16:54:59.483059	41	86
 233	ACH_41_LIG_87	54	2	1	2025-02-22 16:55:42.466829	Généré à partir de la ligne d'un achat	2025-02-22 16:55:42.466829	2025-02-22 16:55:42.469573	41	87
+234	VTE_52_LIG_80	56	1	2	2025-02-25 22:13:56.133831	Généré à partir de la ligne d'un vente	2025-02-25 22:13:56.133831	2025-02-25 22:13:56.142426	52	80
+253	VTE_62_LIG_99	54	1	2	2025-03-01 01:10:04.315483	Généré à partir de la ligne d'un vente	2025-03-01 01:10:04.315483	2025-03-01 01:10:04.3258	62	99
+254	VTE_62_LIG_100	48	1	2	2025-03-01 01:10:04.346586	Généré à partir de la ligne d'un vente	2025-03-01 01:10:04.346586	2025-03-01 01:10:04.353161	62	100
+256	VTE_64_LIG_102	54	1	2	2025-03-03 18:39:11.488112	Généré à partir de la ligne d'un vente	2025-03-03 18:39:11.488112	2025-03-03 18:39:11.494008	64	102
+259	VTE_67_LIG_105	54	2	2	2025-03-03 20:10:04.783918	Généré à partir de la ligne d'un vente	2025-03-03 20:10:04.783918	2025-03-03 20:10:04.807137	67	105
+260	VTE_68_LIG_106	54	1	2	2025-03-03 20:13:25.04376	Généré à partir de la ligne d'un vente	2025-03-03 20:13:25.04376	2025-03-03 20:13:25.048356	68	106
+261	ACH_42_LIG_88	31	5	1	2025-03-03 20:20:27.735614	Généré à partir de la ligne d'un achat	2025-03-03 20:20:27.735614	2025-03-03 20:20:27.741166	42	88
+262	ACH_42_LIG_89	47	2	1	2025-03-03 20:20:59.02678	Généré à partir de la ligne d'un achat	2025-03-03 20:20:59.02678	2025-03-03 20:20:59.042591	42	89
 \.
 
 
@@ -1328,7 +1353,11 @@ COPY public.mouvement_stock (id, reference, produit_id, quantite, type_mouvement
 -- Data for Name: paiements; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.paiements (id_paiement, facture_id, montant_paye, date_paiement, mode_paiement, reference, created_at, etat_id) FROM stdin;
+COPY public.paiements (id_paiement, facture_id, montant_paye, mode_paiement, reference, created_at, etat_id) FROM stdin;
+8	9	0.00		\N	2025-03-01 01:10:04.375571	1
+9	11	0.00		\N	2025-03-03 18:39:11.542456	1
+10	14	0.00		\N	2025-03-03 20:10:04.988186	1
+11	15	0.00		\N	2025-03-03 20:13:25.096617	1
 \.
 
 
@@ -1338,6 +1367,8 @@ COPY public.paiements (id_paiement, facture_id, montant_paye, date_paiement, mod
 
 COPY public.panier (id, id_employe, created_at, id_etat) FROM stdin;
 1	12	2025-02-16 21:06:26.680888	1
+2	14	2025-02-25 22:16:49.113238	1
+3	13	2025-03-03 20:15:40.818567	1
 \.
 
 
@@ -1346,7 +1377,7 @@ COPY public.panier (id, id_employe, created_at, id_etat) FROM stdin;
 --
 
 COPY public.panier_produit (id, id_panier, id_produit, quantite, prix_vente) FROM stdin;
-103	1	56	3	13.00
+116	1	54	1	15.00
 \.
 
 
@@ -1445,10 +1476,11 @@ COPY public.role_authority (id_role, id_authority) FROM stdin;
 
 COPY public.role_employe (id_role, id_employe) FROM stdin;
 2	12
-4	12
 3	12
 1	12
 4	13
+3	14
+3	15
 \.
 
 
@@ -1488,13 +1520,18 @@ COPY public.types_mouvement_stock (id, code, nom, description, date_creation, ty
 --
 
 COPY public.ventes (id_ventes, client_id, date_vente, montant_total, created_at, updated_at, employe_id, actif, etat_id) FROM stdin;
-50	1	\N	0.00	2025-02-22 12:15:15.437091	2025-02-22 12:15:15.437091	12	f	1
-49	24	\N	0.00	2025-02-22 12:15:07.7063	2025-02-22 12:15:07.7063	12	f	1
-48	1	\N	0.00	2025-02-22 10:41:37.045894	2025-02-22 10:41:37.045894	12	f	1
-47	1	\N	0.00	2025-02-22 10:41:07.405214	2025-02-22 10:41:07.404672	12	f	1
-46	1	\N	0.00	2025-02-21 02:33:13.419009	2025-02-21 02:33:13.419009	12	f	1
-45	1	2025-02-21	0.00	2025-02-21 01:27:53	2025-02-21 01:28:07	12	f	1
-51	1	\N	13.00	2025-02-22 12:19:31.61507	2025-02-22 12:19:31.61507	12	t	1
+62	1	\N	44.99	2025-03-01 01:10:04.178842	2025-03-01 01:10:01.948041	12	t	6
+64	1	\N	15.00	2025-03-03 18:39:11.451264	2025-03-03 18:39:11.451264	12	t	6
+67	24	\N	30.00	2025-03-03 20:10:04.656889	2025-03-03 20:10:04.656476	12	t	6
+68	1	\N	15.00	2025-03-03 20:13:24.996192	2025-03-03 20:13:24.996192	12	t	6
+46	1	\N	0.00	2025-02-21 02:33:13.419009	2025-02-21 02:33:13.419009	12	f	6
+48	1	\N	0.00	2025-02-22 10:41:37.045894	2025-02-22 10:41:37.045894	12	f	6
+45	1	2025-02-21	0.00	2025-02-21 01:27:53	2025-02-21 01:28:07	12	f	6
+47	1	\N	0.00	2025-02-22 10:41:07.405214	2025-02-22 10:41:07.404672	12	f	6
+49	24	\N	0.00	2025-02-22 12:15:07.7063	2025-02-22 12:15:07.7063	12	f	6
+50	1	\N	0.00	2025-02-22 12:15:15.437091	2025-02-22 12:15:15.437091	12	f	4
+51	1	\N	13.00	2025-02-22 12:19:31.61507	2025-02-22 12:19:31.61507	12	t	5
+52	1	\N	13.00	2025-02-25 22:13:55.979514	2025-02-25 22:13:55.979514	12	t	4
 \.
 
 
@@ -1502,7 +1539,7 @@ COPY public.ventes (id_ventes, client_id, date_vente, montant_total, created_at,
 -- Name: achats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.achats_id_seq', 41, true);
+SELECT pg_catalog.setval('public.achats_id_seq', 42, true);
 
 
 --
@@ -1530,14 +1567,14 @@ SELECT pg_catalog.setval('public.clients_id_seq', 29, true);
 -- Name: employes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.employes_id_seq', 13, true);
+SELECT pg_catalog.setval('public.employes_id_seq', 15, true);
 
 
 --
 -- Name: etat_facture_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.etat_facture_id_seq', 6, true);
+SELECT pg_catalog.setval('public.etat_facture_id_seq', 10, true);
 
 
 --
@@ -1551,7 +1588,7 @@ SELECT pg_catalog.setval('public.etat_id_seq', 4, true);
 -- Name: etat_paiement_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.etat_paiement_id_seq', 3, true);
+SELECT pg_catalog.setval('public.etat_paiement_id_seq', 4, true);
 
 
 --
@@ -1572,7 +1609,7 @@ SELECT pg_catalog.setval('public.etat_vente_id_seq', 12, true);
 -- Name: factures_id_facture_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.factures_id_facture_seq', 1, true);
+SELECT pg_catalog.setval('public.factures_id_facture_seq', 15, true);
 
 
 --
@@ -1586,42 +1623,42 @@ SELECT pg_catalog.setval('public.fournisseurs_id_seq', 1, false);
 -- Name: lignes_achats_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.lignes_achats_id_seq', 87, true);
+SELECT pg_catalog.setval('public.lignes_achats_id_seq', 89, true);
 
 
 --
 -- Name: lignes_ventes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.lignes_ventes_id_seq', 79, true);
+SELECT pg_catalog.setval('public.lignes_ventes_id_seq', 106, true);
 
 
 --
 -- Name: mouvement_stock_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.mouvement_stock_id_seq', 233, true);
+SELECT pg_catalog.setval('public.mouvement_stock_id_seq', 262, true);
 
 
 --
 -- Name: paiements_id_paiement_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.paiements_id_paiement_seq', 1, false);
+SELECT pg_catalog.setval('public.paiements_id_paiement_seq', 11, true);
 
 
 --
 -- Name: panier_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.panier_id_seq', 1, true);
+SELECT pg_catalog.setval('public.panier_id_seq', 3, true);
 
 
 --
 -- Name: panier_produit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.panier_produit_id_seq', 103, true);
+SELECT pg_catalog.setval('public.panier_produit_id_seq', 117, true);
 
 
 --
@@ -1656,7 +1693,7 @@ SELECT pg_catalog.setval('public.types_mouvement_stock_id_seq', 10, true);
 -- Name: ventes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.ventes_id_seq', 51, true);
+SELECT pg_catalog.setval('public.ventes_id_seq', 68, true);
 
 
 --

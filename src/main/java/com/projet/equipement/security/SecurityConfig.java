@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers( "test").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers(HttpMethod.GET, "/").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("roles/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
                         .requestMatchers("employes/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
                         .anyRequest().authenticated() // Toutes les autres requêtes nécessitent une authentification
