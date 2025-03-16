@@ -20,6 +20,9 @@ public class ProduitPostDto {
     @NotBlank
     private String description;
 
+
+    private String ean13 ;
+
     private String image;
 
     @NotNull(message = "Le prix unitaire est obligatoire")

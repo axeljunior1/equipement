@@ -57,6 +57,8 @@ public class TransactionVenteAndLinesService {
     private final FactureService factureService;
     private final PaiementService paiementService;
     private final EtatPaiementService etatPaiementService;
+    private final EtatVenteService etatVenteService;
+    private final TransactionAchatAndLinesService transactionAchatAndLinesService;
 
     public TransactionVenteAndLinesService(
             LigneVenteMapper ligneVenteMapper,
@@ -71,7 +73,7 @@ public class TransactionVenteAndLinesService {
             ClientService clientService,
             EmployeService employeService,
             PanierService panierService,
-            StateMachine<VenteEnum, String> stateMachine, EtatVenteRepository etatVenteRepository, EtatFactureRepository etatFactureRepository, EtatFactureService etatFactureService, FactureService factureService, PaiementService paiementService, EtatPaiementService etatPaiementService) {
+            StateMachine<VenteEnum, String> stateMachine, EtatVenteRepository etatVenteRepository, EtatFactureRepository etatFactureRepository, EtatFactureService etatFactureService, FactureService factureService, PaiementService paiementService, EtatPaiementService etatPaiementService, EtatVenteService etatVenteService, TransactionAchatAndLinesService transactionAchatAndLinesService) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -91,6 +93,8 @@ public class TransactionVenteAndLinesService {
         this.factureService = factureService;
         this.paiementService = paiementService;
         this.etatPaiementService = etatPaiementService;
+        this.etatVenteService = etatVenteService;
+        this.transactionAchatAndLinesService = transactionAchatAndLinesService;
     }
 
 
@@ -111,7 +115,7 @@ public class TransactionVenteAndLinesService {
         Client client = clientService.findById(validerPanierDTO.getIdClient());
         EmployeGetDto employe = employeService.findById(validerPanierDTO.getIdEmploye());
         Panier panier = panierService.findById(validerPanierDTO.getIdPanier());
-        EtatVente etatVente = etatVenteRepository.findByLibelle("CONFIRMEE").orElseThrow(()->new EntityNotFoundException("EtatVente", "CONFIRMEE" ));
+        EtatVente etatVente = etatVenteRepository.findByLibelle("CREEE").orElseThrow(()->new EntityNotFoundException("EtatVente", "CREE" ));
 
         List<PanierProduitGetDto> panierProduits = panierProduitService.findAllByPanierId(panier.getId());
 
@@ -158,14 +162,26 @@ public class TransactionVenteAndLinesService {
 
         //gen paiement etat => EN_ATTENTE
 
-        PaiementPostDTO  paiementPostDTO = PaiementPostDTO.builder()
-                .factureId(facture.getIdFacture())
-                .modePaiement("")
-                .montantPaye(BigDecimal.valueOf(0.000))
-                .etatId(etatPaiementService.findByLibelle("EN_ATTENTE").getId())
-                .build();
+//        PaiementPostDTO  paiementPostDTO = PaiementPostDTO.builder()
+//                .factureId(facture.getIdFacture())
+//                .modePaiement("")
+//                .montantPaye(BigDecimal.valueOf(0.000))
+//                .etatId(etatPaiementService.findByLibelle("EN_ATTENTE").getId())
+//                .build();
+//
+//        paiementService.createPaiement(paiementPostDTO);
 
-        paiementService.createPaiement(paiementPostDTO);
+        return venteMapper.toDto(vente);
+    }
+
+    public VenteGetDto payerVente( Long id){
+        Vente vente = venteRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Vente", id));
+
+        vente.setEtat(etatVenteService.findByLibelle("CONFIRME"));
+
+        this.saveVente(vente);
+
+        //modif etat fac
 
         return venteMapper.toDto(vente);
     }

@@ -91,5 +91,10 @@ public class VenteController {
          return ResponseEntity.ok("cancel");
     }
 
+    @GetMapping("/payer/{id}")
+    public ResponseEntity<VenteGetDto> payerVenteSansState(@PathVariable Long id){
+        VenteGetDto venteGetDto = transactionVenteAndLinesService.payerVente(id);
+        return ResponseEntity.ok(venteGetDto);
+    }
 
 }

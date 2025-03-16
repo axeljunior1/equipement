@@ -97,6 +97,9 @@ public class ProduitService{
         Produit produit = produitMapper.toEntity(produitPostDto);
         // Qrcode et code unique ean13
         String EAN_CONST = new EAN13Generator().generateEAN13WithFirstThreeChars("999");
+        if (produitPostDto.getEan13() != null){
+            EAN_CONST = produitPostDto.getEan13();
+        }
         produit.setEan13(EAN_CONST);
         produit.setQrCode(new EAN13Generator().genAndSaveQrCodeByProduct(EAN_CONST));
 
