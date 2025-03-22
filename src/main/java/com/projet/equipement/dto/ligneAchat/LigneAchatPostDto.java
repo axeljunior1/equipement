@@ -10,6 +10,8 @@ public class LigneAchatPostDto {
 
     private Double prixAchat;
 
+    private Double prixAchatF;
+
     private Integer quantite;
 
     private Long achatId;

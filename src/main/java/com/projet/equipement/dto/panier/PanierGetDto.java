@@ -3,6 +3,7 @@ package com.projet.equipement.dto.panier;
 import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.entity.Etat;
+import com.projet.equipement.entity.EtatPanier;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +18,7 @@ public class PanierGetDto {
 
     private EmployeGetDto employe;
 
-    private Etat etat;
+    private EtatPanier etat;
 
     private LocalDateTime createdAt;
 

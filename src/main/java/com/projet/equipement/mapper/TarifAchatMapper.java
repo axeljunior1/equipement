@@ -11,6 +11,7 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = ProduitMapper.class)
 public interface TarifAchatMapper {
 
+    @Mapping(target = "id", source = "id")
     TarifAchatGetDto toGetDto(TarifAchat tarifAchat) ;
 
     TarifAchat toEntity(TarifAchatGetDto tarifAchatProduitGetDto);

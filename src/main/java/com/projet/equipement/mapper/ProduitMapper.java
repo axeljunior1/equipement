@@ -5,7 +5,10 @@ import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.entity.Categorie;
 import com.projet.equipement.entity.Produit;
+import com.projet.equipement.entity.TarifAchat;
 import org.mapstruct.*;
+
+import java.math.BigDecimal;
 
 
 @Mapper(componentModel = "spring", uses = CategorieMapper.class)
@@ -14,6 +17,7 @@ public interface ProduitMapper {
 
 
     @Mapping(target = "categorieId", source = "categorie", qualifiedByName = "mapCategorieToId")
+    @Mapping(target = "prixAchat", source = "tarifAchat", qualifiedByName = "mapTarifToPrix")
     @Mapping(target = "categorieNom", source = "categorie", qualifiedByName = "mapCategorieToNom")
     @Mapping(target = "id", source = "id")
     ProduitGetDto toGetDto(Produit produit) ;
@@ -38,6 +42,12 @@ public interface ProduitMapper {
     default Long mapCategorieToId( Categorie categorie){
         return categorie.getId();
     }
+
+    @Named("mapTarifToPrix")
+    default BigDecimal mapTarifToPrix(TarifAchat tarifAchat){
+        return tarifAchat.getPrixAchat();
+    }
+
     @Named("mapCategorieToNom")
     default String mapCategorieToNom( Categorie categorie){
         return categorie.getNom();

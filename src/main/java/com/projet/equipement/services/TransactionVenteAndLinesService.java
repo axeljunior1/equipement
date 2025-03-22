@@ -7,7 +7,6 @@ import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteUpdateDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
-import com.projet.equipement.dto.paiement.PaiementPostDTO;
 import com.projet.equipement.dto.panierProduit.PanierProduitGetDto;
 import com.projet.equipement.dto.validerPanier.ValiderPanierDTO;
 import com.projet.equipement.dto.vente.VenteGetDto;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -58,7 +56,6 @@ public class TransactionVenteAndLinesService {
     private final PaiementService paiementService;
     private final EtatPaiementService etatPaiementService;
     private final EtatVenteService etatVenteService;
-    private final TransactionAchatAndLinesService transactionAchatAndLinesService;
 
     public TransactionVenteAndLinesService(
             LigneVenteMapper ligneVenteMapper,
@@ -73,7 +70,14 @@ public class TransactionVenteAndLinesService {
             ClientService clientService,
             EmployeService employeService,
             PanierService panierService,
-            StateMachine<VenteEnum, String> stateMachine, EtatVenteRepository etatVenteRepository, EtatFactureRepository etatFactureRepository, EtatFactureService etatFactureService, FactureService factureService, PaiementService paiementService, EtatPaiementService etatPaiementService, EtatVenteService etatVenteService, TransactionAchatAndLinesService transactionAchatAndLinesService) {
+            StateMachine<VenteEnum, String> stateMachine,
+            EtatVenteRepository etatVenteRepository,
+            EtatFactureRepository etatFactureRepository,
+            EtatFactureService etatFactureService,
+            FactureService factureService,
+            PaiementService paiementService,
+            EtatPaiementService etatPaiementService,
+            EtatVenteService etatVenteService) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -94,7 +98,6 @@ public class TransactionVenteAndLinesService {
         this.paiementService = paiementService;
         this.etatPaiementService = etatPaiementService;
         this.etatVenteService = etatVenteService;
-        this.transactionAchatAndLinesService = transactionAchatAndLinesService;
     }
 
 

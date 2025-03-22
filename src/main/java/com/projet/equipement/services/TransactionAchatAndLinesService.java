@@ -9,11 +9,11 @@ import com.projet.equipement.dto.ligneAchat.LigneAchatUpdateDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.LigneAchat;
+import com.projet.equipement.entity.TarifAchat;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.AchatMapper;
 import com.projet.equipement.mapper.LigneAchatMapper;
 import com.projet.equipement.repository.AchatRepository;
-import com.projet.equipement.repository.EmployeRepository;
 import com.projet.equipement.repository.LigneAchatRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,21 +34,23 @@ public class TransactionAchatAndLinesService {
     private final AchatMapper achatMapper;
     private final AchatRepository achatRepository;
     private final EntityManager entityManager;
+    private final TarifAchatService tarifAchatService;
 
     public TransactionAchatAndLinesService(
-                                           LigneAchatMapper ligneAchatMapper,
-                                           LigneAchatRepository ligneAchatRepository,
-                                           MouvementStockService mouvementStockService,
-                                           AchatMapper achatMapper,
-                                           AchatRepository achatRepository,
-                                           EntityManager entityManager
-    ) {
+            LigneAchatMapper ligneAchatMapper,
+            LigneAchatRepository ligneAchatRepository,
+            MouvementStockService mouvementStockService,
+            AchatMapper achatMapper,
+            AchatRepository achatRepository,
+            EntityManager entityManager,
+            TarifAchatService tarifAchatService) {
         this.ligneAchatMapper = ligneAchatMapper;
         this.ligneAchatRepository = ligneAchatRepository;
         this.mouvementStockService = mouvementStockService;
         this.achatMapper = achatMapper;
         this.achatRepository = achatRepository;
         this.entityManager = entityManager;
+        this.tarifAchatService = tarifAchatService;
     }
 
 
@@ -164,6 +167,13 @@ public class TransactionAchatAndLinesService {
     @Transactional
     public LigneAchatGetDto saveLigneAchat(LigneAchatPostDto ligneAchatPostDto) {
         Long achatId = ligneAchatPostDto.getAchatId();
+
+        if (ligneAchatPostDto.getPrixAchatF() != null){
+            TarifAchat tarifAchat = tarifAchatService.findByProduitId(ligneAchatPostDto.getProduitId());
+            tarifAchat.setPrixAchat(BigDecimal.valueOf(ligneAchatPostDto.getPrixAchatF()));
+
+            tarifAchatService.save(tarifAchat);
+        }
 
 
         LigneAchat ligneAchatToPost = ligneAchatMapper.toEntity(ligneAchatPostDto);

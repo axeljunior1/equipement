@@ -4,6 +4,7 @@ import com.projet.equipement.dto.categorie.CategorieGetDto;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -29,6 +30,7 @@ public class ProduitGetDto {
     private LocalDateTime updatedAt ;
     private String image;
     private Double prixVente;
+    private BigDecimal prixAchat;
 
     private String categorieNom;
 

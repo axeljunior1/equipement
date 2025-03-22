@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 @Builder
 public class TarifAchatGetDto {
 
+    private Long id;
+
     private ProduitGetDto produit;
 
     private BigDecimal prixAchat;

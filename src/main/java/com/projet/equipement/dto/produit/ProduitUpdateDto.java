@@ -23,7 +23,10 @@ public class ProduitUpdateDto {
     private Integer quantity;
 
     @NotNull(message = "Le prix unitaire est obligatoire")
+
     private Double prixVente;
+
+    private Double prixAchat;
 
     private Integer seuilProduit;
 

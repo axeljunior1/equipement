@@ -7,9 +7,12 @@ import com.projet.equipement.entity.TarifAchat;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.TarifAchatMapper;
 import com.projet.equipement.repository.TarifAchatRepository;
+import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,10 +21,12 @@ public class TarifAchatService {
 
     private final TarifAchatRepository tarifAchatRepository;
     private final TarifAchatMapper tarifAchatMapper;
+    private final EntityManager entityManager;
 
-    public TarifAchatService(TarifAchatRepository tarifAchatRepository, TarifAchatMapper tarifAchatMapper) {
+    public TarifAchatService(TarifAchatRepository tarifAchatRepository, TarifAchatMapper tarifAchatMapper, EntityManager entityManager) {
         this.tarifAchatRepository = tarifAchatRepository;
         this.tarifAchatMapper = tarifAchatMapper;
+        this.entityManager = entityManager;
     }
 
     public TarifAchatGetDto findById(Long id) {
@@ -35,17 +40,32 @@ public class TarifAchatService {
     }
 
 
+    @Transactional
     public TarifAchatGetDto save(TarifAchatPostDto tarifAchat) {
         TarifAchat tarifAchat1 = tarifAchatMapper.toEntity(tarifAchat);
-        return tarifAchatMapper.toGetDto(tarifAchatRepository.save(tarifAchat1));
+
+        TarifAchat save = tarifAchatRepository.save(tarifAchat1);
+
+        return new TarifAchatGetDto();
+    }
+    @Transactional
+    public TarifAchat save(TarifAchat tarifAchat) {
+
+        return tarifAchatRepository.save(tarifAchat);
     }
 
-    public void update(TarifAchatUpdateDto tarifAchatUpdateDto, Long id) {
+    public TarifAchatGetDto updateTarifAchat(TarifAchatUpdateDto tarifAchatUpdateDto, Long id) {
         TarifAchat tarifAchat = tarifAchatRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("TarifAchat", id));
 
         tarifAchatMapper.updateProduitFromDto(tarifAchatUpdateDto, tarifAchat) ;
 
-        tarifAchatRepository.save(tarifAchat);
+        return tarifAchatMapper.toGetDto(tarifAchatRepository.save(tarifAchat));
 
+    }
+
+    public TarifAchat findByProduitId(Long produitId) {
+
+        return tarifAchatRepository.findByProduitId(produitId).orElseThrow(()->
+                new EntityNotFoundException("TarifAchat => ProduitId", produitId));
     }
 }

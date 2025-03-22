@@ -4,8 +4,10 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
+import com.projet.equipement.dto.tarifAchat.TarifAchatPostDto;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.entity.StockCourant;
+import com.projet.equipement.entity.TarifAchat;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.repository.ProduitRepository;
@@ -18,8 +20,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,12 +33,14 @@ public class ProduitService{
     private final ProduitMapper produitMapper;
     private final StockCourantService stockCourantService;
     private final EntityManager entityManager;
+    private final TarifAchatService tarifAchatService;
 
-    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, StockCourantService stockCourantService, EntityManager entityManager) {
+    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, StockCourantService stockCourantService, EntityManager entityManager, TarifAchatService tarifAchatService) {
         this.produitRepository = produitRepository;
         this.produitMapper = produitMapper;
         this.stockCourantService = stockCourantService;
         this.entityManager = entityManager;
+        this.tarifAchatService = tarifAchatService;
     }
 
     public Page<ProduitGetDto> findByActif(boolean active, Pageable pageable){
@@ -97,7 +103,7 @@ public class ProduitService{
         Produit produit = produitMapper.toEntity(produitPostDto);
         // Qrcode et code unique ean13
         String EAN_CONST = new EAN13Generator().generateEAN13WithFirstThreeChars("999");
-        if (produitPostDto.getEan13() != null){
+        if (!Objects.equals(produitPostDto.getEan13(), "") && produitPostDto.getEan13() != null){
             EAN_CONST = produitPostDto.getEan13();
         }
         produit.setEan13(EAN_CONST);
@@ -107,7 +113,18 @@ public class ProduitService{
         Produit saved = produitRepository.findById(p.getId()).orElseThrow(()->new EntityNotFoundException("Produit", p.getId()));
         // Forcer le chargement de la catégorie (si LAZY)
 
+
+        //Creer un tarif d'achat
+
+        TarifAchatPostDto  tarifAchatPostDto = TarifAchatPostDto.builder()
+                .prixAchat(BigDecimal.valueOf(produitPostDto.getPrixAchat()))
+                .produitId(saved.getId())
+                .build();
+
+        tarifAchatService.save(tarifAchatPostDto);
+
         entityManager.refresh(saved);
+
         return produitMapper.toGetDto(saved);
     }
 
@@ -116,10 +133,18 @@ public class ProduitService{
     }
 
 
+    @Transactional
     public ProduitGetDto updateProduit(ProduitUpdateDto produitUpdateDto, Long id){
         Produit produit = findById(id);
         produitMapper.updateProduitFromDto(produitUpdateDto, produit);
         Produit saved = produitRepository.save(produit);
+
+        //Mdification tarif achat
+        if (produitUpdateDto.getPrixAchat() != null){
+            TarifAchat tarifAchat = tarifAchatService.findByProduitId(id);
+            tarifAchat.setPrixAchat(BigDecimal.valueOf(produitUpdateDto.getPrixAchat()));
+            tarifAchatService.save(tarifAchat);
+        }
         return produitMapper.toGetDto(saved);
     }
 

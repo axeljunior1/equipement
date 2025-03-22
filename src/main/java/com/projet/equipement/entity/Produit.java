@@ -28,6 +28,10 @@ public class Produit {
     @Column(nullable = false)
     private String description;
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "produit", cascade = CascadeType.ALL)
+    private TarifAchat tarifAchat;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categorie_id")
     private Categorie categorie;
