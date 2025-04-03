@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+/data/dev.lock.db
+/data/dev.mv.db
+/data/dev.trace.db
+/src/main/resources/static/export_s.sql
+/keystore.p12
+/localhost.pem
+/localhost-key.pem

@@ -12,8 +12,8 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.repository.ProduitRepository;
 import com.projet.equipement.utils.EAN13Generator;
+import com.projet.equipement.utils.PaginationUtil;
 import jakarta.persistence.EntityManager;
-import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,10 +89,19 @@ public class ProduitService{
                 .orElseThrow(() -> new EntityNotFoundException("Produit", ean13)));
     }
 
-    public List<ProduitGetDto> rechercherProduits(String motCle){
-        List<Produit> produitList = produitRepository.rechercherProduits(motCle);
-        return produitList.stream().map(produitMapper::toGetDto).collect(Collectors.toList());
+    public Page<ProduitGetDto> rechercherProduits(String motCle, Pageable pageable) {
+        List<ProduitGetDto> produitsDtos = produitRepository.rechercherProduits(motCle).stream()
+                .map(produitMapper::toGetDto)
+                .peek(elt -> elt.setStockCourant(
+                        Optional.ofNullable(stockCourantService.getStockCourantById(elt.getId()))
+                                .map(StockCourant::getStockCourant)
+                                .orElse(0) // Valeur par défaut si null
+                ))
+                .collect(Collectors.toList());
+
+        return PaginationUtil.toPage(produitsDtos, pageable);
     }
+
 
     public List<ProduitGetDto> findBySpec(Specification<Produit> spec){
         List<Produit> produitList = produitRepository.findAll(spec);

@@ -1,7 +1,6 @@
 package com.projet.equipement.services;
 
 import com.projet.equipement.dto.employe.EmployeGetDto;
-import com.projet.equipement.dto.facture.FactureGetDTO;
 import com.projet.equipement.dto.facture.FacturePostDTO;
 import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
@@ -19,7 +18,9 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.StockInsuffisantException;
 import com.projet.equipement.mapper.LigneVenteMapper;
 import com.projet.equipement.mapper.VenteMapper;
-import com.projet.equipement.repository.*;
+import com.projet.equipement.repository.EtatVenteRepository;
+import com.projet.equipement.repository.LigneVenteRepository;
+import com.projet.equipement.repository.VenteRepository;
 import com.projet.equipement.utils.FactureNumeroGenerator;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,7 @@ import java.util.List;
 
 
 @Service
-public class TransactionVenteAndLinesService {
+public class TransactionVenteAndLinesService  {
 
     private final LigneVenteMapper ligneVenteMapper;
     private final LigneVenteRepository ligneVenteRepository;
@@ -44,17 +45,13 @@ public class TransactionVenteAndLinesService {
     private final StockCourantService stockCourantService;
     private final EntityManager entityManager;
     private final PanierProduitService panierProduitService;
-    private final ClientRepository clientRepository;
     private final ClientService clientService;
     private final EmployeService employeService;
     private final PanierService panierService;
     private final StateMachine<VenteEnum, String> stateMachine;
     private final EtatVenteRepository etatVenteRepository;
-    private final EtatFactureRepository etatFactureRepository;
     private final EtatFactureService etatFactureService;
     private final FactureService factureService;
-    private final PaiementService paiementService;
-    private final EtatPaiementService etatPaiementService;
     private final EtatVenteService etatVenteService;
 
     public TransactionVenteAndLinesService(
@@ -66,17 +63,13 @@ public class TransactionVenteAndLinesService {
             StockCourantService stockCourantService,
             EntityManager entityManagerFactory,
             PanierProduitService panierProduitService,
-            ClientRepository clientRepository,
             ClientService clientService,
             EmployeService employeService,
             PanierService panierService,
             StateMachine<VenteEnum, String> stateMachine,
             EtatVenteRepository etatVenteRepository,
-            EtatFactureRepository etatFactureRepository,
             EtatFactureService etatFactureService,
             FactureService factureService,
-            PaiementService paiementService,
-            EtatPaiementService etatPaiementService,
             EtatVenteService etatVenteService) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
@@ -86,25 +79,25 @@ public class TransactionVenteAndLinesService {
         this.stockCourantService = stockCourantService;
         this.entityManager = entityManagerFactory;
         this.panierProduitService = panierProduitService;
-        this.clientRepository = clientRepository;
         this.clientService = clientService;
         this.employeService = employeService;
         this.panierService = panierService;
         this.stateMachine = stateMachine;
         this.etatVenteRepository = etatVenteRepository;
-        this.etatFactureRepository = etatFactureRepository;
         this.etatFactureService = etatFactureService;
         this.factureService = factureService;
-        this.paiementService = paiementService;
-        this.etatPaiementService = etatPaiementService;
         this.etatVenteService = etatVenteService;
     }
+
+    private static final String VENTE = "Vente";
+    private static final String ETAT_VENTE = "EtatVente";
+
 
 
     @Transactional
     public void updateTotalVente(Long venteId) {
         Vente vente = venteRepository.findById(venteId)
-                .orElseThrow(() -> new EntityNotFoundException("Vente", venteId));
+                .orElseThrow(() -> new EntityNotFoundException(VENTE, venteId));
 
         Double total = ligneVenteRepository.sumTotalByVenteId(venteId);
         vente.setMontantTotal(total != null ? total : 0.0);
@@ -118,14 +111,13 @@ public class TransactionVenteAndLinesService {
         Client client = clientService.findById(validerPanierDTO.getIdClient());
         EmployeGetDto employe = employeService.findById(validerPanierDTO.getIdEmploye());
         Panier panier = panierService.findById(validerPanierDTO.getIdPanier());
-        EtatVente etatVente = etatVenteRepository.findByLibelle("CREEE").orElseThrow(()->new EntityNotFoundException("EtatVente", "CREE" ));
+        EtatVente etatVente = etatVenteRepository.findByLibelle("CREEE").orElseThrow(()->new EntityNotFoundException(ETAT_VENTE, "CREE" ));
 
         List<PanierProduitGetDto> panierProduits = panierProduitService.findAllByPanierId(panier.getId());
 
         if (panierProduits.isEmpty()) {
             throw new NotFoundException("Panier vide ");
         }
-//        Double mTotal = 0D ;
         Double montantTotal = panierProduits.stream()
                 .mapToDouble(ligneCaisse -> ligneCaisse.getQuantite() * ligneCaisse.getPrixVente())
                 .sum();
@@ -150,7 +142,7 @@ public class TransactionVenteAndLinesService {
                     .produitId(lignePanier.getProduit().getId())
                     .quantite(lignePanier.getQuantite())
                     .build();
-            this.saveLigneVente(ligneVentePostDto);
+            saveLigneVente(ligneVentePostDto);
         });
 
         //gen facture CREE
@@ -161,24 +153,24 @@ public class TransactionVenteAndLinesService {
                 .etatId(etatFactureService.findByLibelle("CREEE").getId())
                 .build();
 
-        FactureGetDTO facture = factureService.createFacture(facturePostDTO);
+        factureService.createFacture(facturePostDTO);
 
         //gen paiement etat => EN_ATTENTE
 
-//        PaiementPostDTO  paiementPostDTO = PaiementPostDTO.builder()
-//                .factureId(facture.getIdFacture())
-//                .modePaiement("")
-//                .montantPaye(BigDecimal.valueOf(0.000))
-//                .etatId(etatPaiementService.findByLibelle("EN_ATTENTE").getId())
-//                .build();
-//
-//        paiementService.createPaiement(paiementPostDTO);
+      /*  PaiementPostDTO  paiementPostDTO = PaiementPostDTO.builder()
+                .factureId(facture.getIdFacture())
+                .modePaiement("")
+                .montantPaye(BigDecimal.valueOf(0.000))
+                .etatId(etatPaiementService.findByLibelle("EN_ATTENTE").getId())
+                .build();
+
+        paiementService.createPaiement(paiementPostDTO);*/
 
         return venteMapper.toDto(vente);
     }
 
     public VenteGetDto payerVente( Long id){
-        Vente vente = venteRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Vente", id));
+        Vente vente = venteRepository.findById(id).orElseThrow(()->new EntityNotFoundException(VENTE, id));
 
         vente.setEtat(etatVenteService.findByLibelle("CONFIRME"));
 
@@ -201,7 +193,7 @@ public class TransactionVenteAndLinesService {
 
     public VenteGetDto findByIdVente(Long id) {
         return venteMapper.toDto(venteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Vente", id)));
+                .orElseThrow(() -> new EntityNotFoundException(VENTE, id)));
     }
 
     // Suppression de l'vente
@@ -289,7 +281,7 @@ public class TransactionVenteAndLinesService {
      * Pour la mise à jour d'un vente
      */
     public Vente updateVente(VenteUpdateDto venteUpdateDto, Long id) {
-        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
 
         venteMapper.updateDto(venteUpdateDto, vente);
 
@@ -384,25 +376,24 @@ public class TransactionVenteAndLinesService {
 
     public void payer(Long id) {
 
-        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
 
         // Démarrer le processus avec Spring State Machine
         stateMachine.start();
         stateMachine.sendEvent(String.valueOf(VenteTransitionEnum.CONFIRMEE_PAYEE));
 
-        System.out.println(stateMachine.getState());
 
         // Mettre à jour l'état de la vente dans la base de données
         String libelle = String.valueOf(stateMachine.getState().getId());
         EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
-                .orElseThrow(() -> new EntityNotFoundException("EtatVente", libelle));
+                .orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, libelle));
 
         vente.setEtat(etatVente);
         venteRepository.save(vente);
     }
 
     public void annuler(Long id) {
-        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
 
 
         stateMachine.start();
@@ -412,7 +403,7 @@ public class TransactionVenteAndLinesService {
         // Mettre à jour l'état de la vente dans la base de données
         String libelle = String.valueOf(stateMachine.getState().getId());
         EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
-                .orElseThrow(() -> new EntityNotFoundException("EtatVente", libelle));
+                .orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, libelle));
 
         vente.setEtat(etatVente);
         venteRepository.save(vente);
@@ -420,7 +411,7 @@ public class TransactionVenteAndLinesService {
 
 
     public void rembourser(Long id) {
-        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
 
 
         stateMachine.start();
@@ -430,7 +421,7 @@ public class TransactionVenteAndLinesService {
         // Mettre à jour l'état de la vente dans la base de données
         String libelle = String.valueOf(stateMachine.getState().getId());
         EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
-                .orElseThrow(() -> new EntityNotFoundException("EtatVente", libelle));
+                .orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, libelle));
 
         vente.setEtat(etatVente);
         venteRepository.save(vente);

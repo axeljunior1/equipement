@@ -1,7 +1,6 @@
 package com.projet.equipement.dto.ligneVente;
 
 import com.projet.equipement.dto.produit.ProduitGetDto;
-import com.projet.equipement.entity.LigneVente;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -34,7 +34,7 @@ public interface RapportVenteRepository extends JpaRepository<LigneVente, Intege
            JOIN TarifAchat t ON p.id = t.produit.id
            JOIN Client c ON v.client.id = c.id
            JOIN EtatVente e ON v.etat.id = e.id AND e.libelle = 'CONFIRME'
-      GROUP BY p.id, p.nom, t.prixAchat, p.prixVente
+      GROUP BY p.id, p.nom, t.prixAchat, p.prixVente,l.prixVente
       """
     )
     List<RapportVenteView> rapportVente(@Param("start") LocalDateTime start, @Param("end")LocalDateTime end);

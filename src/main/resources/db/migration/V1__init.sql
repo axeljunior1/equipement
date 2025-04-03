@@ -212,7 +212,6 @@ create table MOUVEMENT_STOCK
         foreign key (PRODUIT_ID) references PRODUITS,
     check ("QUANTITE" > 0)
 );
-
 create table PANIER_PRODUIT
 (
     ID         INTEGER auto_increment
@@ -241,6 +240,7 @@ create table ROLES
     NOM         CHARACTER VARYING not null,
     DESCRIPTION CHARACTER VARYING
 );
+
 
 create table ROLE_AUTHORITY
 (
@@ -274,6 +274,10 @@ create table TARIF_ACHAT
     constraint TARIF_ACHAT_PRODUITS_ID_PRODUIT_FK
         foreign key (ID_PRODUIT) references PRODUITS
 );
+
+alter table TARIF_ACHAT
+    add constraint TARIF_ACHAT_UK
+        unique (ID_PRODUIT);
 
 create table TYPES_MOUVEMENT_STOCK
 (
@@ -383,30 +387,34 @@ create table RETOURS
     check ("QUANTITE" > 0)
 );
 
-CREATE FORCE VIEW "PUBLIC"."VUE_STOCK_COURANT"("ID_PRODUIT", "NOM", "STOCK_INITIAL", "STOCK_COURANT") AS
-SELECT "ID_PRODUIT",
-       "NOM",
-       "STOCK_INITIAL",
-       ("STOCK_INITIAL" + COALESCE((SELECT SUM("MS"."QUANTITE") AS "SUM"
-                                    FROM "PUBLIC"."MOUVEMENT_STOCK" "MS"
-                                             INNER JOIN "PUBLIC"."TYPES_MOUVEMENT_STOCK" "TMS"
-                                                        ON 1 = 1
-                                    WHERE ("MS"."PRODUIT_ID" = "P"."ID_PRODUIT")
-                                      AND (CAST("TMS"."TYPE_MOUVEMENT" AS CHARACTER VARYING) =
-                                           CAST('ENTREE' AS CHARACTER VARYING))
-                                      AND ("MS"."TYPE_MOUVEMENT_ID" = "TMS"."ID")
-                                    GROUP BY ()), CAST(0 AS BIGINT))) - COALESCE((SELECT SUM("MS"."QUANTITE") AS "SUM"
-                                                                                  FROM "PUBLIC"."MOUVEMENT_STOCK" "MS"
-                                                                                           INNER JOIN "PUBLIC"."TYPES_MOUVEMENT_STOCK" "TMS"
-                                                                                                      ON 1 = 1
-                                                                                  WHERE ("MS"."PRODUIT_ID" = "P"."ID_PRODUIT")
-                                                                                    AND (
-                                                                                      CAST("TMS"."TYPE_MOUVEMENT" AS CHARACTER VARYING) =
-                                                                                      CAST('SORTIE' AS CHARACTER VARYING))
-                                                                                    AND ("MS"."TYPE_MOUVEMENT_ID" = "TMS"."ID")
-                                                                                  GROUP BY ()),
-                                                                                 CAST(0 AS BIGINT)) AS "STOCK_COURANT"
-FROM "PUBLIC"."PRODUITS" "P";
+CREATE VIEW vue_stock_courant AS
+SELECT
+    p.id_produit,
+    p.nom,
+    p.stock_initial,
+    (
+        (p.stock_initial + COALESCE(
+                (SELECT SUM(ms.quantite)
+                 FROM mouvement_stock ms
+                          JOIN types_mouvement_stock tms
+                               ON ms.type_mouvement_id = tms.id
+                 WHERE ms.produit_id = p.id_produit
+                   AND tms.type_mouvement = 'ENTREE'), 0)
+            ) -
+        COALESCE(
+                (SELECT SUM(ms.quantite)
+                 FROM mouvement_stock ms
+                          JOIN types_mouvement_stock tms
+                               ON ms.type_mouvement_id = tms.id
+                 WHERE ms.produit_id = p.id_produit
+                   AND tms.type_mouvement = 'SORTIE'), 0)
+        ) AS stock_courant
+FROM produits p;
+
+
+alter table PRODUITS
+    add constraint PRODUITS_pk
+        unique (EAN13);
 
 
 

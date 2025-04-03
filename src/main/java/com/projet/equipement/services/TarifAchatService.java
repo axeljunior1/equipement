@@ -21,12 +21,12 @@ public class TarifAchatService {
 
     private final TarifAchatRepository tarifAchatRepository;
     private final TarifAchatMapper tarifAchatMapper;
-    private final EntityManager entityManager;
 
-    public TarifAchatService(TarifAchatRepository tarifAchatRepository, TarifAchatMapper tarifAchatMapper, EntityManager entityManager) {
+    public TarifAchatService(TarifAchatRepository tarifAchatRepository,
+                             TarifAchatMapper tarifAchatMapper
+    ) {
         this.tarifAchatRepository = tarifAchatRepository;
         this.tarifAchatMapper = tarifAchatMapper;
-        this.entityManager = entityManager;
     }
 
     public TarifAchatGetDto findById(Long id) {
@@ -44,7 +44,7 @@ public class TarifAchatService {
     public TarifAchatGetDto save(TarifAchatPostDto tarifAchat) {
         TarifAchat tarifAchat1 = tarifAchatMapper.toEntity(tarifAchat);
 
-        TarifAchat save = tarifAchatRepository.save(tarifAchat1);
+         tarifAchatRepository.save(tarifAchat1);
 
         return new TarifAchatGetDto();
     }

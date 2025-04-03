@@ -23,7 +23,6 @@ public class RapportVenteController {
 
     @PostMapping()
     public Page<RapportVenteView> rapportVenteDTOS(@RequestBody PeriodeDTO periodeDTO, Pageable pageable){
-        System.out.println(periodeDTO);
         List<RapportVenteView> rapportVenteViews = rapportVenteService.listVueRapportVente(periodeDTO.getStart(), periodeDTO.getEnd());
         return PaginationUtil.toPage(rapportVenteViews, pageable);
     }
