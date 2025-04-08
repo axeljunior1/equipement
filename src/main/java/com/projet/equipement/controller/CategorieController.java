@@ -1,5 +1,7 @@
 package com.projet.equipement.controller;
 
+import com.projet.equipement.dto.categorie.CategoriePostDto;
+import com.projet.equipement.dto.categorie.CategorieUpdateDto;
 import com.projet.equipement.entity.Categorie;
 import com.projet.equipement.services.CategorieService;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,18 @@ public class CategorieController {
     @GetMapping("/{id}")
     public ResponseEntity< Categorie> findCategorie(@PathVariable Long id) {
          Categorie categorie = categorieService.findById(id);
+        return ResponseEntity.ok(categorie);
+    }
+
+    @PostMapping()
+    public ResponseEntity<Categorie> save(@RequestBody CategoriePostDto categoriePostDto) {
+         Categorie categorie = categorieService.save(categoriePostDto);
+        return ResponseEntity.ok(categorie);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Categorie> update(@RequestBody CategorieUpdateDto categorieUpdateDto, @PathVariable Long id) {
+         Categorie categorie = categorieService.update(categorieUpdateDto, id);
         return ResponseEntity.ok(categorie);
     }
 
