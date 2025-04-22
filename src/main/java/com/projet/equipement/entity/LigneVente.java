@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -37,6 +39,8 @@ public class LigneVente {
     @JoinColumn(name = "produit_id")
     private Produit produit;
 
+    @OneToMany(mappedBy = "ligneVente")
+    private List<Retour> retours;
 
 }
 

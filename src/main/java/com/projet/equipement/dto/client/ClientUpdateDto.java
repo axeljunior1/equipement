@@ -1,10 +1,10 @@
 package com.projet.equipement.dto.client;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
+@Builder
 @Getter
 @Setter
 public class ClientUpdateDto {
@@ -12,5 +12,6 @@ public class ClientUpdateDto {
     private String prenom;
     private String email;
     private String telephone;
-    private Boolean actif;
+    @Builder.Default
+    private Boolean actif = true;
 }

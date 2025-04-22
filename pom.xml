@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.springframework.statemachine</groupId>
             <artifactId>spring-statemachine-core</artifactId>
-            <version>3.2.1</version> <!-- Choisis la version compatible avec ton projet -->
+            <version>4.0.0</version> <!-- Choisis la version compatible avec ton projet -->
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework.integration/spring-integration-core -->

@@ -56,5 +56,5 @@ public class Facture {
 
     @OneToMany(mappedBy = "facture")
     @JsonIgnore
-    private List<Paiement> paiements;
+    private List<Paiements> paiements;
 }

@@ -3,7 +3,6 @@ package com.projet.equipement.controller;
 import com.projet.equipement.dto.client.ClientGetDto;
 import com.projet.equipement.dto.client.ClientPostDto;
 import com.projet.equipement.dto.client.ClientUpdateDto;
-import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.entity.Client;
 import com.projet.equipement.services.ClientService;
 import com.projet.equipement.utils.PaginationUtil;
@@ -57,11 +56,11 @@ public class ClientController {
     }
     
     @PatchMapping("/{id}")
-    public ResponseEntity<Client> updateClient(@PathVariable Long id , @Valid  @RequestBody ClientUpdateDto clientUpdateDto) {
+    public ResponseEntity<String> updateClient(@PathVariable Long id , @Valid  @RequestBody ClientUpdateDto clientUpdateDto) {
 
         // Objets pour construire Client et ses Rôles
-        Client client = clientService.updateClient(clientUpdateDto, id);
-        return ResponseEntity.ok(client);
+        clientService.updateClient(clientUpdateDto, id);
+        return ResponseEntity.ok().body("client updated");
     }
 
     @DeleteMapping("/{id}")

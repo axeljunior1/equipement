@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -49,6 +50,12 @@ public class Vente {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vente")
     private Set<LigneVente> ligneVentes;
+
+    @OneToMany(mappedBy = "vente")
+    private List<Paiement> paiements;
+
+    @OneToMany(mappedBy = "vente")
+    private List<Retour> retours;
 
 
 

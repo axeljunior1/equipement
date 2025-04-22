@@ -1,0 +1,47 @@
+create table PUBLIC.RETOUR
+(
+    ID_RETOUR INTEGER auto_increment,
+    LIGNE_ID  INTEGER not null,
+    VENTE_ID  INTEGER not null,
+    RAISON    CHARACTER VARYING,
+    CREATEDAT DATE,
+    UPDATEDAT DATE,
+    constraint RETOUR_PK
+        primary key (ID_RETOUR),
+    constraint RETOUR_LIGNES_VENTES_ID_LIGNES_VENTES_FK
+        foreign key (LIGNE_ID) references PUBLIC.LIGNES_VENTES,
+    constraint RETOUR_VENTES_ID_VENTES_FK
+        foreign key (VENTE_ID) references PUBLIC.VENTES
+);
+
+comment on column PUBLIC.RETOUR.LIGNE_ID is 'ligne_vente';
+
+
+create table PUBLIC.PAIMENT
+(
+    ID_PAIEMENT  INTEGER auto_increment,
+    VENTE_ID     INTEGER not null,
+    MONTANT      NUMERIC,
+    MODEPAIEMENT CHARACTER VARYING,
+    CREATEDAT    TIMESTAMP,
+    UPDATEDAT    DATE,
+    constraint PAIMENT_PK
+        primary key (ID_PAIEMENT),
+    constraint PAIMENT_VENTES_ID_VENTES_FK
+        foreign key (VENTE_ID) references PUBLIC.VENTES
+);
+
+
+create table PUBLIC.ETAT_ACHAT
+(
+    ID          INTEGER auto_increment
+        primary key,
+    LIBELLE     CHARACTER VARYING(50) not null,
+    DESCRIPTION CHARACTER VARYING
+);
+
+INSERT INTO PUBLIC.ETAT_ACHAT (LIBELLE, DESCRIPTION) VALUES ('CREEE', null);
+INSERT INTO PUBLIC.ETAT_ACHAT (LIBELLE, DESCRIPTION) VALUES ('VALIDE', null);
+INSERT INTO PUBLIC.ETAT_ACHAT (LIBELLE, DESCRIPTION) VALUES ('CONFIRME', null);
+INSERT INTO PUBLIC.ETAT_ACHAT (LIBELLE, DESCRIPTION) VALUES ('ANNULEE', null);
+INSERT INTO PUBLIC.ETAT_ACHAT (LIBELLE, DESCRIPTION) VALUES ('REMBOURSEE', null);

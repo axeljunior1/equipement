@@ -7,6 +7,7 @@ import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
 import com.projet.equipement.entity.Vente;
 import com.projet.equipement.services.TransactionVenteAndLinesService;
+import com.projet.equipement.services.VenteService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,20 @@ import org.springframework.web.bind.annotation.*;
 public class VenteController {
 
     private final TransactionVenteAndLinesService transactionVenteAndLinesService;
+    private final VenteService venteService;
 
-    public VenteController(TransactionVenteAndLinesService transactionVenteAndLinesService) {
+    public VenteController(TransactionVenteAndLinesService transactionVenteAndLinesService, VenteService venteService) {
         this.transactionVenteAndLinesService = transactionVenteAndLinesService;
+        this.venteService = venteService;
+    }
+
+
+
+
+    @GetMapping("test")
+    public String findAllVentes() {
+        venteService.validerVente();
+        return "df";
     }
 
 

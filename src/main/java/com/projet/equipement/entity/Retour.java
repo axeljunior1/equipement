@@ -6,32 +6,30 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "paiment")
+@Table(name = "retour")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Paiement {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_paiement")
-    private Long idPaiement;
-
+public class Retour {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private BigDecimal montant;
+    @Column(name = "quantite")
+    private int quantité;
 
-    private String modePaiement; // espèce, carte, mobile, etc.
+    private LocalDateTime dateRetour;
 
-    private LocalDateTime datePaiement;
+    private String raison; // facultatif : produit défectueux, erreur, etc.
+
+    @ManyToOne
+    @JoinColumn(name = "ligne_id", nullable = false)
+    private LigneVente ligneVente;
 
     @ManyToOne
     @JoinColumn(name = "vente_id", nullable = false)

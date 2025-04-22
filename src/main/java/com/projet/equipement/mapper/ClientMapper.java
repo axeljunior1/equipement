@@ -4,9 +4,10 @@ import com.projet.equipement.dto.client.ClientGetDto;
 import com.projet.equipement.dto.client.ClientPostDto;
 import com.projet.equipement.dto.client.ClientUpdateDto;
 import com.projet.equipement.entity.Client;
-import com.projet.equipement.entity.Employe;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface ClientMapper {
@@ -19,6 +20,7 @@ public interface ClientMapper {
     Client toEntity(ClientPostDto clientGetDto);
 
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateDto( ClientUpdateDto clientUpdateDto, @MappingTarget Client client);
 
 

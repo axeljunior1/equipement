@@ -1,16 +1,12 @@
 package com.projet.equipement.services;
 
-import com.projet.equipement.dto.facture.FactureGetDTO;
 import com.projet.equipement.dto.paiement.PaiementGetDTO;
 import com.projet.equipement.dto.paiement.PaiementPostDTO;
 import com.projet.equipement.dto.paiement.PaiementUpdateDTO;
 import com.projet.equipement.entity.EtatPaiement;
-import com.projet.equipement.entity.EtatVente;
-import com.projet.equipement.entity.Paiement;
-import com.projet.equipement.entity.Vente;
+import com.projet.equipement.entity.Paiements;
 import com.projet.equipement.enumeration.PaiementEnum;
 import com.projet.equipement.enumeration.PaiementTransitionEnum;
-import com.projet.equipement.enumeration.VenteTransitionEnum;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.PaiementMapper;
 import com.projet.equipement.repository.EtatPaiementRepository;
@@ -20,8 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 public class PaiementService {
@@ -44,7 +38,7 @@ public class PaiementService {
     // Créer un paiement
     public PaiementGetDTO createPaiement(PaiementPostDTO paiementPostDTO) {
         // Convertir le DTO en entité
-        Paiement paiement = paiementMapper.toEntity(paiementPostDTO);
+        Paiements paiement = paiementMapper.toEntity(paiementPostDTO);
 
         // Sauvegarder le paiement
         paiement = paiementRepository.save(paiement);
@@ -55,7 +49,7 @@ public class PaiementService {
 
     // Mettre à jour un paiement existant
     public PaiementGetDTO updatePaiement(Long paiementId, PaiementUpdateDTO paiementUpdateDTO) {
-        Paiement existingPaiement = paiementRepository.findById(paiementId)
+        Paiements existingPaiement = paiementRepository.findById(paiementId)
                 .orElseThrow(() -> new EntityNotFoundException("Paiement", paiementId));
 
         // Mettre à jour les informations du paiement
@@ -70,7 +64,7 @@ public class PaiementService {
 
     // Obtenir un paiement par son ID
     public PaiementGetDTO getPaiementById(Long paiementId) {
-        Paiement paiement = paiementRepository.findById(paiementId)
+        Paiements paiement = paiementRepository.findById(paiementId)
                 .orElseThrow(() -> new IllegalArgumentException("Paiement not found"));
 
         return paiementMapper.toDto(paiement);
@@ -82,7 +76,7 @@ public class PaiementService {
         Pageable pageable = PageRequest.of(page, size);
 
         // Récupérer une page de paiements à partir du repository
-        Page<Paiement> paiementPage = paiementRepository.findAll(pageable);
+        Page<Paiements> paiementPage = paiementRepository.findAll(pageable);
 
         // Convertir la page d'entités Paiement en une page de DTOs PaiementGetDTO
         return paiementPage.map(paiementMapper::toDto);
@@ -93,7 +87,7 @@ public class PaiementService {
         Pageable pageable = PageRequest.of(page, size);
 
         // Récupérer une page de paiements avec le mode de paiement spécifié
-        Page<Paiement> paiementPage = paiementRepository.findByModePaiement(modePaiement, pageable);
+        Page<Paiements> paiementPage = paiementRepository.findByModePaiement(modePaiement, pageable);
 
         // Convertir la page d'entités Paiement en une page de DTOs PaiementGetDTO
         return paiementPage.map(paiementMapper::toDto);
@@ -111,7 +105,7 @@ public class PaiementService {
 
     public void payerTotal(Long id) {
 
-        Paiement paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Paiements paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
 
         // Démarrer le processus avec Spring State Machine
         stateMachine.start();
@@ -130,7 +124,7 @@ public class PaiementService {
 
     public void payerPartiel(Long id) {
 
-        Paiement paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Paiements paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
 
         // Démarrer le processus avec Spring State Machine
         stateMachine.start();
@@ -149,7 +143,7 @@ public class PaiementService {
 
     public void payerPartielTotal(Long id) {
 
-        Paiement paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Paiements paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
 
         // Démarrer le processus avec Spring State Machine
         stateMachine.start();
@@ -167,7 +161,7 @@ public class PaiementService {
     }
 
     public void annuler(Long id) {
-        Paiement paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Paiements paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
 
         // Démarrer le processus avec Spring State Machine
         stateMachine.start();
@@ -186,7 +180,7 @@ public class PaiementService {
 
 
     public void rembourser(Long id) {
-        Paiement paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
+        Paiements paiement = paiementRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Vente", id));
 
         // Démarrer le processus avec Spring State Machine
         stateMachine.start();

@@ -3,11 +3,7 @@ package com.projet.equipement.controller;
 import com.projet.equipement.dto.role.achat.RoleGetDto;
 import com.projet.equipement.dto.role.achat.RolePostDto;
 import com.projet.equipement.dto.role.achat.RoleUpdateDto;
-import com.projet.equipement.entity.Authority;
 import com.projet.equipement.entity.Role;
-import com.projet.equipement.mapper.RoleMapper;
-import com.projet.equipement.repository.RoleRepository;
-import com.projet.equipement.services.AuthorityService;
 import com.projet.equipement.services.RoleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RequestMapping("/roles")
 @RestController
@@ -57,13 +49,12 @@ public class RoleController {
 
     @PatchMapping("/patch/{id}")
     public ResponseEntity<Role> updateRole(@RequestBody RoleUpdateDto roleUpdateDto, @PathVariable Long id) {
-//        Role role = roleService.update(id, roleUpdateDto);
         return ResponseEntity.ok(new Role());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Role> updateRolePut(@RequestBody RoleUpdateDto roleUpdateDto, @PathVariable Long id) {
-        Role role = roleService.put(id, roleUpdateDto);
+        roleService.put(id, roleUpdateDto);
         return ResponseEntity.ok(new Role());
     }
 

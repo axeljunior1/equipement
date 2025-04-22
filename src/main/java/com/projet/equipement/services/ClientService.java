@@ -4,9 +4,7 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.client.ClientGetDto;
 import com.projet.equipement.dto.client.ClientPostDto;
 import com.projet.equipement.dto.client.ClientUpdateDto;
-import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.entity.Client;
-import com.projet.equipement.entity.Produit;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ClientMapper;
 import com.projet.equipement.repository.ClientRepository;
@@ -42,7 +40,6 @@ public class ClientService {
     }
 
     public Client save(ClientPostDto clientPostDto) {
-//        Set<Role> roles = client.getRoles();
        Client client =  clientMapper.toEntity(clientPostDto);
 
         return clientRepository.save(client);
@@ -54,11 +51,10 @@ public class ClientService {
 
 
 
-    public Client updateClient(ClientUpdateDto clientUpdateDto, Long id) {
+    public void updateClient(ClientUpdateDto clientUpdateDto, Long id) {
         Client client = findById(id);
-//        Set<Role> roles = new HashSet<>();
         clientMapper.updateDto(clientUpdateDto,client);
-        return clientRepository.save(client);
+        clientRepository.save(client);
     }
 
 

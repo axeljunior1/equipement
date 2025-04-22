@@ -50,12 +50,6 @@ public class TarifAchatController {
         return ResponseEntity.ok(tarifAchat);
     }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<String> deleteTarifAchat(@PathVariable Long id ) {
-//        tarifAchatService.deleteById(id);
-//        return ResponseEntity.ok("TarifAchat deleted");
-//    }
-//
 
 
 }
