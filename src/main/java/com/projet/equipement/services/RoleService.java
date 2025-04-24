@@ -32,10 +32,25 @@ public class RoleService {
         this.roleMapper = roleMapper;
     }
 
+    /**
+     * Retrieves a paginated list of all roles sorted by the default property "nom"
+     * in ascending order unless specified otherwise.
+     *
+     * @param pageable the pagination and sorting information, including page size, number, and sort order
+     * @return a paginated list of roles
+     */
     public Page<Role> findAll(@PageableDefault(sort = "nom", direction = Sort.Direction.ASC) Pageable pageable) {
         return roleRepository.findAll(pageable);
     }
 
+
+    /**
+     * Retrieves a Role entity by its unique identifier.
+     *
+     * @param id the unique identifier of the Role to retrieve
+     * @return the Role entity if found
+     * @throws EntityNotFoundException if no Role is found with the given identifier
+     */
     public Role findById(Long id) {
         return roleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Role", id));

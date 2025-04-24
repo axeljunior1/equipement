@@ -1,4 +1,4 @@
-package com.projet.equipement.stateMachine;
+package com.projet.equipement.state_machine;
 
 import com.projet.equipement.enumeration.PaiementEnum;
 import com.projet.equipement.enumeration.PaiementTransitionEnum;

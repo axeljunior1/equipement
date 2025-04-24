@@ -44,6 +44,13 @@ public class ProduitService{
         this.tarifAchatService = tarifAchatService;
     }
 
+    /**
+     * Retrieves a paginated list of active or inactive products and their current stock levels.
+     *
+     * @param active indicates whether to fetch active products (true) or inactive products (false)
+     * @param pageable the pagination information
+     * @return a paginated list of products with their respective stock levels
+     */
     public Page<ProduitGetDto> findByActif(boolean active, Pageable pageable){
         Page<ProduitGetDto> produitGetDtos = produitRepository.findByActif(active, pageable).map(produitMapper::toGetDto);
         // 2. Récupérer tous les IDs des produits paginés
@@ -73,6 +80,13 @@ public class ProduitService{
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
     }
 
+    /**
+     * Retrieves the details of a product along with its current stock level based on its ID.
+     *
+     * @param id the unique identifier of the product to be retrieved
+     * @return a DTO representing the product details and its current stock level
+     * @throws EntityNotFoundException if no product is found with the provided ID
+     */
     public  ProduitGetDto findProduitDtoById(Long id){
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
@@ -108,6 +122,15 @@ public class ProduitService{
         return produitList.stream().map(produitMapper::toGetDto).collect(Collectors.toList());
     }
 
+    /**
+     * Persists a new product and its associated purchasing tariff in the database.
+     * If an EAN-13 code is not provided, a unique code is generated.
+     * Also generates and associates a QR code for the product.
+     *
+     * @param produitPostDto the product data transfer object containing the details of the product to be saved
+     * @return ProduitGetDto a data transfer object containing the saved product's details
+     * @throws EntityNotFoundException if the saved product cannot be found after persisting
+     */
     @Transactional
     public ProduitGetDto save(ProduitPostDto produitPostDto){
         Produit produit = produitMapper.toEntity(produitPostDto);
@@ -142,14 +165,21 @@ public class ProduitService{
         return produitRepository.save(produit);
     }
 
-
+    /**
+     * Updates a product with the provided details and returns the updated product as a DTO.
+     * Also updates the purchase price in the corresponding purchasing price entity if applicable.
+     *
+     * @param produitUpdateDto the DTO containing the updated product details
+     * @param id the ID of the product to update
+     * @return a DTO representing the updated product
+     */
     @Transactional
     public ProduitGetDto updateProduit(ProduitUpdateDto produitUpdateDto, Long id){
         Produit produit = findById(id);
         produitMapper.updateProduitFromDto(produitUpdateDto, produit);
         Produit saved = produitRepository.save(produit);
 
-        //Mdification tarif achat
+        //Modification tarif achat
         if (produitUpdateDto.getPrixAchat() != null){
             TarifAchat tarifAchat = tarifAchatService.findByProduitId(id);
             tarifAchat.setPrixAchat(BigDecimal.valueOf(produitUpdateDto.getPrixAchat()));
@@ -159,8 +189,8 @@ public class ProduitService{
     }
 
     /**
-     * Soft delete d'un produit ok
-     * @param id id du produit
+     * Soft delete a product by setting its 'actif' flag to false.
+     * @param id the ID of the product to update
      */
     public void deleteByIdSoft(Long id){
         Produit produit = findById(id);
