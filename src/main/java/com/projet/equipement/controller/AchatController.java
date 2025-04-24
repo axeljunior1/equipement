@@ -4,8 +4,6 @@ import com.projet.equipement.dto.achat.AchatGetDto;
 import com.projet.equipement.dto.achat.AchatPostDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
 import com.projet.equipement.dto.ligneAchat.LigneAchatGetDto;
-import com.projet.equipement.entity.Achat;
-import com.projet.equipement.entity.LigneAchat;
 import com.projet.equipement.services.TransactionAchatAndLinesService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/achats")
 @RestController
-public class AchatController { 
+public class AchatController {
 
     private final TransactionAchatAndLinesService transactionAchatAndLinesService;
 
