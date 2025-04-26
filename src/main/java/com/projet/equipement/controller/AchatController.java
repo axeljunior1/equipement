@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/achats")
 @RestController
 public class AchatController {
-
-
-
+    
     private final TransactionAchatAndLinesService transactionAchatAndLinesService;
 
     public AchatController(TransactionAchatAndLinesService transactionAchatAndLinesService) {
