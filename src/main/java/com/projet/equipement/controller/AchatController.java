@@ -22,6 +22,7 @@ public class AchatController {
         this.transactionAchatAndLinesService = transactionAchatAndLinesService;
     }
 
+
     @GetMapping("")
     public ResponseEntity<Page<AchatGetDto>> findAllAchats(Pageable pageable) {
         Page<AchatGetDto> achats = transactionAchatAndLinesService.findAllAchat(pageable);
