@@ -52,7 +52,7 @@ public class Vente {
     private Set<LigneVente> ligneVentes;
 
     @OneToMany(mappedBy = "vente")
-    private List<Paiement> paiements;
+    private List<Paiements> paiements;
 
     @OneToMany(mappedBy = "vente")
     private List<Retour> retours;

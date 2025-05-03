@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 public class PaiementPostDTO {
 
-    private Long factureId;
+    private Long venteId;
     private BigDecimal montantPaye;
     private String modePaiement;
     private String reference;
@@ -22,6 +22,8 @@ public class PaiementPostDTO {
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+    @Builder.Default
+    private LocalDateTime updateddAt = LocalDateTime.now();
 }
 
 

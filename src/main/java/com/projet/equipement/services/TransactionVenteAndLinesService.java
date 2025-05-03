@@ -13,29 +13,32 @@ import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
 import com.projet.equipement.entity.*;
 import com.projet.equipement.enumeration.VenteEnum;
-import com.projet.equipement.enumeration.VenteTransitionEnum;
+import com.projet.equipement.enumeration.VenteEvent;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.StockInsuffisantException;
 import com.projet.equipement.mapper.LigneVenteMapper;
 import com.projet.equipement.mapper.VenteMapper;
-import com.projet.equipement.repository.EtatVenteRepository;
-import com.projet.equipement.repository.LigneVenteRepository;
-import com.projet.equipement.repository.VenteRepository;
+import com.projet.equipement.repository.*;
 import com.projet.equipement.utils.FactureNumeroGenerator;
 import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.webjars.NotFoundException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 
 @Service
-public class TransactionVenteAndLinesService  {
+public class TransactionVenteAndLinesService {
 
     private final LigneVenteMapper ligneVenteMapper;
     private final LigneVenteRepository ligneVenteRepository;
@@ -48,11 +51,14 @@ public class TransactionVenteAndLinesService  {
     private final ClientService clientService;
     private final EmployeService employeService;
     private final PanierService panierService;
-    private final StateMachine<VenteEnum, String> stateMachine;
+    @Qualifier("venteStateMachineConfig")
+    private final StateMachine<VenteEnum, VenteEvent> stateMachine;
     private final EtatVenteRepository etatVenteRepository;
     private final EtatFactureService etatFactureService;
     private final FactureService factureService;
     private final EtatVenteService etatVenteService;
+    private final PaiementRepository paiementRepository;
+    private final EtatPaiementRepository etatPaiementRepository;
 
     public TransactionVenteAndLinesService(
             LigneVenteMapper ligneVenteMapper,
@@ -66,11 +72,11 @@ public class TransactionVenteAndLinesService  {
             ClientService clientService,
             EmployeService employeService,
             PanierService panierService,
-            StateMachine<VenteEnum, String> stateMachine,
+            StateMachine<VenteEnum, VenteEvent> stateMachine,
             EtatVenteRepository etatVenteRepository,
             EtatFactureService etatFactureService,
             FactureService factureService,
-            EtatVenteService etatVenteService) {
+            EtatVenteService etatVenteService, PaiementRepository paiementRepository, EtatPaiementRepository etatPaiementRepository) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -87,11 +93,190 @@ public class TransactionVenteAndLinesService  {
         this.etatFactureService = etatFactureService;
         this.factureService = factureService;
         this.etatVenteService = etatVenteService;
+        this.paiementRepository = paiementRepository;
+        this.etatPaiementRepository = etatPaiementRepository;
     }
 
     private static final String VENTE = "Vente";
     private static final String ETAT_VENTE = "EtatVente";
+    private static final Logger logger = LoggerFactory.getLogger(VenteService.class);
 
+
+//VALIDER_PANIER
+//    FAIRE_PAIEMENT
+//    MARQUER_COMME_CREDIT
+//    FERMER_VENTE
+//    ANNULER_VENTE
+
+    @Transactional
+    public void payer(Long venteId, BigDecimal montantPaiement) {
+        Vente vente = venteRepository.findById(venteId)
+                .orElseThrow(() -> new RuntimeException("Vente non trouvée"));
+
+        BigDecimal montantTotal = BigDecimal.valueOf(vente.getMontantTotal());
+        BigDecimal totalDejaPaye = vente.getPaiements().stream()
+                .map(Paiements::getMontantPaye).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalApresPaiement = totalDejaPaye.add(montantPaiement);
+        BigDecimal resteAPayer = montantTotal.subtract(totalApresPaiement);
+
+        if (resteAPayer.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalStateException(String.format("Montant de paiement invalide: Montant total %s << montant paiement %s", montantTotal, montantPaiement));
+        }
+
+        if (resteAPayer.compareTo(BigDecimal.ZERO) == 0) {
+
+            if (totalDejaPaye.compareTo(BigDecimal.ZERO) == 0) {
+
+                fairePaiement(vente, montantPaiement);
+
+            } else if (totalDejaPaye.compareTo(BigDecimal.ZERO)>0) {
+
+                fairePaiementTotal(vente, montantPaiement);
+
+            }
+        } else if (resteAPayer.compareTo(BigDecimal.ZERO) > 0) {
+
+            fairePaiementPartiel(vente, montantPaiement);
+
+        }
+    }
+
+
+    @Transactional
+    public void fairePaiement(Vente vente, BigDecimal montantPaiement) {
+
+
+        // Sauvegarde du paiement
+        Paiements paiement = new Paiements();
+        paiement.setVente(vente);
+        paiement.setMontantPaye(montantPaiement);
+        paiement.setUpdatedAt(LocalDateTime.now());
+        paiement.setEtat(etatPaiementRepository.findByLibelle("PAYEE").orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, "PAYEE")));
+        paiementRepository.save(paiement);
+
+        // Récupération et synchronisation de la machine d'état
+        stateMachine.stop();
+        stateMachine.getStateMachineAccessor()
+                .doWithAllRegions(access -> access.resetStateMachine(
+                        new DefaultStateMachineContext<>(VenteEnum.valueOf(vente.getEtat().getLibelle()), null, null, null)));
+        stateMachine.start();
+
+
+        boolean ok = stateMachine.sendEvent(VenteEvent.FAIRE_PAIEMENT);
+        if (!ok) throw new IllegalStateException("Transition non autorisée");
+
+        // Mise à jour de l'état de la vente
+        String etatMachine = stateMachine.getState().getId().toString();
+        stateMachine.stop();
+
+        vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
+                new EntityNotFoundException(ETAT_VENTE, etatMachine)));
+
+        venteRepository.save(vente);
+    }
+
+
+    public void marquerCommeCredit(Long venteId) {
+
+    }
+
+
+    public void annulerVente(Long venteId) {
+
+    }
+
+
+    public void fermerVente(Long venteId) {
+
+        Vente vente = venteRepository.findById(venteId).orElseThrow(() -> new EntityNotFoundException(VENTE, venteId));
+
+            stateMachine.stop();
+            stateMachine.getStateMachineAccessor()
+                    .doWithAllRegions(access -> access.resetStateMachine(
+                            new DefaultStateMachineContext<>(VenteEnum.valueOf(vente.getEtat().getLibelle()), null, null, null)));
+            stateMachine.start();
+
+
+            stateMachine.sendEvent(VenteEvent.FERMER_VENTE);
+
+
+            String etatMachine = stateMachine.getState().getId().toString();
+            vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
+                    new EntityNotFoundException(ETAT_VENTE, etatMachine)));
+            stateMachine.stop();
+
+            venteRepository.save(vente);
+
+    }
+
+    @Transactional
+    public void fairePaiementTotal(Vente vente, BigDecimal montantPaiement) {
+
+
+        if (montantPaiement.compareTo(BigDecimal.valueOf(vente.getMontantTotal())) < 0) {
+
+
+            // Sauvegarde du paiement
+            Paiements paiement = new Paiements();
+            paiement.setVente(vente);
+            paiement.setMontantPaye(montantPaiement);
+            paiement.setUpdatedAt(LocalDateTime.now());
+            paiement.setEtat(etatPaiementRepository.findByLibelle("PAYEE").orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, "PAYEE")));
+            paiementRepository.save(paiement);
+
+            stateMachine.stop();
+            stateMachine.getStateMachineAccessor()
+                    .doWithAllRegions(access -> access.resetStateMachine(
+                            new DefaultStateMachineContext<>(VenteEnum.valueOf(vente.getEtat().getLibelle()), null, null, null)));
+            stateMachine.start();
+
+
+            stateMachine.sendEvent(VenteEvent.FAIRE_PAIEMENT_TOTAL);
+
+
+            String etatMachine = stateMachine.getState().getId().toString();
+            vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
+                    new EntityNotFoundException(ETAT_VENTE, etatMachine)));
+            stateMachine.stop();
+
+            venteRepository.save(vente);
+
+        }
+    }
+
+
+    @Transactional
+    public void fairePaiementPartiel(Vente vente, BigDecimal montantPaiement) {
+
+
+        if (montantPaiement.compareTo(BigDecimal.valueOf(vente.getMontantTotal())) < 0) {
+
+            // Sauvegarde du paiement
+            Paiements paiement = new Paiements();
+            paiement.setVente(vente);
+            paiement.setMontantPaye(montantPaiement);
+            paiement.setUpdatedAt(LocalDateTime.now());
+            paiement.setEtat(etatPaiementRepository.findByLibelle("PAYEE").orElseThrow(() -> new EntityNotFoundException("EtatPaiement", "PAYEE")));
+            paiementRepository.save(paiement);
+
+            stateMachine.stop();
+            stateMachine.getStateMachineAccessor()
+                    .doWithAllRegions(access -> access.resetStateMachine(
+                            new DefaultStateMachineContext<>(VenteEnum.valueOf(vente.getEtat().getLibelle()), null, null, null)));
+            stateMachine.start();
+
+            stateMachine.sendEvent(VenteEvent.FAIRE_PAIEMENT_PARTIEL);
+
+
+            vente.setEtat(etatVenteRepository.findByLibelle(stateMachine.getState().getId().toString()).orElseThrow(() ->
+                    new EntityNotFoundException(ETAT_VENTE, stateMachine.getState().getId().toString())));
+            stateMachine.stop();
+            venteRepository.save(vente);
+
+        }
+
+
+    }
 
 
     @Transactional
@@ -111,7 +296,7 @@ public class TransactionVenteAndLinesService  {
         Client client = clientService.findById(validerPanierDTO.getIdClient());
         EmployeGetDto employe = employeService.findById(validerPanierDTO.getIdEmploye());
         Panier panier = panierService.findById(validerPanierDTO.getIdPanier());
-        EtatVente etatVente = etatVenteRepository.findByLibelle("CREEE").orElseThrow(()->new EntityNotFoundException(ETAT_VENTE, "CREE" ));
+        EtatVente etatVente = etatVenteRepository.findByLibelle("EN_ATTENTE_PAIEMENT").orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, "CREE"));
 
         List<PanierProduitGetDto> panierProduits = panierProduitService.findAllByPanierId(panier.getId());
 
@@ -169,8 +354,8 @@ public class TransactionVenteAndLinesService  {
         return venteMapper.toDto(vente);
     }
 
-    public VenteGetDto payerVente( Long id){
-        Vente vente = venteRepository.findById(id).orElseThrow(()->new EntityNotFoundException(VENTE, id));
+    public VenteGetDto payerVente(Long id) {
+        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
 
         vente.setEtat(etatVenteService.findByLibelle("CONFIRME"));
 
@@ -372,59 +557,5 @@ public class TransactionVenteAndLinesService  {
         updateTotalVente(ligneVente.getVente().getId());
     }
 
-    // State Machine
-
-    public void payer(Long id) {
-
-        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
-
-        // Démarrer le processus avec Spring State Machine
-        stateMachine.start();
-        stateMachine.sendEvent(String.valueOf(VenteTransitionEnum.CONFIRMEE_PAYEE));
-
-
-        // Mettre à jour l'état de la vente dans la base de données
-        String libelle = String.valueOf(stateMachine.getState().getId());
-        EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
-                .orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, libelle));
-
-        vente.setEtat(etatVente);
-        venteRepository.save(vente);
-    }
-
-    public void annuler(Long id) {
-        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
-
-
-        stateMachine.start();
-        stateMachine.sendEvent(String.valueOf(VenteTransitionEnum.CONFIRMEE_ANNULEE));
-
-
-        // Mettre à jour l'état de la vente dans la base de données
-        String libelle = String.valueOf(stateMachine.getState().getId());
-        EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
-                .orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, libelle));
-
-        vente.setEtat(etatVente);
-        venteRepository.save(vente);
-    }
-
-
-    public void rembourser(Long id) {
-        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
-
-
-        stateMachine.start();
-        stateMachine.sendEvent(String.valueOf(VenteTransitionEnum.PAYEE_REMBOURSEE));
-
-
-        // Mettre à jour l'état de la vente dans la base de données
-        String libelle = String.valueOf(stateMachine.getState().getId());
-        EtatVente etatVente = etatVenteRepository.findByLibelle(libelle)
-                .orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, libelle));
-
-        vente.setEtat(etatVente);
-        venteRepository.save(vente);
-    }
 
 }

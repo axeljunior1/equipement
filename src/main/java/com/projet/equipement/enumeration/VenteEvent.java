@@ -1,0 +1,5 @@
+package com.projet.equipement.enumeration;
+
+public enum VenteEvent {
+    VALIDER_PANIER, FAIRE_PAIEMENT, MARQUER_COMME_CREDIT, FERMER_VENTE, FAIRE_PAIEMENT_TOTAL, FAIRE_PAIEMENT_PARTIEL, ANNULER_VENTE
+}

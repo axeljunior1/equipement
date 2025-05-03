@@ -22,11 +22,9 @@ public class VenteService {
 
     private final VenteRepository venteRepository;
 
-    private final StateMachine<SalesState, SalesEvent> stateMachine;
 
-    public VenteService(VenteRepository venteRepository, StateMachine<SalesState, SalesEvent> stateMachine) {
+    public VenteService(VenteRepository venteRepository) {
         this.venteRepository = venteRepository;
-        this.stateMachine = stateMachine;
     }
 
     /**
@@ -55,11 +53,14 @@ public class VenteService {
         Vente vente = venteRepository.findById(venteId)
                 .orElseThrow(() -> new RuntimeException("Vente non trouvée"));
 //
-        stateMachine.start();
-        stateMachine.getStateMachineAccessor()
-                .doWithAllRegions(access -> access.resetStateMachine(new DefaultStateMachineContext<>(SalesState.CREATED , null, null, null)));
-
-        stateMachine.sendEvent(event);
+//        stateMachine.start();
+//        stateMachine.getStateMachineAccessor()
+//                .doWithAllRegions(access ->
+//                        access.resetStateMachine(
+//                                new DefaultStateMachineContext<>(
+//                                        SalesState.CREATED, null, null, null)));
+//
+//        stateMachine.sendEvent(event);
 //        vente.setEtat(stateMachine.getState().getId());
         venteRepository.save(vente);
     }

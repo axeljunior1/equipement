@@ -23,8 +23,8 @@ public class Paiements {
     private Long idPaiement;
 
     @ManyToOne
-    @JoinColumn(name = "facture_id", nullable = false)
-    private Facture facture;
+    @JoinColumn(name = "vente_id", nullable = false)
+    private Vente vente;
 
     @ManyToOne
     @JoinColumn(name = "etat_id", nullable = false)
@@ -40,6 +40,11 @@ public class Paiements {
     @Column(name = "reference")
     private String reference;
 
+    @Builder.Default
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
+    @Column(name = "updated_at", updatable = false)
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

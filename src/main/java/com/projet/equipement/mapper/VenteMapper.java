@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", uses = {EmployeMapper.class, EtatVente.class ,ClientMapper.class , LigneVenteMapper.class})
+@Mapper(componentModel = "spring", uses = {EmployeMapper.class, EtatVente.class ,ClientMapper.class , LigneVenteMapper.class, PaiementMapper.class})
 public interface VenteMapper {
 
 

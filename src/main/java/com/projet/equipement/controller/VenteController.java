@@ -5,6 +5,7 @@ import com.projet.equipement.dto.validerPanier.ValiderPanierDTO;
 import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
+import com.projet.equipement.entity.PaiementRequest;
 import com.projet.equipement.entity.Vente;
 import com.projet.equipement.services.TransactionVenteAndLinesService;
 import com.projet.equipement.services.VenteService;
@@ -85,28 +86,30 @@ public class VenteController {
         return ResponseEntity.ok(venteGetDto);
     }
 
-    @GetMapping("/{venteId}/payer")
-    public ResponseEntity<String> payerVente(@PathVariable Long venteId) {
-         transactionVenteAndLinesService.payer(venteId);
-         return ResponseEntity.ok("payed");
-    }
+//    @GetMapping("/{venteId}/payer")
+//    public ResponseEntity<String> payerVente(@PathVariable Long venteId, @PathVariable BigDecimal montant) {
+//         transactionVenteAndLinesService.payer(venteId, BigDecimal.ZERO);
+//         return ResponseEntity.ok("payed");
+//    }
+//
+//    @GetMapping("/{venteId}/rembourser")
+//    public ResponseEntity<String> rembourser(@PathVariable Long venteId) {
+//         transactionVenteAndLinesService.rembourser(venteId);
+//         return ResponseEntity.ok("refund");
+//    }
+//
+//    @GetMapping("/{venteId}/annuler")
+//    public ResponseEntity<String> annuler(@PathVariable Long venteId) {
+//         transactionVenteAndLinesService.annuler(venteId);
+//         return ResponseEntity.ok("cancel");
+//    }
+//
+    @PostMapping("/payer/{id}")
+    public ResponseEntity<String> payerVenteSansState(@PathVariable Long id, @RequestBody PaiementRequest paiementRequest) {
 
-    @GetMapping("/{venteId}/rembourser")
-    public ResponseEntity<String> rembourser(@PathVariable Long venteId) {
-         transactionVenteAndLinesService.rembourser(venteId);
-         return ResponseEntity.ok("refund");
-    }
+        transactionVenteAndLinesService.payer(id, paiementRequest.getMontantPaiement());
 
-    @GetMapping("/{venteId}/annuler")
-    public ResponseEntity<String> annuler(@PathVariable Long venteId) {
-         transactionVenteAndLinesService.annuler(venteId);
-         return ResponseEntity.ok("cancel");
-    }
-
-    @GetMapping("/payer/{id}")
-    public ResponseEntity<VenteGetDto> payerVenteSansState(@PathVariable Long id){
-        VenteGetDto venteGetDto = transactionVenteAndLinesService.payerVente(id);
-        return ResponseEntity.ok(venteGetDto);
+        return ResponseEntity.ok(" Vente payed !!");
     }
 
 }

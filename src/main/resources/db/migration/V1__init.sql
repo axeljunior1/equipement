@@ -355,18 +355,19 @@ create table PAIEMENTS
 (
     ID_PAIEMENT   INTEGER auto_increment
         primary key,
-    FACTURE_ID    INTEGER             not null,
-    MONTANT_PAYE  NUMERIC(10, 2)      not null,
+    VENTE_ID      INTEGER        not null,
+    MONTANT_PAYE  NUMERIC(10, 2) not null,
     MODE_PAIEMENT CHARACTER VARYING(50),
     REFERENCE     CHARACTER VARYING(100),
     CREATED_AT    TIMESTAMP default CURRENT_TIMESTAMP,
+    UPDATED_AT    TIMESTAMP,
     ETAT_ID       INTEGER   default 1 not null,
     constraint PAIEMENTS_ETAT_PAIEMENT_ID_FK
         foreign key (ETAT_ID) references ETAT_PAIEMENT,
-    constraint PAIEMENTS_FACTURE_ID_FKEY
-        foreign key (FACTURE_ID) references FACTURES
-            on delete cascade
+    constraint PAIEMENTS_VENTES_ID_VENTES_FK
+        foreign key (VENTE_ID) references PUBLIC.VENTES
 );
+
 
 create table RETOURS
 (

@@ -54,7 +54,4 @@ public class Facture {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "facture")
-    @JsonIgnore
-    private List<Paiements> paiements;
 }
