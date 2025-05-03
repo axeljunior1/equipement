@@ -112,4 +112,22 @@ public class VenteController {
         return ResponseEntity.ok(" Vente payed !!");
     }
 
+    @GetMapping("/credit/{id}")
+    public ResponseEntity<String> marquerCommeCredit(@PathVariable Long id) {
+
+        transactionVenteAndLinesService.marquerCommeCredit(id);
+
+        return ResponseEntity.ok(" Credit validé !!");
+    }
+
+
+    @GetMapping("/{id}/fermer")
+    public ResponseEntity<String> fermerVente(@PathVariable Long id) {
+
+        transactionVenteAndLinesService.fermerVente(id);
+
+        return ResponseEntity.ok(" Vente fermé !!");
+    }
+
+
 }

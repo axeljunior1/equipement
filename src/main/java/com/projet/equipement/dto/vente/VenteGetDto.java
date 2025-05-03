@@ -54,7 +54,7 @@ public class VenteGetDto {
         }
 
         BigDecimal totalPaye = paiements.stream()
-                .filter(p -> p.getMontantPaye() != null && Objects.equals(p.getEtat().getLibelle(), "PAYEE"))
+                .filter(p -> p.getMontantPaye() != null && (Objects.equals(p.getEtat().getLibelle(), "PAYEE") || Objects.equals(p.getEtat().getLibelle(), "PAIEMENT_PARTIEL")))
                 .map(PaiementGetDTO::getMontantPaye)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

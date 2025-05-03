@@ -21,15 +21,16 @@ import com.projet.equipement.mapper.VenteMapper;
 import com.projet.equipement.repository.*;
 import com.projet.equipement.utils.FactureNumeroGenerator;
 import jakarta.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.webjars.NotFoundException;
 
 import java.math.BigDecimal;
@@ -51,15 +52,17 @@ public class TransactionVenteAndLinesService {
     private final ClientService clientService;
     private final EmployeService employeService;
     private final PanierService panierService;
-    @Qualifier("venteStateMachineConfig")
-    private final StateMachine<VenteEnum, VenteEvent> stateMachine;
+    private final StateMachineFactory<VenteEnum, VenteEvent> factory;
     private final EtatVenteRepository etatVenteRepository;
     private final EtatFactureService etatFactureService;
     private final FactureService factureService;
     private final EtatVenteService etatVenteService;
     private final PaiementRepository paiementRepository;
     private final EtatPaiementRepository etatPaiementRepository;
+    private final PaiementService paiementService;
+    private final EtatPaiementService etatPaiementService;
 
+    @Autowired
     public TransactionVenteAndLinesService(
             LigneVenteMapper ligneVenteMapper,
             LigneVenteRepository ligneVenteRepository,
@@ -71,12 +74,11 @@ public class TransactionVenteAndLinesService {
             PanierProduitService panierProduitService,
             ClientService clientService,
             EmployeService employeService,
-            PanierService panierService,
-            StateMachine<VenteEnum, VenteEvent> stateMachine,
+            PanierService panierService, StateMachineFactory<VenteEnum, VenteEvent> factory,
             EtatVenteRepository etatVenteRepository,
             EtatFactureService etatFactureService,
             FactureService factureService,
-            EtatVenteService etatVenteService, PaiementRepository paiementRepository, EtatPaiementRepository etatPaiementRepository) {
+            EtatVenteService etatVenteService, PaiementRepository paiementRepository, EtatPaiementRepository etatPaiementRepository, PaiementService paiementService, EtatPaiementService etatPaiementService) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -88,25 +90,21 @@ public class TransactionVenteAndLinesService {
         this.clientService = clientService;
         this.employeService = employeService;
         this.panierService = panierService;
-        this.stateMachine = stateMachine;
+        this.factory = factory;
         this.etatVenteRepository = etatVenteRepository;
         this.etatFactureService = etatFactureService;
         this.factureService = factureService;
         this.etatVenteService = etatVenteService;
         this.paiementRepository = paiementRepository;
         this.etatPaiementRepository = etatPaiementRepository;
+        this.paiementService = paiementService;
+        this.etatPaiementService = etatPaiementService;
     }
 
     private static final String VENTE = "Vente";
     private static final String ETAT_VENTE = "EtatVente";
     private static final Logger logger = LoggerFactory.getLogger(VenteService.class);
 
-
-//VALIDER_PANIER
-//    FAIRE_PAIEMENT
-//    MARQUER_COMME_CREDIT
-//    FERMER_VENTE
-//    ANNULER_VENTE
 
     @Transactional
     public void payer(Long venteId, BigDecimal montantPaiement) {
@@ -129,7 +127,7 @@ public class TransactionVenteAndLinesService {
 
                 fairePaiement(vente, montantPaiement);
 
-            } else if (totalDejaPaye.compareTo(BigDecimal.ZERO)>0) {
+            } else if (totalDejaPaye.compareTo(BigDecimal.ZERO) > 0) {
 
                 fairePaiementTotal(vente, montantPaiement);
 
@@ -146,28 +144,30 @@ public class TransactionVenteAndLinesService {
     public void fairePaiement(Vente vente, BigDecimal montantPaiement) {
 
 
-        // Sauvegarde du paiement
-        Paiements paiement = new Paiements();
-        paiement.setVente(vente);
-        paiement.setMontantPaye(montantPaiement);
-        paiement.setUpdatedAt(LocalDateTime.now());
-        paiement.setEtat(etatPaiementRepository.findByLibelle("PAYEE").orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, "PAYEE")));
-        paiementRepository.save(paiement);
-
         // Récupération et synchronisation de la machine d'état
-        stateMachine.stop();
-        stateMachine.getStateMachineAccessor()
-                .doWithAllRegions(access -> access.resetStateMachine(
-                        new DefaultStateMachineContext<>(VenteEnum.valueOf(vente.getEtat().getLibelle()), null, null, null)));
-        stateMachine.start();
-
-
-        boolean ok = stateMachine.sendEvent(VenteEvent.FAIRE_PAIEMENT);
-        if (!ok) throw new IllegalStateException("Transition non autorisée");
+        StateMachine<VenteEnum, VenteEvent> sm = factory.getStateMachine(vente.getId().toString());
+        sm.getStateMachineAccessor().doWithAllRegions(access ->
+                access.resetStateMachine(new DefaultStateMachineContext<>(
+                        VenteEnum.valueOf(vente.getEtat().getLibelle()),
+                        null, null, null)));
 
         // Mise à jour de l'état de la vente
-        String etatMachine = stateMachine.getState().getId().toString();
-        stateMachine.stop();
+        VenteEvent event = VenteEvent.FAIRE_PAIEMENT;
+        if (vente.getEtat().getLibelle().equals("VENTE_A_CREDIT")) {
+            event = VenteEvent.FAIRE_PAIEMENT_TOTAL_DETTE;
+        }
+        boolean ok = sm.sendEvent(event);
+        if (!ok) throw new IllegalStateException("Transition non autorisée");
+        String etatMachine = sm.getState().getId().toString();
+
+        // Sauvegarde du paiement
+        Paiements paiement = Paiements.builder()
+                .etat(etatPaiementService.findByLibelle(etatMachine))
+                .vente(vente)
+                .montantPaye(montantPaiement)
+                .updatedAt(LocalDateTime.now())
+                .build();
+        paiementService.savePaiement(paiement);
 
         vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
                 new EntityNotFoundException(ETAT_VENTE, etatMachine)));
@@ -177,6 +177,37 @@ public class TransactionVenteAndLinesService {
 
 
     public void marquerCommeCredit(Long venteId) {
+
+        Vente vente = venteRepository.findById(venteId).orElseThrow(() -> new EntityNotFoundException(VENTE, venteId));
+
+
+        // Récupération et synchronisation de la machine d'état
+        StateMachine<VenteEnum, VenteEvent> sm = factory.getStateMachine(vente.getId().toString());
+        sm.getStateMachineAccessor().doWithAllRegions(access ->
+                access.resetStateMachine(new DefaultStateMachineContext<>(
+                        VenteEnum.valueOf(vente.getEtat().getLibelle()),
+                        null, null, null)));
+
+
+        // Mise à jour de l'état de la vente
+
+        boolean ok = sm.sendEvent(VenteEvent.MARQUER_COMME_CREDIT);
+        if (!ok) throw new IllegalStateException("Transition non autorisée");
+        String etatMachine = sm.getState().getId().toString();
+
+        // Sauvegarde du paiement
+        Paiements paiement = Paiements.builder()
+                .etat(etatPaiementService.findByLibelle(etatMachine))
+                .vente(vente)
+                .montantPaye(BigDecimal.valueOf(0))
+                .updatedAt(LocalDateTime.now())
+                .build();
+        paiementService.savePaiement(paiement);
+
+        vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
+                new EntityNotFoundException(ETAT_VENTE, etatMachine)));
+
+        venteRepository.save(vente);
 
     }
 
@@ -190,22 +221,25 @@ public class TransactionVenteAndLinesService {
 
         Vente vente = venteRepository.findById(venteId).orElseThrow(() -> new EntityNotFoundException(VENTE, venteId));
 
-            stateMachine.stop();
-            stateMachine.getStateMachineAccessor()
-                    .doWithAllRegions(access -> access.resetStateMachine(
-                            new DefaultStateMachineContext<>(VenteEnum.valueOf(vente.getEtat().getLibelle()), null, null, null)));
-            stateMachine.start();
+
+        // Récupération et synchronisation de la machine d'état
+        StateMachine<VenteEnum, VenteEvent> sm = factory.getStateMachine(vente.getId().toString());
+        sm.getStateMachineAccessor().doWithAllRegions(access ->
+                access.resetStateMachine(new DefaultStateMachineContext<>(
+                        VenteEnum.valueOf(vente.getEtat().getLibelle()),
+                        null, null, null)));
 
 
-            stateMachine.sendEvent(VenteEvent.FERMER_VENTE);
+        // Mise à jour de l'état de la vente
 
+        boolean ok = sm.sendEvent(VenteEvent.FERMER_VENTE);
+        if (!ok) throw new IllegalStateException("Transition non autorisée");
+        String etatMachine = sm.getState().getId().toString();
 
-            String etatMachine = stateMachine.getState().getId().toString();
-            vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
-                    new EntityNotFoundException(ETAT_VENTE, etatMachine)));
-            stateMachine.stop();
+        vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
+                new EntityNotFoundException(ETAT_VENTE, etatMachine)));
 
-            venteRepository.save(vente);
+        venteRepository.save(vente);
 
     }
 
@@ -216,28 +250,33 @@ public class TransactionVenteAndLinesService {
         if (montantPaiement.compareTo(BigDecimal.valueOf(vente.getMontantTotal())) < 0) {
 
 
+            // Récupération et synchronisation de la machine d'état
+            StateMachine<VenteEnum, VenteEvent> sm = factory.getStateMachine(vente.getId().toString());
+            sm.getStateMachineAccessor().doWithAllRegions(access ->
+                    access.resetStateMachine(new DefaultStateMachineContext<>(
+                            VenteEnum.valueOf(vente.getEtat().getLibelle()),
+                            null, null, null)));
+
+
+            // Mise à jour de l'état de la vente
+
+            VenteEvent event = VenteEvent.FAIRE_PAIEMENT_TOTAL;
+            boolean ok = sm.sendEvent(event);
+            if (!ok) throw new IllegalStateException("Transition non autorisée");
+            String etatMachine = sm.getState().getId().toString();
+
+
             // Sauvegarde du paiement
-            Paiements paiement = new Paiements();
-            paiement.setVente(vente);
-            paiement.setMontantPaye(montantPaiement);
-            paiement.setUpdatedAt(LocalDateTime.now());
-            paiement.setEtat(etatPaiementRepository.findByLibelle("PAYEE").orElseThrow(() -> new EntityNotFoundException(ETAT_VENTE, "PAYEE")));
-            paiementRepository.save(paiement);
+            Paiements paiement = Paiements.builder()
+                    .etat(etatPaiementService.findByLibelle(etatMachine))
+                    .vente(vente)
+                    .montantPaye(montantPaiement)
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            paiementService.savePaiement(paiement);
 
-            stateMachine.stop();
-            stateMachine.getStateMachineAccessor()
-                    .doWithAllRegions(access -> access.resetStateMachine(
-                            new DefaultStateMachineContext<>(VenteEnum.valueOf(vente.getEtat().getLibelle()), null, null, null)));
-            stateMachine.start();
-
-
-            stateMachine.sendEvent(VenteEvent.FAIRE_PAIEMENT_TOTAL);
-
-
-            String etatMachine = stateMachine.getState().getId().toString();
             vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
                     new EntityNotFoundException(ETAT_VENTE, etatMachine)));
-            stateMachine.stop();
 
             venteRepository.save(vente);
 
@@ -251,26 +290,36 @@ public class TransactionVenteAndLinesService {
 
         if (montantPaiement.compareTo(BigDecimal.valueOf(vente.getMontantTotal())) < 0) {
 
+            // Récupération et synchronisation de la machine d'état
+            StateMachine<VenteEnum, VenteEvent> sm = factory.getStateMachine(vente.getId().toString());
+            sm.getStateMachineAccessor().doWithAllRegions(access ->
+                    access.resetStateMachine(new DefaultStateMachineContext<>(
+                            VenteEnum.valueOf(vente.getEtat().getLibelle()),
+                            null, null, null)));
+
+
+            // Mise à jour de l'état de la vente
+
+            VenteEvent event = VenteEvent.FAIRE_PAIEMENT_PARTIEL;
+            if (vente.getEtat().getLibelle().equals("VENTE_A_CREDIT")) {
+                event = VenteEvent.FAIRE_PAIEMENT_DETTE;
+            }
+            boolean ok = sm.sendEvent(event);
+            if (!ok) throw new IllegalStateException("Transition non autorisée");
+
+            String etatMachine = sm.getState().getId().toString();
+
             // Sauvegarde du paiement
-            Paiements paiement = new Paiements();
-            paiement.setVente(vente);
-            paiement.setMontantPaye(montantPaiement);
-            paiement.setUpdatedAt(LocalDateTime.now());
-            paiement.setEtat(etatPaiementRepository.findByLibelle("PAYEE").orElseThrow(() -> new EntityNotFoundException("EtatPaiement", "PAYEE")));
-            paiementRepository.save(paiement);
+            Paiements paiement = Paiements.builder()
+                    .etat(etatPaiementService.findByLibelle(etatMachine))
+                    .vente(vente)
+                    .montantPaye(montantPaiement)
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            paiementService.savePaiement(paiement);
 
-            stateMachine.stop();
-            stateMachine.getStateMachineAccessor()
-                    .doWithAllRegions(access -> access.resetStateMachine(
-                            new DefaultStateMachineContext<>(VenteEnum.valueOf(vente.getEtat().getLibelle()), null, null, null)));
-            stateMachine.start();
-
-            stateMachine.sendEvent(VenteEvent.FAIRE_PAIEMENT_PARTIEL);
-
-
-            vente.setEtat(etatVenteRepository.findByLibelle(stateMachine.getState().getId().toString()).orElseThrow(() ->
-                    new EntityNotFoundException(ETAT_VENTE, stateMachine.getState().getId().toString())));
-            stateMachine.stop();
+            vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
+                    new EntityNotFoundException(ETAT_VENTE, etatMachine)));
             venteRepository.save(vente);
 
         }
