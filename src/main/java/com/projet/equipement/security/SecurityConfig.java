@@ -42,6 +42,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults()).csrf(c -> c.disable())// Si tu veux désactiver CSRF (utilisé généralement pour les API)
                 .authorizeHttpRequests(r -> r
+                        .requestMatchers("/static/**", "/index.html", "/favicon.ico", "/build/**", "/css/**", "/js/**", "/assets/**")  // Permet l'accès aux ressources statiques
+                        .permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers(HttpMethod.POST, "login").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers( "test").permitAll()  // Permet l'accès à /login sans authentification
