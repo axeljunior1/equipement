@@ -51,13 +51,13 @@ jobs:
             cat > Dockerfile << 'DOCKERFILE'
             FROM eclipse-temurin:17-jdk-alpine
             COPY spring.jar /app.jar
-            EXPOSE 8087
+            EXPOSE 8080
             ENTRYPOINT ["java","-jar","/app.jar"]
             DOCKERFILE
 
             # Construire et lancer en détaché
             docker build -t spring:latest .
             docker run -d --name spring \
-              -p 8080:8087 \
+              -p 8080:8080 \
               spring:latest
           EOF
