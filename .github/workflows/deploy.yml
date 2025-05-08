@@ -35,7 +35,7 @@ jobs:
       # 4) Déployer sur l’EC2
       - name: Deploy to EC2
         env:
-          HOST: 16.170.223.53
+          HOST: api.stockcaisse.com
           USER: ec2-user
         run: |
           # Copier le JAR sur l'EC2
@@ -51,13 +51,13 @@ jobs:
             cat > Dockerfile << 'DOCKERFILE'
             FROM eclipse-temurin:17-jdk-alpine
             COPY spring.jar /app.jar
-            EXPOSE 8080
+            EXPOSE 8087
             ENTRYPOINT ["java","-jar","/app.jar"]
             DOCKERFILE
 
             # Construire et lancer en détaché
             docker build -t spring:latest .
             docker run -d --name spring \
-              -p 8080:8080 \
+              -p 8080:8087 \
               spring:latest
           EOF
