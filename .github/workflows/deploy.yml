@@ -38,8 +38,9 @@ jobs:
           HOST: api.stockcaisse.com
           USER: ec2-user
         run: |
-          # Copier le JAR sur l'EC2
+          # Copier le JAR et Dockerfile sur l'EC2
           scp -o StrictHostKeyChecking=no -i ec2_key.pem target/*.jar $USER@$HOST:/home/$USER/spring.jar
+          scp -o StrictHostKeyChecking=no -i ec2_key.pem Dockerfile $USER@$HOST:/home/$USER/Dockerfile
 
           # Se connecter en SSH et relancer le conteneur Docker
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem $USER@$HOST << 'EOF'
@@ -48,16 +49,8 @@ jobs:
             docker rm spring   || true
 
             # Construire l'image Docker nommée spring:latest
-            cat > Dockerfile << 'EOD'
-            FROM eclipse-temurin:17-jdk-alpine
-            COPY spring.jar /app.jar
-            EXPOSE 8080
-            ENTRYPOINT ["java","-jar","/app.jar"]
-            EOD
+            docker build -t spring:latest /home/$USER
 
-            # Construire et lancer en détaché
-            docker build -t spring:latest .
-            docker run -d --name spring \
-              -p 8080:8080 \
-              spring:latest
+            # Lancer le conteneur Docker
+            docker run -d --name spring -p 8080:8080 spring:latest
           EOF
