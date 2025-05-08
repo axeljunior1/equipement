@@ -35,8 +35,8 @@ jobs:
       # 4) Déployer sur l’EC2
       - name: Deploy to EC2
         env:
-          HOST: ${{ secrets.EC2_HOST }}
-          USER: ${{ secrets.EC2_USER }}
+          HOST: 16.170.223.53
+          USER: ec2-user
         run: |
           # Copier le JAR sur l'EC2
           scp -o StrictHostKeyChecking=no -i ec2_key.pem target/*.jar $USER@$HOST:/home/$USER/spring.jar
