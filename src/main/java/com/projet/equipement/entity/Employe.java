@@ -2,7 +2,6 @@ package com.projet.equipement.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "employes")
-public class Employe {
+public class Employe extends MultiTenantEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -25,18 +24,15 @@ public class Employe {
     private Long id;
     private String nom;
     private String prenom;
+    @JsonIgnore
     private String password;
     @Builder.Default
     private Boolean actif = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "role_employe",
-            joinColumns = @JoinColumn(name = "id_employe"),
-            inverseJoinColumns = @JoinColumn(name = "id_role")
-    )
-    @NotNull(message = "Passer le(s) role(s)" )
-    private Set<Role> roles = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "employe", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Set<RoleEmploye> employeRoles = new HashSet<>();
 
     @Column(name = "created_at")
     @Builder.Default
@@ -50,7 +46,9 @@ public class Employe {
     @JsonIgnore
     private List<Achat> achats;
 
-
+    @ManyToOne
+    @JoinColumn(name = "tenant_id", insertable = false, updatable = false)
+    private Tenant tenant;
 
 }
 

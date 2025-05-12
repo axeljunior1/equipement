@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "categorie")
-public class Categorie {
+public class Categorie extends MultiTenantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

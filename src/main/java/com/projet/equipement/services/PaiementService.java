@@ -5,6 +5,7 @@ import com.projet.equipement.dto.paiement.PaiementPostDTO;
 import com.projet.equipement.dto.paiement.PaiementUpdateDTO;
 import com.projet.equipement.entity.EtatPaiement;
 import com.projet.equipement.entity.Paiements;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.enumeration.PaiementEnum;
 import com.projet.equipement.enumeration.PaiementTransitionEnum;
 import com.projet.equipement.exceptions.EntityNotFoundException;
@@ -41,6 +42,7 @@ public class PaiementService {
         Paiements paiement = paiementMapper.toEntity(paiementPostDTO);
 
         // Sauvegarder le paiement
+        paiement.setTenantId(TenantContext.getTenantId());
         paiement = paiementRepository.save(paiement);
 
         // Convertir l'entité en DTO et retourner
@@ -94,6 +96,7 @@ public class PaiementService {
     }
 
     public void savePaiement(Paiements paiement) {
+        paiement.setTenantId(TenantContext.getTenantId());
         paiementRepository.save(paiement);
     }
 

@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "ventes")
-public class Vente {
+public class Vente extends MultiTenantEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Retour {
+public class Retour extends MultiTenantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

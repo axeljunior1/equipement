@@ -22,4 +22,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             "LOWER(p.prenom) LIKE LOWER(CONCAT('%', :motCle, '%')))"
     )
     List<Client> rechercherClients(@Param("motCle") String motCle);
+
+    @Query("SELECT c FROM Client c WHERE c.id = :id")
+    Optional<Client> findWithTenant(@Param("id") Long id);
 }

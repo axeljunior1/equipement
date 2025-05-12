@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Facture {
+public class Facture extends MultiTenantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,6 +4,7 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockUpdateDto;
 import com.projet.equipement.entity.MouvementStock;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.MouvementStockMapper;
 import com.projet.equipement.repository.MouvementStockRepository;
@@ -59,12 +60,15 @@ public class MouvementStockService {
                 .idLigneOrigine(idLigneOrigine)
                 .build();
 
-        mouvementStockRepository.save(mouvementStockMapper.PostMouvementStockFromDto(mouvementStockPostDto));
+        MouvementStock entity = mouvementStockMapper.PostMouvementStockFromDto(mouvementStockPostDto);
+        entity.setTenantId(TenantContext.getTenantId());
+        mouvementStockRepository.save(entity);
     }
 
 
     public MouvementStock save(MouvementStockPostDto mouvementStockPostDto){
         MouvementStock mouvementStock = mouvementStockMapper.PostMouvementStockFromDto(mouvementStockPostDto);
+        mouvementStock.setTenantId(TenantContext.getTenantId());
         return mouvementStockRepository.save(mouvementStock);
     }
 
@@ -106,6 +110,7 @@ public class MouvementStockService {
         mouvements.forEach(mouvementStock -> {
             MouvementStockUpdateDto dto = updates.get(mouvementStock.getId());
             if (dto != null) {
+                mouvementStock.setTenantId(TenantContext.getTenantId());
                 mouvementStockMapper.updateMouvementStockFromDto(dto, mouvementStock);
             }
         });

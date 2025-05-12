@@ -1,7 +1,7 @@
 package com.projet.equipement.mapper;
 
-import com.projet.equipement.dto.role.achat.RolePostDto;
-import com.projet.equipement.dto.role.achat.RoleUpdateDto;
+import com.projet.equipement.dto.role.RolePostDto;
+import com.projet.equipement.dto.role.RoleUpdateDto;
 import com.projet.equipement.entity.Authority;
 import com.projet.equipement.entity.Role;
 import jakarta.validation.constraints.NotNull;

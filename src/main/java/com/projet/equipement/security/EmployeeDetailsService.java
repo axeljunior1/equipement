@@ -2,7 +2,10 @@ package com.projet.equipement.security;
 
 
 import com.projet.equipement.entity.Employe;
+import com.projet.equipement.entity.TenantContext;
+import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.EmployeRepository;
+import com.projet.equipement.repository.TenantRepository;
 import com.projet.equipement.services.RoleService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,29 +22,38 @@ import java.util.stream.Collectors;
 @Service
 public class EmployeeDetailsService implements UserDetailsService {
 
+
     private final EmployeRepository employeRepository;
     private final RoleService roleService;
+    private final TenantRepository tenantRepository;
 
-    public EmployeeDetailsService(EmployeRepository employeRepository, RoleService roleService) {
+    public EmployeeDetailsService(EmployeRepository employeRepository, RoleService roleService, TenantRepository tenantRepository) {
         this.employeRepository = employeRepository;
         this.roleService = roleService;
+        this.tenantRepository = tenantRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        String tenantId = TenantContext.getTenantId();
+        if (tenantId == null || !tenantRepository.existsByIdAndIsActiveTrue(tenantId)) {
+            throw new EntityNotFoundException("Tenant / Entité",tenantId );
+        }
+
         Employe employe = employeRepository.findByNom(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable : " + username));
 
         // Récupérer les rôles et les convertir en authorities
-        Set<GrantedAuthority> authorities = employe.getRoles().stream()
+        Set<GrantedAuthority> authorities = employe.getEmployeRoles().stream()
                 .flatMap(role -> {
                     // Ajoute le rôle en tant qu'autorité avec le préfixe "ROLE_"
                     Set<GrantedAuthority> roleAuthorities = new HashSet<>();
-                    roleAuthorities.add(new SimpleGrantedAuthority("ROLE_" + roleService.findById(role.getId()).getNom()));
+                    roleAuthorities.add(new SimpleGrantedAuthority("ROLE_" + roleService.findById(role.getRole().getId()).getNom()));
 
                     // Ajoute les permissions spécifiques du rôle
-                    if (role.getAuthorities() != null) {
-                        roleAuthorities.addAll(role.getAuthorities().stream()
+                    if (role.getRole().getAuthorities() != null) {
+                        roleAuthorities.addAll(role.getRole().getAuthorities().stream()
                                 .map(auth -> new SimpleGrantedAuthority(auth.getNom()))
                                 .collect(Collectors.toSet()));
                     }
@@ -57,3 +69,4 @@ public class EmployeeDetailsService implements UserDetailsService {
 
     }
 }
+

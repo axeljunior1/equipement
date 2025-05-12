@@ -4,6 +4,7 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.panier.PanierGetDto;
 import com.projet.equipement.dto.panier.PanierPostDto;
 import com.projet.equipement.entity.Panier;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.PanierMapper;
 import com.projet.equipement.repository.PanierRepository;
@@ -41,7 +42,10 @@ public class PanierService {
 
     @Transactional
     public PanierGetDto save(PanierPostDto panier) {
-        Panier save = panierRepository.save(panierMapper.toEntity(panier));
+        Panier entity = panierMapper.toEntity(panier);
+        entity.setTenantId(TenantContext.getTenantId());
+
+        Panier save = panierRepository.save(entity);
 
 //        entityManager.refresh(save);
         return panierMapper.toGetDto(save);

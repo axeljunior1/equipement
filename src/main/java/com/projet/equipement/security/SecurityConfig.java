@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "login").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers( "test").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("tenant/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
                         .requestMatchers("roles/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
                         .requestMatchers("employes/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
                         .anyRequest().authenticated() // Toutes les autres requêtes nécessitent une authentification

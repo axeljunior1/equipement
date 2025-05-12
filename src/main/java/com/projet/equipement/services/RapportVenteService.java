@@ -1,7 +1,7 @@
 package com.projet.equipement.services;
 
 
-import com.projet.equipement.dto.rapport.vente.RapportVenteView;
+import com.projet.equipement.dto.rapport.RapportVenteView;
 import com.projet.equipement.repository.RapportVenteRepository;
 import org.springframework.stereotype.Service;
 

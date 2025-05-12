@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "tarif_achat")
-public class TarifAchat {
+public class TarifAchat extends MultiTenantEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

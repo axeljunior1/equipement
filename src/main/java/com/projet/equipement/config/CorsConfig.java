@@ -1,5 +1,7 @@
 package com.projet.equipement.config;
 
+import com.projet.equipement.security.TenantFilter;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -20,4 +22,14 @@ public class CorsConfig {
             }
         };
     }
+
+    @Bean
+    public FilterRegistrationBean<TenantFilter> tenantFilterBean() {
+        FilterRegistrationBean<TenantFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new TenantFilter());
+        registrationBean.addUrlPatterns("/clients/*"); // Appliquer à tous les endpoints /api/*
+        return registrationBean;
+    }
+
+
 }

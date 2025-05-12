@@ -1,7 +1,7 @@
 package com.projet.equipement.controller;
 
 import com.projet.equipement.dto.PeriodeDTO;
-import com.projet.equipement.dto.rapport.vente.RapportVenteView;
+import com.projet.equipement.dto.rapport.RapportVenteView;
 import com.projet.equipement.services.RapportVenteService;
 import com.projet.equipement.utils.PaginationUtil;
 import org.springframework.data.domain.Page;

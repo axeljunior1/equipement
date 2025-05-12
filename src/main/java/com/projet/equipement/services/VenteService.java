@@ -48,22 +48,7 @@ public class VenteService {
      * Met à jour l'état de la vente suite à un paiement ou un retour.
      * Vous pouvez appeler cette méthode après un paiement ou retour pour synchroniser l'état.
      */
-    @Transactional
-    public void updateState(Long venteId, SalesEvent event) {
-        Vente vente = venteRepository.findById(venteId)
-                .orElseThrow(() -> new RuntimeException("Vente non trouvée"));
-//
-//        stateMachine.start();
-//        stateMachine.getStateMachineAccessor()
-//                .doWithAllRegions(access ->
-//                        access.resetStateMachine(
-//                                new DefaultStateMachineContext<>(
-//                                        SalesState.CREATED, null, null, null)));
-//
-//        stateMachine.sendEvent(event);
-//        vente.setEtat(stateMachine.getState().getId());
-        venteRepository.save(vente);
-    }
+
 
     // D'autres méthodes pour gérer la vente globale
 }

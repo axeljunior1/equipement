@@ -4,11 +4,14 @@ package com.projet.equipement.security;
 import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.panier.PanierPostDto;
 import com.projet.equipement.dto.produit.ProduitGetDto;
+import com.projet.equipement.entity.Client;
 import com.projet.equipement.entity.Panier;
 import com.projet.equipement.mapper.ProduitMapper;
+import com.projet.equipement.services.ClientService;
 import com.projet.equipement.services.EmployeService;
 import com.projet.equipement.services.PanierService;
 import com.projet.equipement.services.ProduitService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +33,16 @@ public class AuthController {
     private final ProduitService produitService;
     private final ProduitMapper produitMapper;
     private final PanierService panierService;
+    private final ClientService clientService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, EmployeService employeService, ProduitService produitService, ProduitMapper produitMapper, PanierService panierService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, EmployeService employeService, ProduitService produitService, ProduitMapper produitMapper, PanierService panierService, ClientService clientService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.employeService = employeService;
         this.produitService = produitService;
         this.produitMapper = produitMapper;
         this.panierService = panierService;
+        this.clientService = clientService;
     }
 
     @GetMapping
@@ -46,8 +51,8 @@ public class AuthController {
     }
 
     @GetMapping("/test")
-    public String test() {
-        return "Mengue tu es fort";
+    public Page<Client> test(Pageable peageble) {
+        return clientService.findAll(peageble);
     }
 
 
@@ -55,7 +60,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-            String token = jwtUtil.generateToken(loginRequest.getUsername());
+            String token = jwtUtil.generateToken(loginRequest.getUsername(), loginRequest.getTenantId());
 
             EmployeGetDto byUsername = employeService.findByUsername(loginRequest.getUsername());
 
@@ -81,7 +86,7 @@ public class AuthController {
                     .build();
             return ResponseEntity.ok().body(response);
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(401).body("Nom ou mot de passe incorrect. =>" + jwtUtil.generateToken(loginRequest.getUsername()));
+            return ResponseEntity.status(401).body("Nom ou mot de passe incorrect. =>" + jwtUtil.generateToken(loginRequest.getUsername(), loginRequest.getTenantId()));
         }
     }
 

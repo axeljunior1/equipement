@@ -1,8 +1,8 @@
 package com.projet.equipement.controller;
 
-import com.projet.equipement.dto.role.achat.RoleGetDto;
-import com.projet.equipement.dto.role.achat.RolePostDto;
-import com.projet.equipement.dto.role.achat.RoleUpdateDto;
+import com.projet.equipement.dto.role.RoleGetDto;
+import com.projet.equipement.dto.role.RolePostDto;
+import com.projet.equipement.dto.role.RoleUpdateDto;
 import com.projet.equipement.entity.Role;
 import com.projet.equipement.services.RoleService;
 import org.springframework.data.domain.Page;

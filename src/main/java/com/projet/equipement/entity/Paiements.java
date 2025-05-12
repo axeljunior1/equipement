@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Paiements {
+public class Paiements extends MultiTenantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,6 +2,7 @@ package com.projet.equipement.services;
 
 
 import com.projet.equipement.entity.Authority;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.AuthorityRepository;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public class AuthorityService {
 
 
     public Authority save(Authority authority) {
+        authority.setTenantId(TenantContext.getTenantId());
         return authorityRepository.save(authority);
     }
 

@@ -8,7 +8,7 @@ import lombok.*;
 
 @Getter
 @Setter
-public class LigneCaisse {
+public class LigneCaisse extends MultiTenantEntity {
 
     @NotNull
     public Double lVentePrixVenteUnitaire;

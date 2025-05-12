@@ -1,11 +1,9 @@
 package com.projet.equipement.services;
 
 
-import com.projet.equipement.dto.role.achat.RolePostDto;
-import com.projet.equipement.dto.role.achat.RoleUpdateDto;
-import com.projet.equipement.entity.Authority;
-import com.projet.equipement.entity.Employe;
-import com.projet.equipement.entity.Role;
+import com.projet.equipement.dto.role.RolePostDto;
+import com.projet.equipement.dto.role.RoleUpdateDto;
+import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.RoleMapper;
 import com.projet.equipement.repository.RoleRepository;
@@ -67,10 +65,12 @@ public class RoleService {
 
         Role role = roleMapper.postRoleDto(rolePostDto, authorities);
 
+        role.setTenantId(TenantContext.getTenantId());
         return roleRepository.save(role);
     }
 
     public Role save(Role role) {
+        role.setTenantId(TenantContext.getTenantId());
         return roleRepository.save(role);
     }
 
@@ -101,13 +101,13 @@ public class RoleService {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rôle non trouvé"));
 
-        for (Employe employe : role.getEmployes()) {
-            employe.getRoles().remove(role);
-        }
-
-        // Supprimer toutes les liaisons dans la table role_authority
-        role.getAuthorities().clear();
-        roleRepository.save(role);
+//        for (RoleEmployee employe : role.getEmployees()) {
+//            employe.getRole().rremove(role);
+//        }
+//
+//        // Supprimer toutes les liaisons dans la table role_authority
+//        role.getAuthorities().clear();
+//        roleRepository.save(role);
 
         // Maintenant, supprimer le rôle
         roleRepository.delete(role);

@@ -4,6 +4,7 @@ import com.projet.equipement.dto.facture.FactureGetDTO;
 import com.projet.equipement.dto.facture.FacturePostDTO;
 import com.projet.equipement.dto.facture.FactureUpdateDTO;
 import com.projet.equipement.entity.Facture;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.mapper.FactureMapper;
 import com.projet.equipement.repository.FactureRepository;
 import com.projet.equipement.utils.FactureNumeroGenerator;
@@ -34,6 +35,7 @@ public class FactureService {
         facture.setNumeroFacture(numeroFacture);
 
         // Sauvegarder la facture
+        facture.setTenantId(TenantContext.getTenantId());
         facture = factureRepository.save(facture);
 
         // Convertir l'entité en DTO et retourner

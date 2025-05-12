@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "produits", schema = "public")
-public class Produit {
+public class Produit extends MultiTenantEntity {
 
 
     @Id

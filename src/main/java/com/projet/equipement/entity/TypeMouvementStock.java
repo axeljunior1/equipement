@@ -11,7 +11,7 @@ import lombok.*;
 @Entity
 @Table(name = "types_mouvement_stock")
 
-public class TypeMouvementStock {
+public class TypeMouvementStock extends MultiTenantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

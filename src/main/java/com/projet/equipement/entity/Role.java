@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "roles")
-public class Role {
+public class Role extends MultiTenantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_role")
@@ -36,9 +36,10 @@ public class Role {
     private Set<Authority> authorities = new HashSet<>();
 
 
-    @ManyToMany(mappedBy = "roles")
+
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private Set<Employe> employes = new HashSet<>();
+    private Set<RoleEmploye> employees = new HashSet<>();
 
 
 }

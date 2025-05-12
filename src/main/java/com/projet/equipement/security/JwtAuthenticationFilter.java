@@ -1,6 +1,7 @@
 package com.projet.equipement.security;
 
 
+import com.projet.equipement.entity.TenantContext;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -35,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
-
+        String tenantId = null;
 
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
@@ -44,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
 
                 username = jwtUtil.getUsernameFromToken(token);  // Extraction du nom d'utilisateur à partir du token
+                tenantId = jwtUtil.getTenantIdFromToken(token);
             } catch (ExpiredJwtException e) {
                 System.out.println(e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -55,18 +58,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;  // Arrête le traitement si le token est invalide
             }
         }
+        if (jwtUtil.validateToken(token)) {
+            if (tenantId != null && !tenantId.equals(TenantContext.getTenantId())) {
+                TenantContext.setTenantId(tenantId);
 
-        // Si le token est valide et que l'utilisateur n'est pas encore authentifié
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = employeeDetailsService.loadUserByUsername(username);
+                System.out.println("Le tenantId est :" + tenantId);
 
-            if (jwtUtil.validateToken(token)) {
-                // Crée une authentification et configure le contexte de sécurité
-                var authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // Si le token est valide et que l'utilisateur n'est pas encore authentifié
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = employeeDetailsService.loadUserByUsername(username);
 
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    if (jwtUtil.validateToken(token)) {
+                        // Crée une authentification et configure le contexte de sécurité
+                        var authenticationToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    }
+                }
+
             }
         }
 
@@ -74,3 +85,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+

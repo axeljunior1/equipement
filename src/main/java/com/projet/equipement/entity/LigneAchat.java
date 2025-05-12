@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "lignes_achats")
-public class LigneAchat {
+public class LigneAchat extends MultiTenantEntity {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore les champs JSON inconnus
-public class Caisse {
+public class Caisse extends MultiTenantEntity{
 
     @NotBlank(message = " Is Blank")
     public String clientNom;

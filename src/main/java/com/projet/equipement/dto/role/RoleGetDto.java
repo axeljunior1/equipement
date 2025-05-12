@@ -1,4 +1,4 @@
-package com.projet.equipement.dto.role.achat;
+package com.projet.equipement.dto.role;
 
 import com.projet.equipement.entity.Authority;
 import com.projet.equipement.entity.Role;

@@ -13,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "vue_stock_courant")
-public class StockCourant {
+public class StockCourant extends MultiTenantEntity {
     @Id
     @Column(name = "id_produit")
     private Long id;

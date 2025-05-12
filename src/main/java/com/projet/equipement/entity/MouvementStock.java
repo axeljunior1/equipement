@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "mouvement_stock")
-public class MouvementStock  {
+public class MouvementStock extends MultiTenantEntity  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Identifiant unique

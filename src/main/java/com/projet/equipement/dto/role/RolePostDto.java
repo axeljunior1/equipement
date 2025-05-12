@@ -1,4 +1,4 @@
-package com.projet.equipement.dto.role.achat;
+package com.projet.equipement.dto.role;
 
 import lombok.Getter;
 import lombok.Setter;

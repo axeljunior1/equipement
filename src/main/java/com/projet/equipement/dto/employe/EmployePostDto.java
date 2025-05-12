@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.employe;
 
+import com.projet.equipement.entity.RoleEmploye;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;

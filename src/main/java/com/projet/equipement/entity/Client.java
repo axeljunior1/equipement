@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,15 +18,17 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "clients")
-public class Client {
+public class Client extends MultiTenantEntity{
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_client")
     private Long id;
+
     @NotBlank(message = "Le nom d'utilisateur ne peut pas être vide")
     @Column(name = "nom", nullable = false, length = 50)
     private String nom;
+
     private String prenom;
 
     @Column()
@@ -46,8 +51,6 @@ public class Client {
     @OneToMany(mappedBy = "client")
     @JsonIgnore
     private List<Vente> ventes;
-
-
 
 }
 

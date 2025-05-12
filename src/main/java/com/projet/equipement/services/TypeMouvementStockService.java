@@ -1,6 +1,7 @@
 package com.projet.equipement.services;
 
 
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.entity.TypeMouvementStock;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.TypeMouvementStockRepository;
@@ -31,6 +32,7 @@ public class TypeMouvementStockService {
     }
 
     public TypeMouvementStock save(TypeMouvementStock entity) {
+        entity.setTenantId(TenantContext.getTenantId());
         return typeMouvementStockRepository.save(entity);
     }
 

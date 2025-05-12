@@ -33,6 +33,11 @@ public class ProduitController {
         return ResponseEntity.ok(produitGetDto);
     }
 
+    @GetMapping("/test")
+    public List<Produit> test() {
+        return produitService.findProduitsByTenantId();
+    }
+
     @GetMapping("/code-barre/{ean13}")
     public ResponseEntity<ProduitGetDto> findProduitByEan13(@PathVariable String ean13) {
         ProduitGetDto produit = produitService.findByEan13(ean13);

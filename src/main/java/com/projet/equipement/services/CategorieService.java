@@ -4,6 +4,7 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.categorie.CategoriePostDto;
 import com.projet.equipement.dto.categorie.CategorieUpdateDto;
 import com.projet.equipement.entity.Categorie;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.CategorieMapper;
 import com.projet.equipement.repository.CategorieRepository;
@@ -36,6 +37,7 @@ public class CategorieService {
     public Categorie save(CategoriePostDto categoriePostDto) {
 
         Categorie categorie = categorieMapper.toEntity(categoriePostDto);
+        categorie.setTenantId(TenantContext.getTenantId());
         return categorieRepository.save(categorie);
     }
 

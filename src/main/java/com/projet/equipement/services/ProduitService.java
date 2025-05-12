@@ -8,6 +8,7 @@ import com.projet.equipement.dto.tarifAchat.TarifAchatPostDto;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.entity.StockCourant;
 import com.projet.equipement.entity.TarifAchat;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.repository.ProduitRepository;
@@ -97,6 +98,13 @@ public class ProduitService{
 
         return produitGetDto;
     }
+    public List<Produit> findProduitsByTenantId() {
+        String tenantId = TenantContext.getTenantId();
+        return entityManager.createQuery("from Produit p where p.tenantId = :tenantId", Produit.class)
+                .setParameter("tenantId", tenantId)
+                .getResultList();
+    }
+
 
     public ProduitGetDto findByEan13(String ean13) {
         return  produitMapper.toGetDto(produitRepository.findByEan13(ean13)
@@ -142,6 +150,7 @@ public class ProduitService{
         produit.setEan13(EAN_CONST);
         produit.setQrCode(new EAN13Generator().genAndSaveQrCodeByProduct(EAN_CONST));
 
+        produit.setTenantId(TenantContext.getTenantId());
         Produit p = produitRepository.save(produit);
         Produit saved = produitRepository.findById(p.getId()).orElseThrow(()->new EntityNotFoundException("Produit", p.getId()));
         // Forcer le chargement de la catégorie (si LAZY)
@@ -162,6 +171,7 @@ public class ProduitService{
     }
 
     public Produit save(Produit produit){
+        produit.setTenantId(TenantContext.getTenantId());
         return produitRepository.save(produit);
     }
 

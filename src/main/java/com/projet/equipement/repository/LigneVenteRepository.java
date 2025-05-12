@@ -1,6 +1,6 @@
 package com.projet.equipement.repository;
 
-import com.projet.equipement.dto.rapport.vente.RapportVenteView;
+import com.projet.equipement.dto.rapport.RapportVenteView;
 import com.projet.equipement.entity.LigneVente;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,9 +1,4 @@
-package com.projet.equipement.dto.rapport.vente;
-
-import lombok.Data;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+package com.projet.equipement.dto.rapport;
 
 public interface RapportVenteView {
 

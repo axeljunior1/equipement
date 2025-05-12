@@ -10,6 +10,7 @@ import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.LigneAchat;
 import com.projet.equipement.entity.TarifAchat;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.AchatMapper;
 import com.projet.equipement.mapper.LigneAchatMapper;
@@ -62,6 +63,7 @@ public class TransactionAchatAndLinesService {
         Double total = ligneAchatRepository.sumTotalByAchatId(achatId);
         achat.setMontantTotal(total != null ? total : 0.0);
 
+        achat.setTenantId(TenantContext.getTenantId());
         achatRepository.save(achat);
     }
 
@@ -178,6 +180,7 @@ public class TransactionAchatAndLinesService {
 
         LigneAchat ligneAchatToPost = ligneAchatMapper.toEntity(ligneAchatPostDto);
 
+        ligneAchatToPost.setTenantId(TenantContext.getTenantId());
         LigneAchat saveLigneAchat = ligneAchatRepository.save(ligneAchatToPost);
 
         // Modifie le total de l'achat lors de la save d'une ligne
@@ -208,6 +211,7 @@ public class TransactionAchatAndLinesService {
 
         Achat achat = achatMapper.toEntity(achatPostDto);
         // Sauvegarde de l'achat pour obtenir l'id
+        achat.setTenantId(TenantContext.getTenantId());
         Achat achatSansTotal = achatRepository.save(achat);
         entityManager.refresh(achatSansTotal);
         // Mise a jour du total
@@ -221,6 +225,7 @@ public class TransactionAchatAndLinesService {
         LigneAchat ligneAchat = ligneAchatRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("LigneAchat", id));
 
         ligneAchatMapper.updateLigneAchatFromDto(ligneAchatUpdateDto, ligneAchat);
+        ligneAchat.setTenantId(TenantContext.getTenantId());
         LigneAchat savedLine = ligneAchatRepository.save(ligneAchat);
         //mise a jour du total
         updateTotalAchat(savedLine.getAchat().getId());

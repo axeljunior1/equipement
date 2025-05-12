@@ -6,6 +6,7 @@ import com.projet.equipement.dto.panierProduit.PanierProduitPostDto;
 import com.projet.equipement.dto.panierProduit.PanierProduitUpdateDto;
 import com.projet.equipement.entity.Panier;
 import com.projet.equipement.entity.PanierProduit;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.PanierProduitMapper;
 import com.projet.equipement.repository.PanierProduitRepository;
@@ -61,9 +62,12 @@ public class PanierProduitService {
         if (produit != null) {
             // cas de modification de la qte dans le panier
             produit.setQuantite(panierProduit.getQuantite());
+            produit.setTenantId(TenantContext.getTenantId());
             saved = panierProduitRepository.save(produit);
         }else{
-             saved = panierProduitRepository.save(panierProduitMapper.toEntity(panierProduit));
+            PanierProduit entity = panierProduitMapper.toEntity(panierProduit);
+            entity.setTenantId(TenantContext.getTenantId());
+            saved = panierProduitRepository.save(entity);
         }
 
 
@@ -87,6 +91,7 @@ public class PanierProduitService {
             }
         }
 
+        panierProduit.setTenantId(TenantContext.getTenantId());
         PanierProduit saved = panierProduitRepository.save(panierProduit);
         // notifie les client du changement dans le panier
 //        cartUpdateService.notifyCartUpdate(saved);

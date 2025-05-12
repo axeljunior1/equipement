@@ -57,8 +57,6 @@ public class TransactionVenteAndLinesService {
     private final EtatFactureService etatFactureService;
     private final FactureService factureService;
     private final EtatVenteService etatVenteService;
-    private final PaiementRepository paiementRepository;
-    private final EtatPaiementRepository etatPaiementRepository;
     private final PaiementService paiementService;
     private final EtatPaiementService etatPaiementService;
 
@@ -78,7 +76,7 @@ public class TransactionVenteAndLinesService {
             EtatVenteRepository etatVenteRepository,
             EtatFactureService etatFactureService,
             FactureService factureService,
-            EtatVenteService etatVenteService, PaiementRepository paiementRepository, EtatPaiementRepository etatPaiementRepository, PaiementService paiementService, EtatPaiementService etatPaiementService) {
+            EtatVenteService etatVenteService, PaiementService paiementService, EtatPaiementService etatPaiementService) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -95,8 +93,6 @@ public class TransactionVenteAndLinesService {
         this.etatFactureService = etatFactureService;
         this.factureService = factureService;
         this.etatVenteService = etatVenteService;
-        this.paiementRepository = paiementRepository;
-        this.etatPaiementRepository = etatPaiementRepository;
         this.paiementService = paiementService;
         this.etatPaiementService = etatPaiementService;
     }
@@ -171,6 +167,7 @@ public class TransactionVenteAndLinesService {
 
         vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
                 new EntityNotFoundException(ETAT_VENTE, etatMachine)));
+        vente.setTenantId(TenantContext.getTenantId());
 
         venteRepository.save(vente);
     }
@@ -206,6 +203,7 @@ public class TransactionVenteAndLinesService {
 
         vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
                 new EntityNotFoundException(ETAT_VENTE, etatMachine)));
+        vente.setTenantId(TenantContext.getTenantId());
 
         venteRepository.save(vente);
 
@@ -239,6 +237,7 @@ public class TransactionVenteAndLinesService {
         vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
                 new EntityNotFoundException(ETAT_VENTE, etatMachine)));
 
+        vente.setTenantId(TenantContext.getTenantId());
         venteRepository.save(vente);
 
     }
@@ -278,6 +277,7 @@ public class TransactionVenteAndLinesService {
             vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
                     new EntityNotFoundException(ETAT_VENTE, etatMachine)));
 
+            vente.setTenantId(TenantContext.getTenantId());
             venteRepository.save(vente);
 
         }
@@ -320,6 +320,7 @@ public class TransactionVenteAndLinesService {
 
             vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
                     new EntityNotFoundException(ETAT_VENTE, etatMachine)));
+            vente.setTenantId(TenantContext.getTenantId());
             venteRepository.save(vente);
 
         }
@@ -336,6 +337,7 @@ public class TransactionVenteAndLinesService {
         Double total = ligneVenteRepository.sumTotalByVenteId(venteId);
         vente.setMontantTotal(total != null ? total : 0.0);
 
+        vente.setTenantId(TenantContext.getTenantId());
         venteRepository.save(vente);
     }
 
@@ -439,6 +441,7 @@ public class TransactionVenteAndLinesService {
     }
 
     private void saveVente(Vente vente) {
+        vente.setTenantId(TenantContext.getTenantId());
         venteRepository.save(vente);
     }
 
@@ -466,6 +469,7 @@ public class TransactionVenteAndLinesService {
 
         LigneVente ligneVenteToPost = ligneVenteMapper.toEntity(ligneVentePostDto);
 
+        ligneVenteToPost.setTenantId(TenantContext.getTenantId());
         LigneVente saveLigneVente = ligneVenteRepository.save(ligneVenteToPost);
 
         entityManager.refresh(saveLigneVente);
@@ -475,7 +479,7 @@ public class TransactionVenteAndLinesService {
 
         LocalDateTime dateCreate = LocalDateTime.now();
         // Enregistrement du mouvement de stock via le service dédié
-        mouvementStockService.save(MouvementStockPostDto.builder()
+        MouvementStockPostDto mouvStk = MouvementStockPostDto.builder()
                 .reference("VTE_" + ligneVentePostDto.getVenteId() + "_LIG_" + saveLigneVente.getId())
                 .produitId(ligneVentePostDto.getProduitId())
                 .quantite(ligneVentePostDto.getQuantite())
@@ -485,7 +489,8 @@ public class TransactionVenteAndLinesService {
                 .typeMouvementCode("VENTE_PRODUIT")
                 .idEvenementOrigine(Math.toIntExact(saveLigneVente.getVente().getId()))
                 .idLigneOrigine(Math.toIntExact(saveLigneVente.getId()))
-                .build());
+                .build();
+        mouvementStockService.save(mouvStk);
 
 
         return saveLigneVente;
@@ -495,6 +500,7 @@ public class TransactionVenteAndLinesService {
 
         Vente vente = venteMapper.toEntity(ventePostDto);
 
+        vente.setTenantId(TenantContext.getTenantId());
         Vente save = venteRepository.save(vente);
         entityManager.refresh(save);
         return save;
@@ -504,6 +510,7 @@ public class TransactionVenteAndLinesService {
         LigneVente ligneVente = this.findByIdLine(id);
 
         ligneVenteMapper.updateLigneVenteFromDto(ligneVenteUpdateDto, ligneVente);
+        ligneVente.setTenantId(TenantContext.getTenantId());
         LigneVente save = ligneVenteRepository.save(ligneVente);
 
         entityManager.refresh(save);
@@ -520,6 +527,7 @@ public class TransactionVenteAndLinesService {
         venteMapper.updateDto(venteUpdateDto, vente);
 
 
+        vente.setTenantId(TenantContext.getTenantId());
         Vente save = venteRepository.save(vente);
         entityManager.refresh(save);
         return save;
@@ -560,6 +568,7 @@ public class TransactionVenteAndLinesService {
 
         LigneVente ligneVente = ligneVenteMapper.toEntity(ligneVentePostDto);
 
+        ligneVente.setTenantId(TenantContext.getTenantId());
         LigneVente saveLigneVente = ligneVenteRepository.save(ligneVente);
 
         entityManager.refresh(saveLigneVente);
@@ -602,6 +611,7 @@ public class TransactionVenteAndLinesService {
 
         // soft delete de la ligne
         ligneVente.setActif(false);
+        ligneVente.setTenantId(TenantContext.getTenantId());
         ligneVenteRepository.save(ligneVente);
         updateTotalVente(ligneVente.getVente().getId());
     }

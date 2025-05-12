@@ -25,9 +25,10 @@ public class JwtUtil {
     // Générer un token
 
 
-    public  String generateToken(String username) {
+    public  String generateToken(String username, String tenantId) {
         return Jwts.builder()
                 .subject(username)
+                .claim("tenant_id", tenantId)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
@@ -49,7 +50,6 @@ public class JwtUtil {
     // Valider un token
     public  boolean validateToken(String token) {
         try {
-            System.out.println("validation");
             Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload();
             return true;
         } catch (JwtException | IllegalArgumentException e) {
@@ -59,6 +59,11 @@ public class JwtUtil {
 
     public String getUsernameFromToken(String token) {
             return extractAllClaims(token).getSubject();
+    }
+
+    // Extraire le tenant_id du token
+    public String getTenantIdFromToken(String token) {
+        return extractAllClaims(token).get("tenant_id").toString();
     }
 
 

@@ -6,7 +6,9 @@ import com.projet.equipement.dto.client.ClientUpdateDto;
 import com.projet.equipement.entity.Client;
 import com.projet.equipement.services.ClientService;
 import com.projet.equipement.utils.PaginationUtil;
+import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
+import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +21,11 @@ import java.util.List;
 public class ClientController {
 
     private final ClientService clientService;
+    private EntityManager entityManager;
 
-    public ClientController(ClientService clientService) {
+    public ClientController(ClientService clientService, EntityManager entityManager) {
         this.clientService = clientService;
+        this.entityManager = entityManager;
     }
 
     @GetMapping("")
@@ -48,6 +52,22 @@ public class ClientController {
 
         return ResponseEntity.ok(client);
     }
+    @GetMapping("/test-clients")
+    public List<Client> testClients() {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("tenantFilter").setParameter("tenantId", "ent3");
+
+
+        return entityManager.createQuery("from Client", Client.class).getResultList();
+    }
+    @GetMapping("/debug-clients")
+    public List<Client> debugClients() {
+        Session session = entityManager.unwrap(Session.class);
+        session.enableFilter("tenantFilter").setParameter("tenantId", "ent3");
+
+        return entityManager.createQuery("from Client", Client.class).getResultList();
+    }
+
 
     @PostMapping("")
     public ResponseEntity<Client> addClient(@RequestBody ClientPostDto clientPostDto) {

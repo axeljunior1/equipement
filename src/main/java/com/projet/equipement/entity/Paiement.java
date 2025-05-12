@@ -10,12 +10,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "paiment")
+@Table(name = "paiement")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Paiement {
+public class Paiement extends MultiTenantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

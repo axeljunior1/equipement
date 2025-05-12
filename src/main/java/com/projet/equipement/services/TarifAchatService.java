@@ -4,6 +4,7 @@ import com.projet.equipement.dto.tarifAchat.TarifAchatGetDto;
 import com.projet.equipement.dto.tarifAchat.TarifAchatPostDto;
 import com.projet.equipement.dto.tarifAchat.TarifAchatUpdateDto;
 import com.projet.equipement.entity.TarifAchat;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.TarifAchatMapper;
 import com.projet.equipement.repository.TarifAchatRepository;
@@ -44,6 +45,7 @@ public class TarifAchatService {
     public TarifAchatGetDto save(TarifAchatPostDto tarifAchat) {
         TarifAchat tarifAchat1 = tarifAchatMapper.toEntity(tarifAchat);
 
+        tarifAchat1.setTenantId(TenantContext.getTenantId());
          tarifAchatRepository.save(tarifAchat1);
 
         return new TarifAchatGetDto();
@@ -51,6 +53,7 @@ public class TarifAchatService {
     @Transactional
     public TarifAchat save(TarifAchat tarifAchat) {
 
+        tarifAchat.setTenantId(TenantContext.getTenantId());
         return tarifAchatRepository.save(tarifAchat);
     }
 

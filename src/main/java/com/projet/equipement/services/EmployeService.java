@@ -5,34 +5,40 @@ import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.employe.EmployePostDto;
 import com.projet.equipement.dto.employe.EmployeUpdateDto;
 import com.projet.equipement.entity.Employe;
-import com.projet.equipement.entity.Role;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.EmployeMapper;
 import com.projet.equipement.repository.EmployeRepository;
+import com.projet.equipement.repository.RoleEmployeRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmployeService {
     private final EmployeRepository employeRepository;
     private final EmployeMapper employeMapper;
-    private final RoleService roleService;
+    private final EntityManager entityManager;
     private final PasswordEncoder passwordEncoder;
+    private final RoleEmployeService roleEmployeService;
 
-    public EmployeService(EmployeRepository employeRepository, EmployeMapper employeMapper, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public EmployeService(EmployeRepository employeRepository,
+                          EmployeMapper employeMapper,
+                          EntityManager entityManager,
+                          PasswordEncoder passwordEncoder,
+                          RoleEmployeService roleEmployeService) {
         this.employeRepository = employeRepository;
         this.employeMapper = employeMapper;
-        this.roleService = roleService;
+        this.entityManager = entityManager;
         this.passwordEncoder = passwordEncoder;
+        this.roleEmployeService = roleEmployeService;
     }
 
     public Page<EmployeGetDto> findAll(Pageable pageable) {
-        return employeRepository.findAll(pageable).map(employeMapper::toDto);
+        return employeRepository.findAll(pageable, TenantContext.getTenantId()).map(employeMapper::toDto);
     }
 
     public EmployeGetDto findById(Long id) {
@@ -41,17 +47,44 @@ public class EmployeService {
     }
 
 
+    public Employe findByIdEmploye(Long id) {
+        return employeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employe", id));
+    }
+
+
     public EmployeGetDto findByUsername(String username) {
         return employeMapper.toDto(employeRepository.findByNom(username)
                 .orElseThrow(() -> new EntityNotFoundException("Employe", username)));
     }
 
+    @Transactional
     public Employe save(EmployePostDto employePostDto) {
-        Set<Role> roles = employePostDto.getRolesIds().stream().map(roleService::findById).collect(Collectors.toSet());
-
+// 1. Mapper et encoder
         Employe employe = employeMapper.toEmploye(employePostDto);
+        String tenantId = TenantContext.getTenantId();
+        employe.setTenantId(tenantId);
         employe.setPassword(passwordEncoder.encode(employe.getPassword()));
 
+// 2. Sauver pour obtenir l'ID
+        Employe employeSave = employeRepository.save(employe);
+
+        roleEmployeService.save(tenantId, employe, employePostDto.getRolesIds());
+
+        return employeRepository.save(employeSave);
+    }
+
+    public Employe save(Employe employe) {
+        employe.setPassword(passwordEncoder.encode(employe.getPassword()));
+
+        employe.setTenantId(TenantContext.getTenantId());
+        return employeRepository.save(employe);
+    }
+
+    public Employe save(Employe employe, String tenantId) {
+        employe.setPassword(passwordEncoder.encode(employe.getPassword()));
+
+        employe.setTenantId(tenantId);
         return employeRepository.save(employe);
     }
 
@@ -60,10 +93,24 @@ public class EmployeService {
     }
 
 
+    @Transactional
     public EmployeGetDto updateEmploye(EmployeUpdateDto employeUpdateDto, Long id) {
-        Employe employe = employeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Employe", id));
+        // 1. Récupérer l'employé
+        Employe employe = employeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employe", id));
+
         employeMapper.updateEmployeFromDto(employeUpdateDto, employe);
-        return employeMapper.toDto(employeRepository.save(employe));
+
+        Employe saved = employeRepository.save(employe);
+
+        // 4. Gérer les rôles
+        roleEmployeService.deleteByEmployeId(id);
+
+        entityManager.clear();
+        roleEmployeService.save(TenantContext.getTenantId(), employe, employeUpdateDto.getRolesIds());
+
+        // 5. Retourner le DTO
+        return employeMapper.toDto(saved);
     }
 
     public EmployeGetDto putEmploye(EmployeUpdateDto employeUpdateDto, Long id) {
@@ -72,15 +119,5 @@ public class EmployeService {
         return employeMapper.toDto(employeRepository.save(employe));
     }
 
-    // Add a role to a user
-//    public void addRoleToUser(Long userId, Long roleId) {
-//        Employe employe = findById(userId);
-//        Role role = roleRepository.findById(roleId)
-//                .orElseThrow(() -> new RuntimeException("Role not found"));
-//
-//        // Add the role to the user
-//        employe.getRoles().add(role);
-//        employeRepository.save(employe);
-//    }
 
 }
