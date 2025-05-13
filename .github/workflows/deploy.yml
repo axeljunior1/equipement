@@ -46,11 +46,11 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem $USER@$HOST << 'EOF'
             # Arrêter et supprimer l'ancien conteneur s'il existe
             docker stop spring || true
-            #docker rm spring   || true
+            docker rm spring   || true
 
             # Construire l'image Docker nommée spring:latest
             docker build -t spring:latest /home/$USER
 
             # Lancer le conteneur Docker
-            docker run -d --name spring --restart unless-stopped -p 8080:8080 spring:latest
+            docker run -d --name spring --restart unless-stopped -p 8080:8080 -v spring_data:/data spring:latest
           EOF
