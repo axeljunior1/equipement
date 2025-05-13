@@ -23,7 +23,6 @@ public class TenantFilterAspect {
 //    public void before() {
 //        System.out.println("Loging for Tenant :");
 //    }
-
     @Pointcut("execution(* com.projet.equipement.services.*.*(..))")
     public void transactionalMethod() {}
 
