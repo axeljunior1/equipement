@@ -33,7 +33,7 @@ public interface RapportVenteRepository extends JpaRepository<LigneVente, Intege
            JOIN Produit p ON l.produit.id = p.id
            JOIN TarifAchat t ON p.id = t.produit.id
            JOIN Client c ON v.client.id = c.id
-           JOIN EtatVente e ON v.etat.id = e.id AND e.libelle = 'CONFIRME'
+           JOIN EtatVente e ON v.etat.id = e.id AND (e.libelle = 'FERMEE' or e.libelle = "PAYEE")
       GROUP BY p.id, p.nom, t.prixAchat, p.prixVente,l.prixVente
       """
     )
