@@ -24,6 +24,17 @@ public class TenantController {
         return ResponseEntity.ok( authorities) ;
     }
 
+    @GetMapping("init")
+    public ResponseEntity<Tenant> initTenants(Pageable pageable) {
+
+        Tenant tenant = new Tenant();
+        tenant.setActive(true);
+        tenant.setId("ent2");
+        tenant.setName("ent2");
+        Tenant tenant1 = tenantService.createTenant(tenant);
+        return ResponseEntity.ok(tenant1);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("@tenantService.getIsMasterTenant()==true")
     public ResponseEntity< Tenant> findTenant(@PathVariable String id) {

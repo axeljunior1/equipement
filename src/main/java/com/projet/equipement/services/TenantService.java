@@ -1,10 +1,9 @@
 package com.projet.equipement.services;
-import com.projet.equipement.dto.employe.EmployePostDto;
+
 import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.EmployeRepository;
 import com.projet.equipement.repository.RoleEmployeRepository;
-import com.projet.equipement.repository.RoleRepository;
 import com.projet.equipement.repository.TenantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 @Service("tenantService")
 public class TenantService {
