@@ -115,11 +115,16 @@ public class ProduitService{
     public Page<ProduitGetDto> rechercherProduits(String motCle, Pageable pageable) {
         List<ProduitGetDto> produitsDtos = produitRepository.rechercherProduits(motCle).stream()
                 .map(produitMapper::toGetDto)
-                .peek(elt -> elt.setStockCourant(
-                        Optional.ofNullable(stockCourantService.getStockCourantById(elt.getId()))
-                                .map(StockCourant::getStockCourant)
-                                .orElse(0) // Valeur par défaut si null
-                ))
+                .peek(elt -> {
+                            elt.setStockCourant(
+                                    Optional.ofNullable(stockCourantService.getStockCourantById(elt.getId()))
+                                            .map(StockCourant::getStockCourant)
+
+                                            .orElse(0) // Valeur par défaut si null
+                            );
+                            elt.setPrixAchat(tarifAchatService.findByProduitId(elt.getId()).getPrixAchat());
+                        }
+                )
                 .collect(Collectors.toList());
 
         return PaginationUtil.toPage(produitsDtos, pageable);
