@@ -3,31 +3,31 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.tarifAchat.TarifAchatGetDto;
 import com.projet.equipement.dto.tarifAchat.TarifAchatPostDto;
 import com.projet.equipement.dto.tarifAchat.TarifAchatUpdateDto;
+import com.projet.equipement.entity.Produit;
 import com.projet.equipement.entity.TarifAchat;
 import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.TarifAchatMapper;
+import com.projet.equipement.repository.ProduitRepository;
 import com.projet.equipement.repository.TarifAchatRepository;
-import jakarta.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class TarifAchatService {
 
     private final TarifAchatRepository tarifAchatRepository;
     private final TarifAchatMapper tarifAchatMapper;
+    private final ProduitRepository produitRepository;
 
     public TarifAchatService(TarifAchatRepository tarifAchatRepository,
-                             TarifAchatMapper tarifAchatMapper
-    ) {
+                             TarifAchatMapper tarifAchatMapper,
+                             ProduitRepository produitRepository) {
         this.tarifAchatRepository = tarifAchatRepository;
         this.tarifAchatMapper = tarifAchatMapper;
+        this.produitRepository = produitRepository;
     }
 
     public TarifAchatGetDto findById(Long id) {
@@ -68,7 +68,9 @@ public class TarifAchatService {
 
     public TarifAchat findByProduitId(Long produitId) {
 
-        return tarifAchatRepository.findByProduitId(produitId).orElseThrow(()->
+
+        Produit produit = produitRepository.findById(produitId).orElseThrow(()-> new EntityNotFoundException("Produit", produitId));
+        return tarifAchatRepository.findByProduit(produit).orElseThrow(()->
                 new EntityNotFoundException("TarifAchat => ProduitId", produitId));
     }
 }

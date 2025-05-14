@@ -47,16 +47,17 @@ public class RoleController {
         return ResponseEntity.ok(role);
     }
 
-    @PatchMapping("/patch/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Role> updateRole(@RequestBody RoleUpdateDto roleUpdateDto, @PathVariable Long id) {
+        roleService.update(id, roleUpdateDto);
         return ResponseEntity.ok(new Role());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Role> updateRolePut(@RequestBody RoleUpdateDto roleUpdateDto, @PathVariable Long id) {
-        roleService.put(id, roleUpdateDto);
-        return ResponseEntity.ok(new Role());
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<Role> updateRolePut(@RequestBody RoleUpdateDto roleUpdateDto, @PathVariable Long id) {
+//        roleService.put(id, roleUpdateDto);
+//        return ResponseEntity.ok(new Role());
+//    }
 
 
     @DeleteMapping("/{id}")

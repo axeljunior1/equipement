@@ -94,6 +94,7 @@ public class ProduitService{
         StockCourant stockCourant = stockCourantService.getStockCourantById(produit.getId());
 
         ProduitGetDto produitGetDto = produitMapper.toGetDto(produit);
+        produitGetDto.setPrixAchat(tarifAchatService.findByProduitId(produit.getId()).getPrixAchat());
         produitGetDto.setStockCourant(stockCourant.getStockCourant());
 
         return produitGetDto;

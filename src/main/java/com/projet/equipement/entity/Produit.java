@@ -29,8 +29,8 @@ public class Produit extends MultiTenantEntity {
     private String description;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "produit", cascade = CascadeType.ALL)
-    private TarifAchat tarifAchat;
+    @OneToMany(mappedBy = "produit", cascade = CascadeType.ALL)
+    private List<TarifAchat> tarifAchat;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "categorie_id")
@@ -63,8 +63,6 @@ public class Produit extends MultiTenantEntity {
     @Column(name = "prix_vente")
     private Double prixVente;
 
-    @Column(name = "prix_achat")
-    private Double prixAchat;
 
     @Column(name = "stock_initial")
     private Integer stockInitial;

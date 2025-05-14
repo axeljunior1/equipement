@@ -11,6 +11,7 @@ import com.projet.equipement.services.ClientService;
 import com.projet.equipement.services.EmployeService;
 import com.projet.equipement.services.PanierService;
 import com.projet.equipement.services.ProduitService;
+import jakarta.persistence.EntityManager;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,8 +35,16 @@ public class AuthController {
     private final ProduitMapper produitMapper;
     private final PanierService panierService;
     private final ClientService clientService;
+    private final EntityManager entityManager;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, EmployeService employeService, ProduitService produitService, ProduitMapper produitMapper, PanierService panierService, ClientService clientService) {
+    public AuthController(AuthenticationManager authenticationManager,
+                          JwtUtil jwtUtil,
+                          EmployeService employeService,
+                          ProduitService produitService,
+                          ProduitMapper produitMapper,
+                          PanierService panierService,
+                          EntityManager entityManager,
+                          ClientService clientService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.employeService = employeService;
@@ -43,6 +52,7 @@ public class AuthController {
         this.produitMapper = produitMapper;
         this.panierService = panierService;
         this.clientService = clientService;
+        this.entityManager = entityManager;
     }
 
     @GetMapping
@@ -78,6 +88,7 @@ public class AuthController {
             }
 
             panier = panierService.findAllByEmployeId(byUsername.getId());
+
 
             JwtResponse response = JwtResponse.builder()
                     .token(token)

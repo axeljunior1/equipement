@@ -9,6 +9,7 @@ import com.projet.equipement.entity.TarifAchat;
 import org.mapstruct.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @Mapper(componentModel = "spring", uses = CategorieMapper.class)
@@ -17,7 +18,7 @@ public interface ProduitMapper {
 
 
     @Mapping(target = "categorieId", source = "categorie", qualifiedByName = "mapCategorieToId")
-    @Mapping(target = "prixAchat", source = "tarifAchat", qualifiedByName = "mapTarifToPrix")
+//    @Mapping(target = "prixAchat", source = "tarifAchat", qualifiedByName = "mapTarifToPrix")
     @Mapping(target = "categorieNom", source = "categorie", qualifiedByName = "mapCategorieToNom")
     @Mapping(target = "id", source = "id")
     ProduitGetDto toGetDto(Produit produit) ;
@@ -44,8 +45,8 @@ public interface ProduitMapper {
     }
 
     @Named("mapTarifToPrix")
-    default BigDecimal mapTarifToPrix(TarifAchat tarifAchat){
-        return tarifAchat.getPrixAchat();
+    default BigDecimal mapTarifToPrix(List<TarifAchat> tarifAchat){
+        return tarifAchat.get(0).getPrixAchat();
     }
 
     @Named("mapCategorieToNom")

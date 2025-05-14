@@ -61,7 +61,10 @@ public class RoleService {
 
 
     public Role save(RolePostDto rolePostDto) {
+
+
         Set<Authority> authorities = rolePostDto.getAutoritiesId().stream().map(authorityService::findById).collect(Collectors.toSet());
+
 
         Role role = roleMapper.postRoleDto(rolePostDto, authorities);
 

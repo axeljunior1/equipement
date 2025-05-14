@@ -5,12 +5,15 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.EmployeRepository;
 import com.projet.equipement.repository.RoleEmployeRepository;
 import com.projet.equipement.repository.TenantRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,27 +25,31 @@ public class TenantService {
     private final RoleEmployeRepository roleEmployeRepository;
     private final EmployeRepository employeRepository;
     private final EmployeService employeService;
+    private final TenantInitializer tenantInitializer;
+    private final EntityManager entityManager;
 
     @Autowired
     public TenantService(TenantRepository tenantRepository,
                          RoleService roleService,
-                         RoleEmployeRepository roleEmployeRepository, EmployeRepository employeRepository, EmployeService employeService) {
+                         EntityManager entityManager,
+                         RoleEmployeRepository roleEmployeRepository, EmployeRepository employeRepository, EmployeService employeService, TenantInitializer tenantInitializer) {
         this.tenantRepository = tenantRepository;
         this.roleService = roleService;
         this.roleEmployeRepository = roleEmployeRepository;
         this.employeRepository = employeRepository;
         this.employeService = employeService;
+        this.tenantInitializer = tenantInitializer;
+        this.entityManager = entityManager;
     }
 
     // Créer un nouveau tenant
     @Transactional
-    public Tenant createTenant(Tenant tenant) {
+    public Tenant createTenant(Tenant tenant) throws IOException {
         //Create Tenant
         tenant.setActive(true);
         Tenant savedTenant = tenantRepository.save(tenant);
-        //Create Role
-        Role admin = roleService.findByNom("ADMIN");
 
+        //Create Role
 
         Employe employe = Employe.builder()
                 .actif(true)
@@ -52,16 +59,11 @@ public class TenantService {
                 .build();
         employe.setTenantId( savedTenant.getId() );
         employe.setTenant( savedTenant );
-        Employe savedEmploye  = employeService.save(employe, tenant.getId());
+        employeService.save(employe, tenant.getId());
 
-        RoleEmploye roleEmploye = new RoleEmploye();
+        entityManager.flush();
 
-        roleEmploye.setId(new EmployeeRoleId(savedEmploye.getId(), admin.getId(), savedTenant.getId()));
-        roleEmploye.setEmploye(savedEmploye);
-        roleEmploye.setRole(admin);
-        roleEmploye.setTenant(savedTenant);
-
-        roleEmployeRepository.save(roleEmploye);
+        tenantInitializer.initializeTenant(tenant.getId());
 
         return savedTenant;
     }

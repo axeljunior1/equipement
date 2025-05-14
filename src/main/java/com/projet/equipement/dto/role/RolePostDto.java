@@ -14,7 +14,7 @@ public class RolePostDto {
 
     private String description;
 
-    private Set<Long> autoritiesId;
+    private Set<Long> autoritiesId = new HashSet<>();
 
     private Set<String> authoritiesNoms = new HashSet<String>();
 

@@ -47,12 +47,15 @@ create table CLIENTS
 
     CONSTRAINT fk_client_tenant FOREIGN KEY (tenant_id) REFERENCES tenant(id) ON DELETE CASCADE
 );
+alter table CLIENTS
+    add constraint CLIENTS_pk
+        unique (TENANT_ID, NOM);
 
 create table EMPLOYES
 (
     ID_EMPLOYE BIGINT auto_increment
         primary key,
-    NOM        CHARACTER VARYING(255) not null unique ,
+    NOM        CHARACTER VARYING(255) not null  ,
     PRENOM     CHARACTER VARYING(255) not null,
     CREATED_AT TIMESTAMP default CURRENT_TIMESTAMP,
     UPDATED_AT TIMESTAMP default CURRENT_TIMESTAMP,
@@ -62,6 +65,9 @@ create table EMPLOYES
 
     CONSTRAINT fk_employes_tenant FOREIGN KEY (tenant_id) REFERENCES tenant(id) ON DELETE CASCADE
 );
+alter table EMPLOYES
+    add constraint EMPLOYES_PK
+        unique (TENANT_ID, NOM);
 
 create table ACHATS
 (
@@ -212,7 +218,7 @@ create table PRODUITS
 
 alter table PRODUITS
     add constraint PRODUITS_pk
-        unique (EAN13);
+        unique (TENANT_ID, EAN13);
 
 
 create table LIGNES_ACHATS
@@ -326,7 +332,7 @@ create table ROLE_EMPLOYE
 );
 alter table ROLE_EMPLOYE
     add constraint ROLE_EMPLOYE_pk
-        unique (ID_ROLE, ID_EMPLOYE, TENANT_ID);
+        unique ( ID_ROLE, ID_EMPLOYE, TENANT_ID);
 
 create table TARIF_ACHAT
 (
@@ -346,14 +352,12 @@ create table TARIF_ACHAT
 
 alter table TARIF_ACHAT
     add constraint TARIF_ACHAT_UK
-        unique (ID_PRODUIT);
+        unique (tenant_id, ID_PRODUIT);
 
 create table TYPES_MOUVEMENT_STOCK
 (
     ID             INTEGER auto_increment,
-    CODE           CHARACTER VARYING(50) not null
-        constraint TYPES_MOUVEMENT_STOCK_PK
-            unique,
+    CODE           CHARACTER VARYING(50) not null,
     NOM            CHARACTER VARYING(50) not null,
     DESCRIPTION    CHARACTER VARYING,
     DATE_CREATION  TIMESTAMP default CURRENT_TIMESTAMP,
@@ -362,6 +366,9 @@ create table TYPES_MOUVEMENT_STOCK
 
     CONSTRAINT fk_types_mouvement_stock_tenant FOREIGN KEY (tenant_id) REFERENCES tenant(id) ON DELETE CASCADE
 );
+alter table TYPES_MOUVEMENT_STOCK
+    add constraint TYPES_MOUVEMENT_STOCK_pk
+        unique (TENANT_ID, CODE);
 
 create table VENTES
 (

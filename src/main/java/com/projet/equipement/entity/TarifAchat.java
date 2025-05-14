@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class TarifAchat extends MultiTenantEntity {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_produit")
     private Produit produit;
 

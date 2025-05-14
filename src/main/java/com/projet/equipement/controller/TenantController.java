@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RequestMapping("/tenant")
 @RestController
 public class TenantController {
@@ -24,16 +26,6 @@ public class TenantController {
         return ResponseEntity.ok( authorities) ;
     }
 
-    @GetMapping("init")
-    public ResponseEntity<Tenant> initTenants(Pageable pageable) {
-
-        Tenant tenant = new Tenant();
-        tenant.setActive(true);
-        tenant.setId("ent2");
-        tenant.setName("ent2");
-        Tenant tenant1 = tenantService.createTenant(tenant);
-        return ResponseEntity.ok(tenant1);
-    }
 
     @GetMapping("/{id}")
     @PreAuthorize("@tenantService.getIsMasterTenant()==true")
@@ -46,7 +38,7 @@ public class TenantController {
 
     @PostMapping("")
     @PreAuthorize("@tenantService.getIsMasterTenant()==true")
-    public ResponseEntity<Tenant> addTenant(@RequestBody Tenant tenant) {
+    public ResponseEntity<Tenant> addTenant(@RequestBody Tenant tenant) throws IOException {
        Tenant tenant1 = tenantService.createTenant(tenant);
         return ResponseEntity.ok(tenant1);
     }
