@@ -52,5 +52,5 @@ jobs:
             docker build -t spring:latest /home/$USER
 
             # Lancer le conteneur Docker
-            docker run -d --name spring_dev --restart unless-stopped -p 8080:8080 -v spring_data_dev:/data spring:latest
+            docker run -d --name spring_dev --restart unless-stopped -p 8081:8080 -v spring_data_dev:/data spring:latest
           EOF
