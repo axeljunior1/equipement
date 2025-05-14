@@ -1,0 +1,56 @@
+name: CI/CD Spring Boot → EC2
+
+# Se déclenche à chaque push sur main
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Récupérer le code
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 2) Installer Java 17 et compiler
+      - name: Setup Java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build JAR with Maven
+        run: |
+          mvn clean package -DskipTests
+          ls -la target/*.jar
+
+      # 3) Préparer la clé SSH
+      - name: Decode SSH key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" | base64 -d > ec2_key.pem
+          chmod 600 ec2_key.pem
+
+      # 4) Déployer sur l’EC2
+      - name: Deploy to EC2
+        env:
+          HOST: api.dev.stockcaisse.com
+          USER: ec2-user
+        run: |
+          # Copier le JAR et Dockerfile sur l'EC2
+          scp -o StrictHostKeyChecking=no -i ec2_key.pem target/*.jar $USER@$HOST:/home/$USER/spring.jar
+          scp -o StrictHostKeyChecking=no -i ec2_key.pem Dockerfile $USER@$HOST:/home/$USER/Dockerfile
+
+          # Se connecter en SSH et relancer le conteneur Docker
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem $USER@$HOST << 'EOF'
+            # Arrêter et supprimer l'ancien conteneur s'il existe
+            docker stop spring_dev || true
+            docker rm spring_dev   || true
+
+            # Construire l'image Docker nommée spring:latest
+            docker build -t spring:latest /home/$USER
+
+            # Lancer le conteneur Docker
+            docker run -d --name spring_dev --restart unless-stopped -p 8080:8080 -v spring_data_dev:/data spring:latest
+          EOF
