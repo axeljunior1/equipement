@@ -76,6 +76,13 @@ public class ProduitService{
     }
 
 
+    /**
+     * Retrieves a produit entity by its unique identifier.
+     *
+     * @param id the unique identifier of the produit to be retrieved
+     * @return the produit entity associated with the given identifier
+     * @throws EntityNotFoundException if no produit entity is found with the specified identifier
+     */
     public  Produit findById(Long id){
         return  produitRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
@@ -115,11 +122,16 @@ public class ProduitService{
     public Page<ProduitGetDto> rechercherProduits(String motCle, Pageable pageable) {
         List<ProduitGetDto> produitsDtos = produitRepository.rechercherProduits(motCle).stream()
                 .map(produitMapper::toGetDto)
-                .peek(elt -> elt.setStockCourant(
-                        Optional.ofNullable(stockCourantService.getStockCourantById(elt.getId()))
-                                .map(StockCourant::getStockCourant)
-                                .orElse(0) // Valeur par défaut si null
-                ))
+                .peek(elt -> {
+                            elt.setStockCourant(
+                                    Optional.ofNullable(stockCourantService.getStockCourantById(elt.getId()))
+                                            .map(StockCourant::getStockCourant)
+
+                                            .orElse(0) // Valeur par défaut si null
+                            );
+                            elt.setPrixAchat(tarifAchatService.findByProduitId(elt.getId()).getPrixAchat());
+                        }
+                )
                 .collect(Collectors.toList());
 
         return PaginationUtil.toPage(produitsDtos, pageable);
