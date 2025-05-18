@@ -39,6 +39,12 @@ public class AuthorityService {
         return authorityRepository.save(authority);
     }
 
+    public Authority update(Authority authority, Long id) {
+        Authority authority1 = findById(id);
+        authority1.setNom(authority.getNom());
+        return authorityRepository.save(authority1);
+    }
+
     public void deleteById(Long id) {
         authorityRepository.deleteById(id);
     }

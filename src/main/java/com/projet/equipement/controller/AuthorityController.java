@@ -43,7 +43,11 @@ public class AuthorityController {
         return ResponseEntity.ok(authority1);
     }
 
-    
+    @PatchMapping("/{id}")
+    public ResponseEntity<Authority> updateAuth(@PathVariable Long id , @RequestBody Authority authority ) {
+        return ResponseEntity.ok(authorityService.update(authority, id));
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAuthority(@PathVariable Long id ) {
