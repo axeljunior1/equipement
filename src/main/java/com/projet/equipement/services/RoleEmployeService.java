@@ -72,30 +72,10 @@ public class RoleEmployeService {
         roleEmployeRepository.saveAll(toSave); // batch insert
     }
 
-
-
     public void deleteByEmployeId( Long employeId) {
         String tenantId = TenantContext.getTenantId();
         roleEmployeRepository.deleteByTenantAndEmployeId(tenantId,employeId);
     }
-
-    public void assignRoleToEmploye(Long employeeId, Long roleId, String tenantId) {
-        Employe employe = employeRepository.findById(employeeId).orElseThrow(() -> new EntityNotFoundException("Employe", employeeId));
-        Role role = roleRepository.findById(roleId).orElseThrow(() -> new EntityNotFoundException("Role", roleId));
-        Tenant tenant = tenantRepository.findById(tenantId).orElseThrow(() -> new EntityNotFoundException("Tenant", tenantId));
-
-        EmployeeRoleId id = new EmployeeRoleId(employeeId, roleId, tenantId);
-
-        RoleEmploye roleEmploye = new RoleEmploye();
-        roleEmploye.setId(id);
-        roleEmploye.setEmploye(employe);
-        roleEmploye.setRole(role);
-        roleEmploye.setTenant(tenant);
-
-        roleEmployeRepository.save(roleEmploye);
-    }
-
-
 
 
 }

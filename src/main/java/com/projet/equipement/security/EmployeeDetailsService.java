@@ -52,9 +52,9 @@ public class EmployeeDetailsService implements UserDetailsService {
                     roleAuthorities.add(new SimpleGrantedAuthority("ROLE_" + roleService.findById(role.getRole().getId()).getNom()));
 
                     // Ajoute les permissions spécifiques du rôle
-                    if (role.getRole().getAuthorities() != null) {
-                        roleAuthorities.addAll(role.getRole().getAuthorities().stream()
-                                .map(auth -> new SimpleGrantedAuthority(auth.getNom()))
+                    if (role.getRole().getAuthoritiesRole() != null && !role.getRole().getAuthoritiesRole().isEmpty()) {
+                        roleAuthorities.addAll(role.getRole().getAuthoritiesRole().stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getAuthority().getNom()))
                                 .collect(Collectors.toSet()));
                     }
                     return roleAuthorities.stream();

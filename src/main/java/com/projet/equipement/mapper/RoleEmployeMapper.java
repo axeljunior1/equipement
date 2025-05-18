@@ -19,10 +19,8 @@ public interface RoleEmployeMapper {
 
     RoleEmploye toEntity(RoleEmployePostDto roleEmployeGetDto);
 
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateDto( RoleEmployeUpdateDto roleEmployeUpdateDto, @MappingTarget RoleEmploye roleEmploye);
-
 
 
 }

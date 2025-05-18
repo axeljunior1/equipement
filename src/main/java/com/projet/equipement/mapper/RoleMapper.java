@@ -1,28 +1,49 @@
 package com.projet.equipement.mapper;
 
+import com.projet.equipement.dto.role.RoleGetDto;
 import com.projet.equipement.dto.role.RolePostDto;
 import com.projet.equipement.dto.role.RoleUpdateDto;
 import com.projet.equipement.entity.Authority;
+import com.projet.equipement.entity.AuthorityRole;
 import com.projet.equipement.entity.Role;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
 import java.util.Set;
 
-@Component
-public class RoleMapper {
+@Mapper(componentModel = "spring", uses = Authority.class)
+public interface RoleMapper {
 
-    public void updateRoleFromDto(RoleUpdateDto roleUpdateDto, Role role, Set<Authority> authorities) {
-        if (roleUpdateDto.getNom() != null) role.setNom(roleUpdateDto.getNom());
-        if (roleUpdateDto.getDescription() != null) role.setDescription(roleUpdateDto.getDescription());
-        if(authorities != null) role.setAuthorities(authorities);
+
+    @Mapping(source = "authoritiesRole", target = "authorityIds", qualifiedByName = "mapAuthorityToId")
+    @Mapping(source = "authoritiesRole", target = "authorityNoms", qualifiedByName = "mapAuthorityToNoms")
+    @Mapping(source = "authoritiesRole", target = "authorities", qualifiedByName = "mapAuthToAuth")
+    RoleGetDto toGetDto(Role role) ;
+
+    Role toEntity(RoleGetDto roleGetDto);
+
+    Role toEntity(RolePostDto rolePostDto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateRoleFromDto(RoleUpdateDto roleUpdateDto, @MappingTarget Role role);
+
+    @Named("mapAuthorityToId")
+    default Set<Long> mapAuthorityToId(Set<AuthorityRole> authoritiesRole) {
+        return authoritiesRole.stream().map(AuthorityRole::getAuthority)
+                .map(Authority::getId)
+                .collect(java.util.stream.Collectors.toSet());
     }
 
-    public Role postRoleDto(RolePostDto rolePostDto, @NotNull Set<Authority> authorities) {
-        return Role.builder()
-                .nom(rolePostDto.getNom())
-                .description(rolePostDto.getDescription())
-                .authorities(authorities)
-                .build();
+    @Named("mapAuthorityToNoms")
+    default Set<String> mapAuthorityToNoms(Set<AuthorityRole> authorityRoles){
+        return authorityRoles.stream().map(AuthorityRole::getAuthority)
+                .map(Authority::getNom)
+                .collect(java.util.stream.Collectors.toSet());
     }
+
+    @Named("mapAuthToAuth")
+    default Set<Authority> mapAuthToAuth(Set<AuthorityRole> authorities){
+        return authorities.stream().map(AuthorityRole::getAuthority)
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
 }

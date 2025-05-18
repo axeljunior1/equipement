@@ -2,7 +2,6 @@ package com.projet.equipement.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.HashSet;
@@ -26,20 +25,10 @@ public class Role extends MultiTenantEntity {
 
     private String description;  // ex: ROLE_ADMIN, ROLE_USER
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "role_authority",
-            joinColumns = @JoinColumn(name = "id_role"),
-            inverseJoinColumns = @JoinColumn(name = "id_authority")
-    )
-    @NotNull(message = "Entre les autorisations")
-    private Set<Authority> authorities = new HashSet<>();
 
-
-
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<RoleEmploye> employees = new HashSet<>();
+    private Set<AuthorityRole> authoritiesRole = new HashSet<>();
 
 
 }

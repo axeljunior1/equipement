@@ -317,6 +317,9 @@ create table ROLE_AUTHORITY
     constraint ROLE_AUTHORITY_ROLES_ID_ROLE_FK
         foreign key (ID_ROLE) references ROLES
 );
+alter table ROLE_AUTHORITY
+    add constraint ROLE_AUTHORITY_pk
+        unique ( ID_ROLE, ID_AUTHORITY, TENANT_ID);
 
 create table ROLE_EMPLOYE
 (

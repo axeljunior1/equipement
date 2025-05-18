@@ -1,7 +1,11 @@
 package com.projet.equipement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -17,5 +21,6 @@ public class Authority extends MultiTenantEntity {
     private Long id;
     @Column(name = "nom")
     private String nom; // ex: READ_PRIVILEGE, WRITE_PRIVILEGE
+
 
 }

@@ -16,7 +16,8 @@ public class RoleUpdateDto {
 
     private String description;
 
-    private Set<String> authoritiesNoms = new HashSet<String>();
+    private Set<String> authoritiesNoms = new HashSet<>();
+    private Set<Long> authoritiesIds = new HashSet<>();
 
 
 }

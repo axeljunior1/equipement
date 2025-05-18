@@ -1,12 +1,15 @@
 package com.projet.equipement.services;
 
 
+import com.projet.equipement.dto.role.RoleGetDto;
 import com.projet.equipement.dto.role.RolePostDto;
 import com.projet.equipement.dto.role.RoleUpdateDto;
-import com.projet.equipement.entity.*;
+import com.projet.equipement.entity.Role;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.RoleMapper;
 import com.projet.equipement.repository.RoleRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,20 +17,24 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Service
 public class RoleService {
     private final RoleRepository roleRepository;
     private final AuthorityService authorityService;
     private final RoleMapper roleMapper;
+    private final AuthorityRoleService authorityRoleService;
+    private final EntityManager entityManager;
 
-    public RoleService(RoleRepository roleRepository, AuthorityService authorityService, RoleMapper roleMapper) {
+    public RoleService(RoleRepository roleRepository,
+                       AuthorityService authorityService,
+                       RoleMapper roleMapper,
+                       EntityManager entityManager,
+                       AuthorityRoleService authorityRoleService) {
         this.roleRepository = roleRepository;
         this.authorityService = authorityService;
         this.roleMapper = roleMapper;
+        this.authorityRoleService = authorityRoleService;
+        this.entityManager = entityManager;
     }
 
     /**
@@ -60,60 +67,58 @@ public class RoleService {
     }
 
 
+    @Transactional
     public Role save(RolePostDto rolePostDto) {
+// 1. Mapper et encoder
+        Role role = roleMapper.toEntity(rolePostDto);
 
+        String tenantId = TenantContext.getTenantId();
 
-        Set<Authority> authorities = rolePostDto.getAutoritiesId().stream().map(authorityService::findById).collect(Collectors.toSet());
+        role.setTenantId(tenantId);
 
+// 2. Sauver pour obtenir l'ID
+        Role save = roleRepository.save(role);
 
-        Role role = roleMapper.postRoleDto(rolePostDto, authorities);
+        authorityRoleService.save(tenantId, role, rolePostDto.getAutoritiesId());
 
-        role.setTenantId(TenantContext.getTenantId());
-        return roleRepository.save(role);
+        return roleRepository.save(save);
     }
+
 
     public Role save(Role role) {
         role.setTenantId(TenantContext.getTenantId());
         return roleRepository.save(role);
     }
 
-    public Role update(Long id, RoleUpdateDto roleUpdateDto) {
-        Role role = this.findById(id);
-        Set<Authority> authorities = null ;
-        if (roleUpdateDto.getAuthoritiesNoms() != null) {
-            authorities = new HashSet<>(roleUpdateDto.getAuthoritiesNoms().stream().map(authorityService::findByNom).collect(Collectors.toSet()));
-        }
-        roleMapper.updateRoleFromDto(roleUpdateDto, role, authorities);
 
-        return roleRepository.save(role);
+
+    @Transactional
+    public RoleGetDto update(RoleUpdateDto roleUpdateDto, Long id) {
+        // 1. Récupérer l'employé
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Role", id));
+
+        roleMapper.updateRoleFromDto(roleUpdateDto, role);
+
+        Role saved = roleRepository.save(role);
+
+        // 4. Gérer les rôles
+        authorityRoleService.deleteByRoleId(id);
+
+        entityManager.clear();
+        authorityRoleService.save(TenantContext.getTenantId(), role, roleUpdateDto.getAuthoritiesIds());
+
+        // 5. Retourner le DTO
+        return roleMapper.toGetDto(saved);
     }
 
-    public Role put(Long id, RoleUpdateDto roleUpdateDto){
-        Role role = this.findById(id);
-        Set<Authority> authorities = null ;
-        if (roleUpdateDto.getAuthoritiesNoms() != null) {
-            authorities = roleUpdateDto.getAuthoritiesNoms().stream().map(authorityService::findByNom).collect(Collectors.toSet());
-        }
-        roleMapper.updateRoleFromDto(roleUpdateDto, role, authorities);
-        return roleRepository.save(role);
-    }
+
+
 
     @Transactional
     public void deleteById(Long id) {
 
-        Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Rôle non trouvé"));
-
-//        for (RoleEmployee employe : role.getEmployees()) {
-//            employe.getRole().rremove(role);
-//        }
-//
-//        // Supprimer toutes les liaisons dans la table role_authority
-//        role.getAuthorities().clear();
-//        roleRepository.save(role);
-
-        // Maintenant, supprimer le rôle
-        roleRepository.delete(role);
+        roleRepository.deleteById(id);
     }
 
 
