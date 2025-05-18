@@ -35,8 +35,6 @@ public class AuthorityController {
         return ResponseEntity.ok(authority);
     }
 
-
-
     @PostMapping("")
     public ResponseEntity<Authority> addAuthority(@RequestBody Authority authority) {
        Authority authority1 = authorityService.save(authority);
