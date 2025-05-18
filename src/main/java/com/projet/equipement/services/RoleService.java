@@ -94,6 +94,7 @@ public class RoleService {
 
     @Transactional
     public RoleGetDto update(RoleUpdateDto roleUpdateDto, Long id) {
+
         // 1. Récupérer l'employé
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Role", id));
