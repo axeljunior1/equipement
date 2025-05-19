@@ -52,5 +52,5 @@ jobs:
             docker build -t spring:latest /home/$USER
 
             # Lancer le conteneur Docker
-            docker run -d --name spring --restart unless-stopped -p 8080:8080 -v spring_data:/data spring:latest
+            docker run -d --name spring --restart unless-stopped -p 8080:8080 -e JAVA_OPTS="-Xms128m -Xmx256m" -v spring_data:/data spring:latest
           EOF

@@ -1,6 +1,8 @@
 # Utiliser une image Java officielle
 FROM eclipse-temurin:17-jdk-alpine
 
+ENV JAVA_OPTS="-Xms128m -Xmx256m"
+
 # Copier le fichier JAR dans le conteneur
 COPY spring.jar /app.jar
 
