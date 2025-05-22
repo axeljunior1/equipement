@@ -47,7 +47,6 @@
 #            # Arrêter et supprimer l'ancien conteneur s'il existe
 #            docker stop spring_dev || true
 #            docker rm spring_dev   || true
-#
 #            # Construire l'image Docker nommée spring:latest
 #            docker build -t spring:latest /home/$USER
 #
