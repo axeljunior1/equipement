@@ -19,10 +19,7 @@ public class TenantFilterAspect {
     @PersistenceContext
     private EntityManager em;
 
-//    @Before("execution(* com.projet.equipement.services.*.*(..))")
-//    public void before() {
-//        System.out.println("Loging for Tenant :");
-//    }
+
     @Pointcut("execution(* com.projet.equipement.services.*.*(..))")
     public void transactionalMethod() {}
 
@@ -33,7 +30,6 @@ public class TenantFilterAspect {
             Filter filter = session.enableFilter("tenantFilter");
             filter.setParameter("tenantId", TenantContext.getTenantId());
         }
-        System.out.println("Set tenant filter for: " + TenantContext.getTenantId());
         return pjp.proceed();
     }
 }
