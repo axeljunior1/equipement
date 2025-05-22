@@ -37,13 +37,15 @@ jobs:
         env:
           HOST: api.stockcaisse.com
           USER: ec2-user
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
         run: |
           # Copier le JAR et Dockerfile sur l'EC2
           scp -o StrictHostKeyChecking=no -i ec2_key.pem target/*.jar $USER@$HOST:/home/$USER/spring.jar
           scp -o StrictHostKeyChecking=no -i ec2_key.pem Dockerfile $USER@$HOST:/home/$USER/Dockerfile
 
           # Se connecter en SSH et relancer le conteneur Docker
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem $USER@$HOST << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem $USER@$HOST << EOF
             # Arrêter et supprimer l'ancien conteneur s'il existe
             docker stop spring || true
             docker rm spring   || true
@@ -52,5 +54,5 @@ jobs:
             docker build -t spring:latest /home/$USER
 
             # Lancer le conteneur Docker
-            docker run -d --name spring --restart unless-stopped -p 8080:8080  -v spring_data:/data spring:latest
+            docker run -d --name spring --restart unless-stopped -p 8080:8080 -e JWT_EXPIRATION=${JWT_EXPIRATION} -e JWT_SECRET=${JWT_SECRET} -v spring_data:/data spring:latest
           EOF
