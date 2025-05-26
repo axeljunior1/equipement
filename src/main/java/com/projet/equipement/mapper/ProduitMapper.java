@@ -4,6 +4,7 @@ import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.entity.Categorie;
+import com.projet.equipement.entity.Devise;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.entity.TarifAchat;
 import org.mapstruct.*;
@@ -18,12 +19,10 @@ public interface ProduitMapper {
 
 
     @Mapping(target = "categorieId", source = "categorie", qualifiedByName = "mapCategorieToId")
-//    @Mapping(target = "prixAchat", source = "tarifAchat", qualifiedByName = "mapTarifToPrix")
     @Mapping(target = "categorieNom", source = "categorie", qualifiedByName = "mapCategorieToNom")
-    @Mapping(target = "id", source = "id")
+    @Mapping(target = "deviseCode", source = "devise", qualifiedByName = "mapDevToCode")
+    @Mapping(target = "deviseSymbole", source = "devise", qualifiedByName = "mapDevToSymbole")
     ProduitGetDto toGetDto(Produit produit) ;
-
-    Produit toEntity(ProduitGetDto produitGetDto);
 
     @Mapping(target = "categorie", source = "categorieId", qualifiedByName = "mapIdToCategorie")
     Produit toEntity(ProduitPostDto produitPostDto);
@@ -52,6 +51,15 @@ public interface ProduitMapper {
     @Named("mapCategorieToNom")
     default String mapCategorieToNom( Categorie categorie){
         return categorie.getNom();
+    }
+
+    @Named("mapDevToCode")
+    default String mapDevToCode(Devise devise){
+        return devise.getCode();
+    }
+    @Named("mapDevToSymbole")
+    default String mapDevToSymbole(Devise devise){
+        return devise.getSymbole();
     }
 
 

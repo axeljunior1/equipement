@@ -39,6 +39,8 @@ public class ProduitPostDto {
 
     private Integer stockInitial;
 
+    private String deviseCode;
+
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 

@@ -38,5 +38,8 @@ public class ProduitGetDto {
     // mis en place dans le controller
     private Integer stockCourant;
 
+    private String deviseCode;
+    private String deviseSymbole;
+
 
 }

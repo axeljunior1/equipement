@@ -5,10 +5,7 @@ import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
 import com.projet.equipement.dto.tarifAchat.TarifAchatPostDto;
-import com.projet.equipement.entity.Produit;
-import com.projet.equipement.entity.StockCourant;
-import com.projet.equipement.entity.TarifAchat;
-import com.projet.equipement.entity.TenantContext;
+import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.repository.ProduitRepository;
@@ -36,13 +33,15 @@ public class ProduitService{
     private final StockCourantService stockCourantService;
     private final EntityManager entityManager;
     private final TarifAchatService tarifAchatService;
+    private final DeviseService deviseService;
 
-    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, StockCourantService stockCourantService, EntityManager entityManager, TarifAchatService tarifAchatService) {
+    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, StockCourantService stockCourantService, EntityManager entityManager, TarifAchatService tarifAchatService, DeviseService deviseService) {
         this.produitRepository = produitRepository;
         this.produitMapper = produitMapper;
         this.stockCourantService = stockCourantService;
         this.entityManager = entityManager;
         this.tarifAchatService = tarifAchatService;
+        this.deviseService = deviseService;
     }
 
     /**
@@ -155,6 +154,10 @@ public class ProduitService{
     @Transactional
     public ProduitGetDto save(ProduitPostDto produitPostDto){
         Produit produit = produitMapper.toEntity(produitPostDto);
+
+        Devise devise = deviseService.findByCode(produitPostDto.getDeviseCode());
+        produit.setDevise(devise);
+
         // Qrcode et code unique ean13
         String EAN_CONST = new EAN13Generator().generateEAN13WithFirstThreeChars("999");
         if (!Objects.equals(produitPostDto.getEan13(), "") && produitPostDto.getEan13() != null){
