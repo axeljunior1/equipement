@@ -4,7 +4,6 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.devise.DevisePostDto;
 import com.projet.equipement.dto.devise.DeviseUpdateDto;
 import com.projet.equipement.entity.Devise;
-import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.DeviseMapper;
 import com.projet.equipement.repository.DeviseRepository;
@@ -33,13 +32,7 @@ public class DeviseService {
         return deviseRepository.findByNom(nom).orElseThrow(()-> new EntityNotFoundException("Devise", nom));
     }
 
-//    public Page<Devise> findByNom(String nom, Pageable pageable) {
-//        return deviseRepository.findByTenantIdAndNom(TenantContext.getTenantId(), nom, pageable);
-//    }
-//
-//    public Page<Devise> findByCode(String code, Pageable pageable) {
-//        return deviseRepository.findByTenantIdAndCode(TenantContext.getTenantId(), code, pageable);
-//    }
+
 
     public Devise findById(Long id) {
         return deviseRepository.findById(id)
@@ -49,7 +42,6 @@ public class DeviseService {
     public Devise save(DevisePostDto devisePostDto) {
 
         Devise devise = deviseMapper.toEntity(devisePostDto);
-        devise.setTenantId(TenantContext.getTenantId());
         return deviseRepository.save(devise);
     }
 

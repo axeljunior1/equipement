@@ -14,10 +14,6 @@ public interface DeviseRepository extends JpaRepository<Devise, Long> {
     @Override
     Page<Devise> findAll(Pageable pageable);
 
-    Page<Devise> findByTenantIdAndNom(String tenantId, String nom, Pageable pageable);
-
-    Page<Devise> findByTenantIdAndCode(String tenantId, String code, Pageable attr1);
-
     Optional<Devise> findByCode(String code);
     Optional<Devise> findByNom(String nom);
 }

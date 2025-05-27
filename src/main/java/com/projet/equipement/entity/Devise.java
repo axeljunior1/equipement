@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "devise")
-public class Devise extends MultiTenantEntity{
+public class Devise {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
