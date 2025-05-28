@@ -15,5 +15,9 @@ public class JwtResponse {
     private String token;
     private EmployeGetDto employeGetDto;
     private List<Panier> panier;
+    private String tenantId;
+    private Long employeId;
+    private String employeName;
+    private String employePrenom;
 
 }

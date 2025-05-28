@@ -6,6 +6,7 @@ import com.projet.equipement.dto.panier.PanierPostDto;
 import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.entity.Client;
 import com.projet.equipement.entity.Panier;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.mapper.ProduitMapper;
 import com.projet.equipement.services.ClientService;
 import com.projet.equipement.services.EmployeService;
@@ -94,6 +95,10 @@ public class AuthController {
                     .token(token)
                     .employeGetDto(byUsername)
                     .panier(panier)
+                    .tenantId(TenantContext.getTenantId())
+                    .employeId(byUsername.getId())
+                    .employeName(byUsername.getNom())
+                    .employePrenom(byUsername.getPrenom())
                     .build();
             return ResponseEntity.ok().body(response);
         } catch (AuthenticationException e) {
