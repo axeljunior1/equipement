@@ -1,10 +1,13 @@
 package com.projet.equipement.controller;
 
 import com.projet.equipement.dto.uniteVente.UniteVenteGetDto;
+import com.projet.equipement.entity.UniteVente;
 import com.projet.equipement.mapper.UniteVenteMapper;
 import com.projet.equipement.services.UniteVenteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +23,11 @@ public class UniteVenteController {
     private final UniteVenteMapper uniteVenteMapper;
     
     @GetMapping
-    public ResponseEntity<List<UniteVenteGetDto>> getAllUniteVentes() {
-        return ResponseEntity.ok(
-            uniteVenteService.findAll().stream()
-                .map(p->uniteVenteMapper.toDto(p))
-                .collect(Collectors.toList())
-        );
+    public ResponseEntity<Page<UniteVenteGetDto>> getAllUniteVentes(Pageable pageable) {
+
+        Page<UniteVente> uniteVente = uniteVenteService.findAll(pageable);;
+        return ResponseEntity.ok(uniteVente.map(uniteVenteMapper::toDto));
+
     }
     
     @GetMapping("/{id}")
@@ -34,6 +36,8 @@ public class UniteVenteController {
             uniteVenteMapper.toDto(uniteVenteService.findById(id))
         );
     }
+
+
     
     @PostMapping
     public ResponseEntity<UniteVenteGetDto> createUniteVente(@Valid @RequestBody UniteVenteGetDto uniteVenteDto) {
@@ -44,5 +48,9 @@ public class UniteVenteController {
                 )
             )
         );
+    }
+
+    public void deleteUniteVente(@PathVariable Long id) {
+        uniteVenteService.deleteById(id);
     }
 }

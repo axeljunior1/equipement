@@ -9,24 +9,27 @@ import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.entity.UniteVente;
 import com.projet.equipement.mapper.FormatVenteMapper;
 import com.projet.equipement.repository.FormatVenteRepository;
-import com.projet.equipement.repository.ProduitRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class FormatVenteService {
-    
+
+
     private final FormatVenteRepository formatVenteRepository;
-    private final ProduitRepository produitRepository;
     private final ProduitService produitService;
     private final UniteVenteService uniteVenteService;
     private final FormatVenteMapper formatVenteMapper;
+
+    public FormatVenteService(FormatVenteRepository formatVenteRepository, ProduitService produitService, UniteVenteService uniteVenteService, FormatVenteMapper formatVenteMapper) {
+        this.formatVenteRepository = formatVenteRepository;
+        this.produitService = produitService;
+        this.uniteVenteService = uniteVenteService;
+        this.formatVenteMapper = formatVenteMapper;
+    }
 
     public Page<FormatVente> findAll(Pageable pageable) {
         return formatVenteRepository.findAll(pageable);
@@ -35,6 +38,10 @@ public class FormatVenteService {
     public FormatVente findById(Long id) {
         return formatVenteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Format de vente non trouvé"));
+    }
+
+    public Page<FormatVente> findAllByProduitId(Long id, Pageable pageable) {
+        return formatVenteRepository.findByProduitId(id, pageable);
     }
     
     public FormatVenteGetDto save(FormatVentePostDto formatVentePostDto) {

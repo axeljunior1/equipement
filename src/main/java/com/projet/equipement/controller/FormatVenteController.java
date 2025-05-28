@@ -35,6 +35,12 @@ public class FormatVenteController {
             formatVenteMapper.toDto(formatVenteService.findById(id))
         );
     }
+
+    @GetMapping("/produit/{id}")
+    public ResponseEntity<Page<FormatVenteGetDto>> getAllByProduitId(@PathVariable Long id, Pageable pageable) {
+        Page<FormatVenteGetDto> collect = formatVenteService.findAllByProduitId(id, pageable).map(formatVenteMapper::toDto);
+        return ResponseEntity.ok(collect);
+    }
     
     @PostMapping
     public ResponseEntity<FormatVenteGetDto> createFormatVente(@Valid @RequestBody FormatVentePostDto formatVentePostDto) {
