@@ -39,6 +39,12 @@ public class LigneVente extends MultiTenantEntity {
     @JoinColumn(name = "produit_id")
     private Produit produit;
 
+
+    @ManyToOne()
+    @JoinColumn(name = "format_vente_id")
+    @JsonIgnore
+    private FormatVente formatVente;
+
     @OneToMany(mappedBy = "ligneVente")
     private List<Retour> retours;
 

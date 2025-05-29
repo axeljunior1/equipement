@@ -18,7 +18,9 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.StockInsuffisantException;
 import com.projet.equipement.mapper.LigneVenteMapper;
 import com.projet.equipement.mapper.VenteMapper;
-import com.projet.equipement.repository.*;
+import com.projet.equipement.repository.EtatVenteRepository;
+import com.projet.equipement.repository.LigneVenteRepository;
+import com.projet.equipement.repository.VenteRepository;
 import com.projet.equipement.utils.FactureNumeroGenerator;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
@@ -59,6 +61,7 @@ public class TransactionVenteAndLinesService {
     private final EtatVenteService etatVenteService;
     private final PaiementService paiementService;
     private final EtatPaiementService etatPaiementService;
+    private final FormatVenteService formatVenteService;
 
     @Autowired
     public TransactionVenteAndLinesService(
@@ -76,7 +79,7 @@ public class TransactionVenteAndLinesService {
             EtatVenteRepository etatVenteRepository,
             EtatFactureService etatFactureService,
             FactureService factureService,
-            EtatVenteService etatVenteService, PaiementService paiementService, EtatPaiementService etatPaiementService) {
+            EtatVenteService etatVenteService, PaiementService paiementService, EtatPaiementService etatPaiementService, FormatVenteService formatVenteService) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -95,11 +98,12 @@ public class TransactionVenteAndLinesService {
         this.etatVenteService = etatVenteService;
         this.paiementService = paiementService;
         this.etatPaiementService = etatPaiementService;
+        this.formatVenteService = formatVenteService;
     }
 
     private static final String VENTE = "Vente";
     private static final String ETAT_VENTE = "EtatVente";
-    private static final Logger logger = LoggerFactory.getLogger(VenteService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TransactionVenteAndLinesService.class);
 
 
     @Transactional
@@ -377,6 +381,7 @@ public class TransactionVenteAndLinesService {
                     .prixVente(lignePanier.getPrixVente())
                     .produitId(lignePanier.getProduit().getId())
                     .quantite(lignePanier.getQuantite())
+                    .formatVenteId(lignePanier.getFormatVenteId())
                     .build();
             saveLigneVente(ligneVentePostDto);
         });
@@ -454,7 +459,6 @@ public class TransactionVenteAndLinesService {
             this.deleteLinesByIdSoft(ligneVente.getId());
         }
 
-
         this.deleteVenteByIdSoft(id);
     }
 
@@ -468,6 +472,9 @@ public class TransactionVenteAndLinesService {
     public LigneVente saveLigneVente(LigneVentePostDto ligneVentePostDto) {
 
         LigneVente ligneVenteToPost = ligneVenteMapper.toEntity(ligneVentePostDto);
+
+        FormatVente formatVente = formatVenteService.findById(ligneVentePostDto.getFormatVenteId());
+        ligneVenteToPost.setFormatVente(formatVente);
 
         ligneVenteToPost.setTenantId(TenantContext.getTenantId());
         LigneVente saveLigneVente = ligneVenteRepository.save(ligneVenteToPost);

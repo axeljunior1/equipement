@@ -15,5 +15,7 @@ public class PanierProduitPostDto {
 
     private Integer quantite;
 
+    private Long formatVenteId;
+
 
 }

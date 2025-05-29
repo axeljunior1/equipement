@@ -80,6 +80,7 @@ public class Produit extends MultiTenantEntity {
     private List<MouvementStock> mouvementStocks;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "devise_id", nullable = false)
     private Devise devise;
 

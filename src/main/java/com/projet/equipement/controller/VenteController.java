@@ -8,7 +8,6 @@ import com.projet.equipement.dto.vente.VenteUpdateDto;
 import com.projet.equipement.entity.PaiementRequest;
 import com.projet.equipement.entity.Vente;
 import com.projet.equipement.services.TransactionVenteAndLinesService;
-import com.projet.equipement.services.VenteService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,20 +20,10 @@ import org.springframework.web.bind.annotation.*;
 public class VenteController {
 
     private final TransactionVenteAndLinesService transactionVenteAndLinesService;
-    private final VenteService venteService;
 
-    public VenteController(TransactionVenteAndLinesService transactionVenteAndLinesService, VenteService venteService) {
+    public VenteController(TransactionVenteAndLinesService transactionVenteAndLinesService
+    ) {
         this.transactionVenteAndLinesService = transactionVenteAndLinesService;
-        this.venteService = venteService;
-    }
-
-
-
-
-    @GetMapping("test")
-    public String findAllVentes() {
-        venteService.validerVente();
-        return "df";
     }
 
 
@@ -80,13 +69,13 @@ public class VenteController {
     @PostMapping("/valide-panier")
     @Transactional // Active la gestion transactionnelle
     public ResponseEntity<VenteGetDto> createVenteNLignes(@Valid @RequestBody ValiderPanierDTO validerPanierDTO
-                                                          ) {
+    ) {
         VenteGetDto venteGetDto = transactionVenteAndLinesService.validerVenteDansPanier(validerPanierDTO);
 
         return ResponseEntity.ok(venteGetDto);
     }
 
-//    @GetMapping("/{venteId}/payer")
+    //    @GetMapping("/{venteId}/payer")
 //    public ResponseEntity<String> payerVente(@PathVariable Long venteId, @PathVariable BigDecimal montant) {
 //         transactionVenteAndLinesService.payer(venteId, BigDecimal.ZERO);
 //         return ResponseEntity.ok("payed");

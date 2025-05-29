@@ -19,6 +19,8 @@ public class LigneVentePostDto {
 
     private Long produitId;
 
+    private Long formatVenteId;
+
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
     @Builder.Default

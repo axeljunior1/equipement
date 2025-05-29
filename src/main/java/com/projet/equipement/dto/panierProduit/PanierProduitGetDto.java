@@ -23,5 +23,7 @@ public class PanierProduitGetDto {
 
     private Integer quantite;
 
+    private Long formatVenteId;
+
 
 }

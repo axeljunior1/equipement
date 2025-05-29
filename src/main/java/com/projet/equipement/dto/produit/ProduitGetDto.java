@@ -1,11 +1,14 @@
 package com.projet.equipement.dto.produit;
 
 import com.projet.equipement.dto.categorie.CategorieGetDto;
+import com.projet.equipement.entity.FormatVente;
+import com.projet.equipement.entity.UniteVente;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Getter
@@ -40,6 +43,8 @@ public class ProduitGetDto {
 
     private String deviseCode;
     private String deviseSymbole;
+
+    private List<FormatVente> formatVentes;
 
 
 }

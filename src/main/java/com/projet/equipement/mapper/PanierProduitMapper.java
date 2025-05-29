@@ -3,6 +3,7 @@ package com.projet.equipement.mapper;
 import com.projet.equipement.dto.panierProduit.PanierProduitGetDto;
 import com.projet.equipement.dto.panierProduit.PanierProduitPostDto;
 import com.projet.equipement.dto.panierProduit.PanierProduitUpdateDto;
+import com.projet.equipement.entity.FormatVente;
 import com.projet.equipement.entity.Panier;
 import com.projet.equipement.entity.PanierProduit;
 import com.projet.equipement.entity.Produit;
@@ -15,6 +16,7 @@ public interface PanierProduitMapper {
 
 
 
+    @Mapping(target = "formatVenteId", source = "formatVente", qualifiedByName = "mapFormatVenteToId")
     PanierProduitGetDto toGetDto(PanierProduit produit) ;
 
     PanierProduit toEntity(PanierProduitGetDto panierProduitGetDto);
@@ -42,10 +44,16 @@ public interface PanierProduitMapper {
         return panier;
     }
 
+    @Named("mapFormatVenteToId")
+    default Long mapFormatVenteToId( FormatVente formatVente){
+        return formatVente.getId();
+    }
+
     @Named("mapProduitToId")
     default Long mapProduitToId( Produit produit){
         return produit.getId();
     }
+
     @Named("mapPanierToId")
     default Long mapPanierToId( Panier panier){
         return panier.getId();

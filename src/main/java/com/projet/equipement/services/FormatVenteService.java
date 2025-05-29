@@ -40,6 +40,8 @@ public class FormatVenteService {
                 .orElseThrow(() -> new RuntimeException("Format de vente non trouvé"));
     }
 
+
+
     public Page<FormatVente> findAllByProduitId(Long id, Pageable pageable) {
         return formatVenteRepository.findByProduitId(id, pageable);
     }

@@ -19,4 +19,6 @@ public class LigneVenteUpdateDto {
 
     private Integer produitId;
 
+    private Long formatVenteId;
+
 }

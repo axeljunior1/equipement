@@ -2,6 +2,7 @@ package com.projet.equipement.services;
 
 import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.entity.UniteVente;
+import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.UniteVenteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,18 +14,24 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class UniteVenteService {
-    
+
     private final UniteVenteRepository uniteVenteRepository;
-    
+
     public Page<UniteVente> findAll(Pageable pageable) {
         return uniteVenteRepository.findAll(pageable);
     }
-    
+
     public UniteVente findById(Long id) {
         return uniteVenteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Unité de vente non trouvée"));
     }
-    
+
+    public UniteVente findByCode(String code) {
+        return uniteVenteRepository.findByCode(code).orElseThrow(
+                () -> new EntityNotFoundException("Unite vente", code)
+        );
+    }
+
     public UniteVente save(UniteVente uniteVente) {
         uniteVente.setTenantId(TenantContext.getTenantId());
         return uniteVenteRepository.save(uniteVente);

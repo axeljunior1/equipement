@@ -26,5 +26,11 @@ public class PanierProduit extends MultiTenantEntity {
     @JoinColumn(name = "id_produit", nullable = false)
     private Produit produit;
 
+    @ManyToOne
+    @JoinColumn(name = "format_vente_id", nullable = false)
+    private FormatVente formatVente;
+
     private Integer quantite;
+
+
 }

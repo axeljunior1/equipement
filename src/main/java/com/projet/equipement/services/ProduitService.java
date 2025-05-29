@@ -1,6 +1,7 @@
 package com.projet.equipement.services;
 
 
+import com.projet.equipement.dto.formatVente.FormatVentePostDto;
 import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;
@@ -8,7 +9,9 @@ import com.projet.equipement.dto.tarifAchat.TarifAchatPostDto;
 import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
+import com.projet.equipement.repository.FormatVenteRepository;
 import com.projet.equipement.repository.ProduitRepository;
+import com.projet.equipement.repository.UniteVenteRepository;
 import com.projet.equipement.utils.EAN13Generator;
 import com.projet.equipement.utils.PaginationUtil;
 import jakarta.persistence.EntityManager;
@@ -34,14 +37,24 @@ public class ProduitService{
     private final EntityManager entityManager;
     private final TarifAchatService tarifAchatService;
     private final DeviseService deviseService;
+    private final UniteVenteRepository uniteVenteRepository;
+    private final FormatVenteRepository formatVenteRepository;
 
-    public ProduitService(ProduitRepository produitRepository, ProduitMapper produitMapper, StockCourantService stockCourantService, EntityManager entityManager, TarifAchatService tarifAchatService, DeviseService deviseService) {
+    public ProduitService(ProduitRepository produitRepository,
+                          ProduitMapper produitMapper,
+                          StockCourantService stockCourantService,
+                          EntityManager entityManager,
+                          TarifAchatService tarifAchatService,
+                          DeviseService deviseService,
+                          UniteVenteRepository uniteVenteRepository, FormatVenteRepository formatVenteRepository) {
         this.produitRepository = produitRepository;
         this.produitMapper = produitMapper;
         this.stockCourantService = stockCourantService;
         this.entityManager = entityManager;
         this.tarifAchatService = tarifAchatService;
         this.deviseService = deviseService;
+        this.uniteVenteRepository = uniteVenteRepository;
+        this.formatVenteRepository = formatVenteRepository;
     }
 
     /**
@@ -166,8 +179,14 @@ public class ProduitService{
         produit.setEan13(EAN_CONST);
         produit.setQrCode(new EAN13Generator().genAndSaveQrCodeByProduct(EAN_CONST));
 
+
         produit.setTenantId(TenantContext.getTenantId());
         Produit p = produitRepository.save(produit);
+
+        //creer formatVente unité si inexistant
+
+        initFormatVente(produit);
+
         Produit saved = produitRepository.findById(p.getId()).orElseThrow(()->new EntityNotFoundException("Produit", p.getId()));
         // Forcer le chargement de la catégorie (si LAZY)
 
@@ -184,6 +203,21 @@ public class ProduitService{
         entityManager.refresh(saved);
 
         return produitMapper.toGetDto(saved);
+    }
+
+    private void initFormatVente(Produit produit) {
+        Page<FormatVente> formatVentes = formatVenteRepository.findByProduitId(produit.getId(), Pageable.unpaged());
+
+        if (formatVentes.isEmpty()){
+            FormatVente formatVentePost = new FormatVente();
+            formatVentePost.setPrixVente(BigDecimal.valueOf(produit.getPrixVente()));
+            formatVentePost.setQuantiteParFormat(1);
+            formatVentePost.setLibelleFormat("Produit à l'unité");
+            formatVentePost.setProduit(produit);
+            formatVentePost.setUniteVente(uniteVenteRepository.findByCode("UNI").orElseThrow(()-> new EntityNotFoundException("Unité de vente", "UNI")));
+            formatVentePost.setTenantId(TenantContext.getTenantId());
+            formatVenteRepository.save(formatVentePost);
+        }
     }
 
     public Produit save(Produit produit){
@@ -211,6 +245,11 @@ public class ProduitService{
             tarifAchat.setPrixAchat(BigDecimal.valueOf(produitUpdateDto.getPrixAchat()));
             tarifAchatService.save(tarifAchat);
         }
+
+        //creer formatVente unité si inexistant
+
+        initFormatVente(produit);
+
         return produitMapper.toGetDto(saved);
     }
 

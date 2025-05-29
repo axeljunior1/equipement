@@ -23,6 +23,10 @@ public class LigneVenteGetDto {
 
     private ProduitGetDto produit;
 
+    private Long formatVenteId;
+
+    private String formatVenteLibelle;
+
 
 
 }
