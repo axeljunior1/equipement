@@ -1,6 +1,6 @@
 CREATE TABLE devise
 (
-    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id        serial PRIMARY KEY,
     code      VARCHAR(3)   NOT NULL UNIQUE, -- Exemple: USD, EUR
     nom       VARCHAR(50)  NOT NULL,
     symbole   VARCHAR(5),

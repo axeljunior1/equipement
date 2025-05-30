@@ -32,13 +32,21 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" | base64 -d > ec2_key.pem
           chmod 600 ec2_key.pem
 
+      - name: Créer le fichier .env
+        run: |
+          echo "db_driver=${{ secrets.DB_DRIVER }}" >> .env
+          echo "db_host=${{ secrets.DB_HOST }}" >> .env
+          echo "db_username=${{ secrets.DB_USERNAME }}" >> .env
+          echo "db_password=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "SPRING_PROFILES_ACTIVE=prod" >> .env
+
       # 4) Déployer sur l’EC2
       - name: Deploy to EC2
         env:
           HOST: api.stockcaisse.com
           USER: ec2-user
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
         run: |
           # Copier le JAR et Dockerfile sur l'EC2
           scp -o StrictHostKeyChecking=no -i ec2_key.pem target/*.jar $USER@$HOST:/home/$USER/spring.jar
@@ -54,5 +62,5 @@ jobs:
             docker build -t spring:latest /home/$USER
 
             # Lancer le conteneur Docker
-            docker run -d --name spring --restart unless-stopped -p 8080:8080 -e JWT_EXPIRATION=${JWT_EXPIRATION} -e JWT_SECRET=${JWT_SECRET} -v spring_data:/data spring:latest
+            docker run -d --name spring --restart unless-stopped -p 8080:8080  --env-file .env -v spring_data:/data spring:latest
           EOF

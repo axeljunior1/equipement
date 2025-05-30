@@ -1,13 +1,12 @@
 -- Création de la table unite_vente
 CREATE TABLE unite_vente
 (
-    id        BIGINT AUTO_INCREMENT,
+    id        serial primary key ,
     code      VARCHAR(255) NOT NULL,
     libelle   VARCHAR(255) NOT NULL,
     tenant_id VARCHAR(100) NOT NULL,
 
     CONSTRAINT fk_unite_vente_tenant FOREIGN KEY (tenant_id) REFERENCES tenant (id) ON DELETE CASCADE,
-    CONSTRAINT pk_unite_vente PRIMARY KEY (id),
     CONSTRAINT uk_unite_vente_code UNIQUE (code)
 );
 
@@ -32,7 +31,7 @@ VALUES ('M2', 'Mettre carre', 'AxelairCorp');
 -- Création de la table format_vente
 CREATE TABLE format_vente
 (
-    id                  BIGINT AUTO_INCREMENT,
+    id                  serial primary key ,
     produit_id          BIGINT         NOT NULL,
     unite_vente_id      BIGINT         NOT NULL,
     libelle_format      VARCHAR(255)   NOT NULL,
@@ -41,7 +40,6 @@ CREATE TABLE format_vente
     tenant_id VARCHAR(100) NOT NULL,
 
     CONSTRAINT fk_format_vente_tenant FOREIGN KEY (tenant_id) REFERENCES tenant(id) ON DELETE CASCADE,
-    CONSTRAINT pk_format_vente PRIMARY KEY (id),
     CONSTRAINT fk_format_vente_produit FOREIGN KEY (produit_id) REFERENCES PRODUITS (ID_PRODUIT),
     CONSTRAINT fk_format_vente_unite FOREIGN KEY (unite_vente_id) REFERENCES unite_vente (id),
     CONSTRAINT chk_quantite_positive CHECK (quantite_par_format > 0),
