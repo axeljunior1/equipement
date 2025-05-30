@@ -110,10 +110,13 @@ VALUES ('{{tenant_id}}', null, 'Produit {{tenant_id}}', 'test', 2.00, 6.00, null
         '89504E470D0A1A0A0000000D49484452000000640000006401000000005899A8F9000000BA49444154785EE5D2B10D84300C0550A30CC00291320A2B5D1638740B5C5672E735905880742E22F98C0E080D263D569A57D9DF0EC8A916789A103A2C2F80F15624994B94D22088E423FA36CDB95118DA2459F4D5C92EA5F9C89FD35E4A8BC3B1334BE83285B4CF6289CA7BD037DD0B7D27058EC90CD1D44BE9A541ACF95CA2AD83252D94C4F33F9F25DD19CB07F74D185AEF0070A4B50451DC32D44B5B42F982DB3AD8A2397168906484C875B24BADFF0546DE3A58AAF568FD00EB151EFCC96903A20000000049454E44AE426082',
         '9996804452255', 2, true,
         (select id from devise where code = 'XAF'));
+
+
+
 INSERT INTO TARIF_ACHAT (tenant_id,ID_PRODUIT, PRIX_ACHAT, CREATED_AT, UPDATED_AT) VALUES ('{{tenant_id}}', (select ID_PRODUIT
                                                                                            from produits where
-                                                                                           nom = 'Produit {{tenant_id}}')
-                                                                                           and tenant_id = '{{tenant_id}}' ,
+                                                                                           nom = 'Produit {{tenant_id}}'
+                                                                                           and tenant_id = '{{tenant_id}}') ,
                                                                                            2.00,
                                                                                            '2025-05-03 14:28:26.161295', null);
 
