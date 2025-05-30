@@ -126,3 +126,21 @@ INSERT INTO ETAT_ACHAT (tenant_id, LIBELLE, DESCRIPTION) VALUES ('{{tenant_id}}'
 INSERT INTO ETAT_ACHAT (tenant_id, LIBELLE, DESCRIPTION) VALUES ('{{tenant_id}}','CONFIRME', null);
 INSERT INTO ETAT_ACHAT (tenant_id, LIBELLE, DESCRIPTION) VALUES ('{{tenant_id}}','ANNULEE', null);
 INSERT INTO ETAT_ACHAT (tenant_id, LIBELLE, DESCRIPTION) VALUES ('{{tenant_id}}','REMBOURSEE', null);
+
+-- Insertions dans la table unite_vente
+INSERT INTO unite_vente (code, libelle, tenant_id)
+VALUES ('UNI', 'Unité', '{{tenant_id}}');
+INSERT INTO unite_vente (code, libelle, tenant_id)
+VALUES ('KG', 'Kilogramme', '{{tenant_id}}');
+INSERT INTO unite_vente (code, libelle, tenant_id)
+VALUES ('L', 'Litre', '{{tenant_id}}');
+INSERT INTO unite_vente (code, libelle, tenant_id)
+VALUES ('PAQ', 'Paquet', '{{tenant_id}}');
+INSERT INTO unite_vente (code, libelle, tenant_id)
+VALUES ('BOX', 'Boîte', '{{tenant_id}}');
+INSERT INTO unite_vente (code, libelle, tenant_id)
+VALUES ('CTN', 'Carton', '{{tenant_id}}');
+INSERT INTO unite_vente (code, libelle, tenant_id)
+VALUES ('M', 'Mettre', '{{tenant_id}}');
+INSERT INTO unite_vente (code, libelle, tenant_id)
+VALUES ('M2', 'Mettre carre', '{{tenant_id}}');
