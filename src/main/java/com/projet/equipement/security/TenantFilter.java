@@ -23,19 +23,19 @@ public class TenantFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String tenantId = request.getHeader("X-Tenant-ID");
-        logger.debug("Header X-Tenant-ID reçu : {}", tenantId);
+        logger.info("Header X-Tenant-ID reçu : {}", tenantId);
 
         if (tenantId != null) {
             TenantContext.setTenantId(tenantId);
-            logger.debug("TenantId '{}' défini dans le contexte", tenantId);
+            logger.info("TenantId '{}' défini dans le contexte", tenantId);
         } else {
-            logger.warn("Aucun X-Tenant-ID trouvé dans les headers de la requête");
+            logger.info("Aucun X-Tenant-ID trouvé dans les headers de la requête");
         }
 
         try {
             filterChain.doFilter(request, response);
         } finally {
-            logger.debug("Nettoyage du TenantContext pour tenant '{}'", TenantContext.getTenantId());
+            logger.info("Nettoyage du TenantContext pour tenant '{}'", TenantContext.getTenantId());
             TenantContext.clear();
         }
     }
