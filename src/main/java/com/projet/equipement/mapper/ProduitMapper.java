@@ -24,19 +24,11 @@ public interface ProduitMapper {
     @Mapping(target = "deviseSymbole", source = "devise", qualifiedByName = "mapDevToSymbole")
     ProduitGetDto toGetDto(Produit produit) ;
 
-    @Mapping(target = "categorie", source = "categorieId", qualifiedByName = "mapIdToCategorie")
     Produit toEntity(ProduitPostDto produitPostDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "categorie", source = "categorieId", qualifiedByName = "mapIdToCategorie")
     void updateProduitFromDto(ProduitUpdateDto produitUpdateDto, @MappingTarget Produit produit);
 
-    @Named("mapIdToCategorie")
-    default Categorie mapIdToCategorie(Long id){
-        Categorie categorie = new Categorie();
-        categorie.setId(id);
-        return categorie;
-    }
 
     @Named("mapCategorieToId")
     default Long mapCategorieToId( Categorie categorie){

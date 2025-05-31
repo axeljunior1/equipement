@@ -9,6 +9,7 @@ import com.projet.equipement.dto.tarifAchat.TarifAchatPostDto;
 import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.ProduitMapper;
+import com.projet.equipement.repository.CategorieRepository;
 import com.projet.equipement.repository.FormatVenteRepository;
 import com.projet.equipement.repository.ProduitRepository;
 import com.projet.equipement.repository.UniteVenteRepository;
@@ -39,6 +40,7 @@ public class ProduitService{
     private final DeviseService deviseService;
     private final UniteVenteRepository uniteVenteRepository;
     private final FormatVenteRepository formatVenteRepository;
+    private final CategorieRepository categorieRepository;
 
     public ProduitService(ProduitRepository produitRepository,
                           ProduitMapper produitMapper,
@@ -46,7 +48,7 @@ public class ProduitService{
                           EntityManager entityManager,
                           TarifAchatService tarifAchatService,
                           DeviseService deviseService,
-                          UniteVenteRepository uniteVenteRepository, FormatVenteRepository formatVenteRepository) {
+                          UniteVenteRepository uniteVenteRepository, FormatVenteRepository formatVenteRepository, CategorieRepository categorieRepository) {
         this.produitRepository = produitRepository;
         this.produitMapper = produitMapper;
         this.stockCourantService = stockCourantService;
@@ -55,6 +57,7 @@ public class ProduitService{
         this.deviseService = deviseService;
         this.uniteVenteRepository = uniteVenteRepository;
         this.formatVenteRepository = formatVenteRepository;
+        this.categorieRepository = categorieRepository;
     }
 
     /**
@@ -168,8 +171,11 @@ public class ProduitService{
     public ProduitGetDto save(ProduitPostDto produitPostDto){
         Produit produit = produitMapper.toEntity(produitPostDto);
 
+        Categorie categorie = categorieRepository.findById(produitPostDto.getCategorieId()).orElseThrow(()->new EntityNotFoundException("Categorie", produitPostDto.getCategorieId()));
+
         Devise devise = deviseService.findByCode(produitPostDto.getDeviseCode());
         produit.setDevise(devise);
+        produit.setCategorie(categorie);
 
         // Qrcode et code unique ean13
         String EAN_CONST = new EAN13Generator().generateEAN13WithFirstThreeChars("999");
@@ -237,6 +243,10 @@ public class ProduitService{
     public ProduitGetDto updateProduit(ProduitUpdateDto produitUpdateDto, Long id){
         Produit produit = findById(id);
         produitMapper.updateProduitFromDto(produitUpdateDto, produit);
+        Categorie categorie = categorieRepository.findById(produitUpdateDto.getCategorieId()).orElseThrow(()->new EntityNotFoundException("Categorie", produitUpdateDto.getCategorieId()));
+
+        produit.setCategorie(categorie);
+
         Produit saved = produitRepository.save(produit);
 
         //Modification tarif achat

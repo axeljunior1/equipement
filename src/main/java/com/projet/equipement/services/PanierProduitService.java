@@ -31,8 +31,9 @@ public class PanierProduitService {
     private final FormatVenteRepository formatVenteRepository;
     private final UniteVenteRepository uniteVenteRepository;
     private final ProduitRepository produitRepository;
+    private final PanierRepository panierRepository;
 
-    public PanierProduitService(PanierProduitRepository panierProduitRepository, PanierProduitMapper panierProduitMapper, EntityManager entityManager, UniteVenteService uniteVenteService, FormatVenteService formatVenteService, FormatVenteRepository formatVenteRepository, UniteVenteRepository uniteVenteRepository, ProduitRepository produitRepository) {
+    public PanierProduitService(PanierProduitRepository panierProduitRepository, PanierProduitMapper panierProduitMapper, EntityManager entityManager, UniteVenteService uniteVenteService, FormatVenteService formatVenteService, FormatVenteRepository formatVenteRepository, UniteVenteRepository uniteVenteRepository, ProduitRepository produitRepository, PanierRepository panierRepository) {
         this.panierProduitRepository = panierProduitRepository;
         this.panierProduitMapper = panierProduitMapper;
         this.entityManager = entityManager;
@@ -41,6 +42,7 @@ public class PanierProduitService {
         this.formatVenteRepository = formatVenteRepository;
         this.uniteVenteRepository = uniteVenteRepository;
         this.produitRepository = produitRepository;
+        this.panierRepository = panierRepository;
     }
 
     public Page<PanierProduitGetDto> findAll(Pageable pageable) {
@@ -118,6 +120,10 @@ public class PanierProduitService {
             FormatVente formatVente = formatVenteService.findAllByProduitId(panierProduit.getProduitId(), Pageable.unpaged()).getContent().stream().findFirst().orElseThrow(()-> new EntityNotFoundException("Format de vente", panierProduit.getProduitId().toString()));
 
             PanierProduit entity = panierProduitMapper.toEntity(panierProduit);
+            Panier panier = panierRepository.findById(panierProduit.getPanierId()).orElseThrow(()->new EntityNotFoundException("Panier", panierProduit.getPanierId()));
+            entity.setPanier(panier);
+            entity.setProduit(produitRepository.findById(panierProduit.getProduitId()).orElseThrow(()->new EntityNotFoundException("Produit", panierProduit.getProduitId())));
+            entity.setFormatVente(formatVenteRepository.findById(panierProduit.getFormatVenteId()).orElseThrow(()->new EntityNotFoundException("Format de vente", panierProduit.getFormatVenteId().toString())));
             entity.setFormatVente(formatVente);
             entity.setTenantId(TenantContext.getTenantId());
             saved = panierProduitRepository.save(entity);
