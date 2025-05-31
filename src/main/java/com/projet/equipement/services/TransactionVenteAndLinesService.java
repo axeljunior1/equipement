@@ -396,31 +396,9 @@ public class TransactionVenteAndLinesService {
 
         factureService.createFacture(facturePostDTO);
 
-        //gen paiement etat => EN_ATTENTE
-
-      /*  PaiementPostDTO  paiementPostDTO = PaiementPostDTO.builder()
-                .factureId(facture.getIdFacture())
-                .modePaiement("")
-                .montantPaye(BigDecimal.valueOf(0.000))
-                .etatId(etatPaiementService.findByLibelle("EN_ATTENTE").getId())
-                .build();
-
-        paiementService.createPaiement(paiementPostDTO);*/
-
         return venteMapper.toDto(vente);
     }
 
-    public VenteGetDto payerVente(Long id) {
-        Vente vente = venteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(VENTE, id));
-
-        vente.setEtat(etatVenteService.findByLibelle("CONFIRME"));
-
-        this.saveVente(vente);
-
-        //modif etat fac
-
-        return venteMapper.toDto(vente);
-    }
 
 
     public Page<LigneVenteGetDto> findByVenteId(Long id, Pageable pageable) {

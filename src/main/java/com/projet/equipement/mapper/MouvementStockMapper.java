@@ -8,10 +8,11 @@ import com.projet.equipement.entity.TypeMouvementStock;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.ProduitRepository;
 import com.projet.equipement.services.TypeMouvementStockService;
+import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
 
-@Component
+@Mapper()
 public class MouvementStockMapper {
 
 

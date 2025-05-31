@@ -16,8 +16,6 @@ public interface CategorieMapper {
 
     CategorieGetDto toGetDto(Categorie categorie) ;
 
-    Categorie toEntity(CategorieGetDto CategorieGetDto);
-
     Categorie toEntity(CategoriePostDto categoriePostDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
