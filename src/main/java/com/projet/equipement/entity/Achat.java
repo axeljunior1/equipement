@@ -20,7 +20,7 @@ public class Achat extends MultiTenantEntity{
     @Column(name = "id_achat")
     private Long id;
 
-    @Column(name = "montant_total")
+    @Column(name = "montant_total" , nullable = false)
     private Double montantTotal;
 
     @Column(name = "updated_at")
@@ -28,10 +28,10 @@ public class Achat extends MultiTenantEntity{
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Builder.Default
-    @Column(name = "actif")
+    @Column(name = "actif", nullable = false)
     private Boolean actif = true;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     @Builder.Default
     private LocalDateTime dateCreation =LocalDateTime.now();
 

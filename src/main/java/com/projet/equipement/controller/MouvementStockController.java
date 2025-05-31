@@ -4,6 +4,7 @@ import com.projet.equipement.dto.mvt_stk.MouvementStockGetDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockUpdateDto;
 import com.projet.equipement.entity.MouvementStock;
+import com.projet.equipement.mapper.MouvementStockMapper;
 import com.projet.equipement.services.MouvementStockService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -16,21 +17,23 @@ import org.springframework.web.bind.annotation.*;
 public class MouvementStockController {
 
     private final MouvementStockService mouvementStockService;
+    private final MouvementStockMapper mouvementStockMapper;
 
-    public MouvementStockController(MouvementStockService mouvementStockService) {
+    public MouvementStockController(MouvementStockService mouvementStockService, MouvementStockMapper mouvementStockMapper) {
         this.mouvementStockService = mouvementStockService;
+        this.mouvementStockMapper = mouvementStockMapper;
     }
 
     @GetMapping("")
     public ResponseEntity<Page<MouvementStockGetDto>> findAllMouvementStock(Pageable pageable) {
         Page <MouvementStock> mouvementStocks = mouvementStockService.findAll(pageable);
-        return ResponseEntity.ok(mouvementStocks.map(MouvementStockGetDto::new));
+        return ResponseEntity.ok(mouvementStocks.map(mouvementStockMapper::toDto));
     }
 
     @GetMapping("/produit/{id}")
     public ResponseEntity<Page<MouvementStockGetDto>> findAllMouvementStockByProductId(@PathVariable Long id, Pageable pageable) {
         Page <MouvementStock> mouvementStocks = mouvementStockService.findAllMouvementStockByProductId(id, pageable);
-        return ResponseEntity.ok(mouvementStocks.map(MouvementStockGetDto::new));
+        return ResponseEntity.ok(mouvementStocks.map(mouvementStockMapper::toDto));
     }
     
     @GetMapping("/{id}")

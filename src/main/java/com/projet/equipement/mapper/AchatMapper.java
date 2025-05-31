@@ -23,14 +23,6 @@ public interface AchatMapper {
     @Mapping(source = "employe", target = "employeId", qualifiedByName = "mapEmployeToId")
     AchatGetDto toDto(Achat achat);
 
-    /**
-     * Maps an AchatGetDto to an Achat entity.
-     *
-     * @param achatGetDto the AchatGetDto to be mapped
-     * @return the mapped Achat entity
-     */
-    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
-    Achat toEntity(AchatGetDto achatGetDto);
 
     /**
      * Maps an AchatPostDto to an Achat entity.
@@ -40,7 +32,6 @@ public interface AchatMapper {
      * @param achatGetDto the AchatPostDto object containing the data to be mapped
      * @return the mapped Achat entity
      */
-    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
     Achat toEntity(AchatPostDto achatGetDto);
 
 
@@ -52,7 +43,6 @@ public interface AchatMapper {
      * @param achatUpdateDto the data transfer object containing the updated values for the Achat
      * @param achat the target Achat entity to be updated
      */
-    @Mapping(source = "employeId", target = "employe", qualifiedByName = "mapIdToEmploye")
     void updateDto( AchatUpdateDto achatUpdateDto, @MappingTarget Achat achat);
 
 
@@ -73,12 +63,7 @@ public interface AchatMapper {
      * @param id the identifier of the Employe
      * @return an Employe entity with its id field populated
      */
-    @Named("mapIdToEmploye")
-    default Employe mapIdToEmploye(Long id){
-        Employe employe = new Employe();
-        employe.setId(id);
-        return employe;
-    }
+
 
 
 }

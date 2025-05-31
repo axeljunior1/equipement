@@ -13,11 +13,11 @@ public class LigneVenteUpdateDto {
 
     private Integer quantite;
 
-    private Integer venteId;
+    private Long venteId;
 
     private Boolean actif;
 
-    private Integer produitId;
+    private Long produitId;
 
     private Long formatVenteId;
 

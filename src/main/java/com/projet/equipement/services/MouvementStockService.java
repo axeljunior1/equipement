@@ -8,6 +8,8 @@ import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.MouvementStockMapper;
 import com.projet.equipement.repository.MouvementStockRepository;
+import com.projet.equipement.repository.ProduitRepository;
+import com.projet.equipement.repository.TypeMouvementStockRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,15 @@ public class MouvementStockService {
 
     private final MouvementStockRepository mouvementStockRepository;
     private final MouvementStockMapper mouvementStockMapper;
+    private final ProduitRepository produitRepository;
+    private final TypeMouvementStockRepository typeMouvementStockRepository;
 
     public MouvementStockService(MouvementStockRepository mouvementStockRepository,
-                                 MouvementStockMapper mouvementStockMapper) {
+                                 MouvementStockMapper mouvementStockMapper, ProduitRepository produitRepository, TypeMouvementStockRepository typeMouvementStockRepository) {
         this.mouvementStockRepository = mouvementStockRepository;
         this.mouvementStockMapper = mouvementStockMapper;
+        this.produitRepository = produitRepository;
+        this.typeMouvementStockRepository = typeMouvementStockRepository;
     }
 
     public Page<MouvementStock> findAll(Pageable pageable){
@@ -40,28 +46,12 @@ public class MouvementStockService {
     }
 
 
-    public void enregistrerMouvementStock(Long produitId, int quantite, String reference, String commentaire, String typeMouvementCode, Integer idEveOrigine, Integer idLigneOrigine) {
-        LocalDateTime dateCreate = LocalDateTime.now();
-        MouvementStockPostDto mouvementStockPostDto = MouvementStockPostDto.builder()
-                .reference(reference)
-                .produitId(produitId)
-                .quantite(quantite)
-                .commentaire(commentaire)
-                .createdAt(dateCreate)
-                .dateMouvement(dateCreate)
-                .typeMouvementCode(typeMouvementCode)
-                .idEvenementOrigine(idEveOrigine)
-                .idLigneOrigine(idLigneOrigine)
-                .build();
-
-        MouvementStock entity = mouvementStockMapper.PostMouvementStockFromDto(mouvementStockPostDto);
-        entity.setTenantId(TenantContext.getTenantId());
-        mouvementStockRepository.save(entity);
-    }
-
-
     public MouvementStock save(MouvementStockPostDto mouvementStockPostDto){
-        MouvementStock mouvementStock = mouvementStockMapper.PostMouvementStockFromDto(mouvementStockPostDto);
+        MouvementStock mouvementStock = mouvementStockMapper.toEntity(mouvementStockPostDto);
+
+        mouvementStock.setProduit(produitRepository.findById(mouvementStockPostDto.getProduitId()).orElseThrow(()-> new EntityNotFoundException("Produit", mouvementStockPostDto.getProduitId())));
+        mouvementStock.setTypeMouvement(typeMouvementStockRepository.findByCode(mouvementStockPostDto.getTypeMouvementCode()).orElseThrow(()-> new EntityNotFoundException("TypeMouvementStock", mouvementStockPostDto.getTypeMouvementCode())));
+
         mouvementStock.setTenantId(TenantContext.getTenantId());
         return mouvementStockRepository.save(mouvementStock);
     }

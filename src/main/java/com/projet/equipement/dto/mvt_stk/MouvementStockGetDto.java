@@ -25,7 +25,7 @@ public class MouvementStockGetDto {
 
     private String typeMouvementCode; // Relation Many-to-One vers types_mouvement_stock
 
-    private String typeMouvement; // Relation Many-to-One vers types_mouvement_stock
+    private Long typeMouvementId; // Relation Many-to-One vers types_mouvement_stock
 
     private LocalDateTime dateMouvement; // Date du mouvement (par défaut : maintenant)
 
@@ -37,20 +37,6 @@ public class MouvementStockGetDto {
 
     private Integer idEvenementOrigine;
 
-
-    public MouvementStockGetDto(MouvementStock mouvementStock) {
-        this.produitId = mouvementStock.getProduit().getId();
-        this.reference = mouvementStock.getReference();
-        this.quantite = mouvementStock.getQuantite();
-        this.typeMouvementCode = mouvementStock.getTypeMouvement().getCode();
-        this.dateMouvement = mouvementStock.getDateMouvement();
-        this.commentaire = mouvementStock.getCommentaire();
-        this.createdAt = mouvementStock.getCreatedAt();
-        this.produitNom = mouvementStock.getProduit().getNom();
-        this.idEvenementOrigine = mouvementStock.getIdEvenementOrigine();
-        this.idLigneOrigine = mouvementStock.getIdLigneOrigine();
-        this.typeMouvement = String.valueOf(mouvementStock.getTypeMouvement().getTypeMouvement());
-    }
 
 
 }

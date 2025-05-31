@@ -13,9 +13,6 @@ public class AchatUpdateDto {
 
     private Double montantTotal;
 
-//    private LocalDateTime dateDerniereMiseAjour;
-
-//    private Integer clientId;
 
     private Long employeId;
 

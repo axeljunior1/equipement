@@ -6,10 +6,7 @@ import com.projet.equipement.dto.ligneAchat.LigneAchatUpdateDto;
 import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.LigneAchat;
 import com.projet.equipement.entity.Produit;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring" , uses = {ProduitMapper.class, AchatMapper.class})
 public interface LigneAchatMapper {
@@ -18,24 +15,12 @@ public interface LigneAchatMapper {
     @Mapping(source = "achat", target = "achatId", qualifiedByName = "mapAchatToId")
     LigneAchatGetDto toDto(LigneAchat ligneAchat);
 
-    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
-    @Mapping(source = "achatId", target = "achat", qualifiedByName = "mapIdToAchat")
-    LigneAchat toEntity(LigneAchatGetDto ligneAchatGetDto);
 
-    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
-    @Mapping(source = "achatId", target = "achat", qualifiedByName = "mapIdToAchat")
     LigneAchat toEntity(LigneAchatPostDto ligneAchatPostDto);
 
-    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
-    @Mapping(source = "achatId", target = "achat", qualifiedByName = "mapIdToAchat")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateLigneAchatFromDto(LigneAchatUpdateDto ligneAchatUpdateDto, @MappingTarget LigneAchat ligneAchat);
 
-    @Named("mapIdToProduit")
-    default Produit mapIdToProduit(Long id) {
-        Produit produit = new Produit();
-        produit.setId(id);
-        return produit;
-    }
 
     @Named("mapProduitToId")
     default Long mapProduitToId(Produit produit) {
@@ -48,12 +33,7 @@ public interface LigneAchatMapper {
         return achat.getId();
     }
 
-    @Named("mapIdToAchat")
-    default Achat mapIdToAchat(Long id) {
-        Achat achat = new Achat();
-        achat.setId(id);
-        return achat;
-    }
+
 
 
 

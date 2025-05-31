@@ -1,58 +1,48 @@
 package com.projet.equipement.mapper;
 
+import com.projet.equipement.dto.mvt_stk.MouvementStockGetDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockUpdateDto;
 import com.projet.equipement.entity.MouvementStock;
 import com.projet.equipement.entity.Produit;
 import com.projet.equipement.entity.TypeMouvementStock;
-import com.projet.equipement.exceptions.EntityNotFoundException;
-import com.projet.equipement.repository.ProduitRepository;
-import com.projet.equipement.services.TypeMouvementStockService;
-import org.mapstruct.Mapper;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
 
-@Mapper()
-public class MouvementStockMapper {
+@Mapper(componentModel = "spring")
+public interface MouvementStockMapper {
 
 
-    private final ProduitRepository produitRepository;
-    private final TypeMouvementStockService typeMouvementStockService;
+    @Mapping(source = "produit", target = "produitId", qualifiedByName = "mapProduitToId")
+    @Mapping(source = "produit", target = "produitNom", qualifiedByName = "mapProduitToNom")
+    @Mapping(source = "typeMouvement", target = "typeMouvementCode", qualifiedByName = "mapTypeMouvementToCode")
+    @Mapping(source = "typeMouvement", target = "typeMouvementId", qualifiedByName = "mapTypeMouvementToId")
+    MouvementStockGetDto toDto(MouvementStock mouvementStock) ;
 
-    public MouvementStockMapper(ProduitRepository produitRepository, TypeMouvementStockService typeMouvementStockService) {
-        this.produitRepository = produitRepository;
-        this.typeMouvementStockService = typeMouvementStockService;
+    MouvementStock toEntity(MouvementStockPostDto mouvementStockPostDto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateMouvementStockFromDto(MouvementStockUpdateDto mouvementStockUpdateDto, @MappingTarget MouvementStock mouvementStock);
+
+
+    @Named("mapProduitToId")
+    default Long mapProduitToId(Produit produit) {
+        return produit != null ? produit.getId() : null;
+    }
+    @Named("mapProduitToNom")
+    default String mapProduitToNom(Produit produit) {
+        return produit != null ? produit.getNom() : null;
     }
 
-    public void updateMouvementStockFromDto(MouvementStockUpdateDto mouvementStockUpdateDto, MouvementStock mouvementStock){
-        if (mouvementStockUpdateDto.getReference() != null) mouvementStock.setReference(mouvementStockUpdateDto.getReference());
-        if (mouvementStockUpdateDto.getCommentaire() != null) mouvementStock.setCommentaire(mouvementStockUpdateDto.getCommentaire());
-        if(mouvementStockUpdateDto.getTypeMouvementCode() !=null) mouvementStock.setTypeMouvement(mouvementStockUpdateDto.getTypeMouvementCode());
-        if(mouvementStockUpdateDto.getIdEvenementOrigine() != null) mouvementStock.setIdEvenementOrigine(mouvementStockUpdateDto.getIdEvenementOrigine());
-        if(mouvementStockUpdateDto.getIdLigneOrigine() != null) mouvementStock.setIdLigneOrigine(mouvementStockUpdateDto.getIdLigneOrigine());
-        if(mouvementStockUpdateDto.getProduitId() != null) {
-            Produit produit = produitRepository.findById(mouvementStock.getId()).orElseThrow(
-                    () -> new EntityNotFoundException("MouvementStock", mouvementStock.getId())
-            );
-            mouvementStock.setProduit(produit);
-        };
+    @Named("mapTypeMouvementToId")
+    default Long mapTypeMouvementToId(TypeMouvementStock typeMouvementStock) {
+        return typeMouvementStock != null ? typeMouvementStock.getId() : null;
     }
 
-
-
-    public MouvementStock PostMouvementStockFromDto(MouvementStockPostDto mouvementStockPostDto ){
-        TypeMouvementStock typeMouvementStock = typeMouvementStockService.findByCode(mouvementStockPostDto.getTypeMouvementCode());
-        return MouvementStock.builder()
-                .reference(mouvementStockPostDto.getReference())
-                .commentaire(mouvementStockPostDto.getCommentaire())
-                .typeMouvement(typeMouvementStock)
-                .quantite(mouvementStockPostDto.getQuantite())
-                .idLigneOrigine(mouvementStockPostDto.getIdLigneOrigine())
-                .idEvenementOrigine(mouvementStockPostDto.getIdEvenementOrigine())
-                .produit(produitRepository.findById(mouvementStockPostDto.getProduitId()).orElseThrow(()-> new EntityNotFoundException("Produit", mouvementStockPostDto.getProduitId())))
-                .dateMouvement(mouvementStockPostDto.getDateMouvement())
-                .createdAt(mouvementStockPostDto.getCreatedAt())
-                .build();
+    @Named("mapTypeMouvementToCode")
+    default String mapTypeMouvementToCode(TypeMouvementStock typeMouvementStock) {
+        return typeMouvementStock != null ? typeMouvementStock.getCode() : null;
     }
+
 
 }

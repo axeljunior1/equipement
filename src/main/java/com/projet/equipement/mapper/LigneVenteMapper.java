@@ -21,24 +21,12 @@ public interface LigneVenteMapper {
     @Mapping(source = "formatVente", target = "formatVenteLibelle", qualifiedByName = "mapFormatToLib")
     LigneVenteGetDto toDto(LigneVente ligneVente);
 
-    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
-    @Mapping(source = "venteId", target = "vente", qualifiedByName = "mapIdToVente")
-    LigneVente toEntity(LigneVenteGetDto ligneVenteGetDto);
 
-    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
-    @Mapping(source = "venteId", target = "vente", qualifiedByName = "mapIdToVente")
     LigneVente toEntity(LigneVentePostDto ligneVentePostDto);
 
-    @Mapping(source = "produitId", target = "produit", qualifiedByName = "mapIdToProduit")
-    @Mapping(source = "venteId", target = "vente", qualifiedByName = "mapIdToVente")
+
     void updateLigneVenteFromDto(LigneVenteUpdateDto ligneVenteUpdateDto, @MappingTarget LigneVente ligneVente);
 
-    @Named("mapIdToProduit")
-    default Produit mapIdToProduit(Long id) {
-        Produit produit = new Produit();
-        produit.setId(id);
-        return produit;
-    }
 
     @Named("mapProduitToId")
     default Long mapProduitToId(Produit produit) {
@@ -60,10 +48,5 @@ public interface LigneVenteMapper {
         return vente.getId();
     }
 
-    @Named("mapIdToVente")
-    default Vente mapIdToVente(Long id) {
-        Vente vente = new Vente();
-        vente.setId(id);
-        return vente;
-    }
+
 }

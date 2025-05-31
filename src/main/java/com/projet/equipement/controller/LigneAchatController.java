@@ -3,8 +3,7 @@ package com.projet.equipement.controller;
 import com.projet.equipement.dto.ligneAchat.LigneAchatGetDto;
 import com.projet.equipement.dto.ligneAchat.LigneAchatPostDto;
 import com.projet.equipement.dto.ligneAchat.LigneAchatUpdateDto;
-import com.projet.equipement.entity.LigneAchat;
-import com.projet.equipement.services.TransactionAchatAndLinesService;
+import com.projet.equipement.services.LigneAchatService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,47 +14,41 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class LigneAchatController {
 
-    private final TransactionAchatAndLinesService transactionAchatAndLinesService;
+    private final LigneAchatService ligneAchatService;
 
-    public LigneAchatController(TransactionAchatAndLinesService transactionAchatAndLinesService) {
-        this.transactionAchatAndLinesService = transactionAchatAndLinesService;
+    public LigneAchatController(LigneAchatService ligneAchatService) {
+        this.ligneAchatService = ligneAchatService;
     }
 
-//    @GetMapping("/all")
-//    public ResponseEntity<Page<LigneAchatGetDto>> findAllLigneAchats(Pageable pageable) {
-//        Page<LigneAchat> ligneAchats = transactionAchatAndLinesService.findAllLine(pageable);
-//        return ResponseEntity.ok( ligneAchats) ;
-//    }
 
     @GetMapping("")
     public ResponseEntity<Page<LigneAchatGetDto>> findAllLigneAchatsDto(Pageable pageable) {
-        Page<LigneAchatGetDto> ligneAchats = transactionAchatAndLinesService.findAllLine(pageable);
+        Page<LigneAchatGetDto> ligneAchats = ligneAchatService.findAll(pageable);
         return ResponseEntity.ok(ligneAchats);
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<LigneAchatGetDto> findLigneAchat(@PathVariable Long id) {
-        LigneAchatGetDto ligneAchat = transactionAchatAndLinesService.findLigneAchatById(id);
-
+        LigneAchatGetDto ligneAchat = ligneAchatService.findById(id);
         return ResponseEntity.ok(ligneAchat);
     }
     @PostMapping("")
     public ResponseEntity<LigneAchatGetDto> addLigneAchat(@Valid @RequestBody LigneAchatPostDto ligneAchatPostDto) {
-        LigneAchatGetDto ligneAchat = transactionAchatAndLinesService.saveLigneAchat(ligneAchatPostDto);
+        LigneAchatGetDto ligneAchat = ligneAchatService.save(ligneAchatPostDto);
         return ResponseEntity.ok(ligneAchat);
     }
     
     @PatchMapping("/{id}")
     public ResponseEntity<LigneAchatGetDto> updateLigneAchat(@PathVariable Long id , @Valid  @RequestBody LigneAchatUpdateDto ligneAchatUpdateDto) {
 
-        LigneAchatGetDto ligneAchat = transactionAchatAndLinesService.updateLigneAchat(ligneAchatUpdateDto, id);
+        LigneAchatGetDto ligneAchat = ligneAchatService.updateLigneAchat(ligneAchatUpdateDto, id);
         return ResponseEntity.ok(ligneAchat);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteLigneAchat(@PathVariable Long id ) {
-        transactionAchatAndLinesService.deleteLinesByIdSoft(id);
+        ligneAchatService.deleteLinesByIdSoft(id);
         return ResponseEntity.ok("LigneAchat deleted");
     }
 

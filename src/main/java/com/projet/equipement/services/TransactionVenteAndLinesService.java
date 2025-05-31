@@ -18,9 +18,7 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.StockInsuffisantException;
 import com.projet.equipement.mapper.LigneVenteMapper;
 import com.projet.equipement.mapper.VenteMapper;
-import com.projet.equipement.repository.EtatVenteRepository;
-import com.projet.equipement.repository.LigneVenteRepository;
-import com.projet.equipement.repository.VenteRepository;
+import com.projet.equipement.repository.*;
 import com.projet.equipement.utils.FactureNumeroGenerator;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
@@ -62,6 +60,8 @@ public class TransactionVenteAndLinesService {
     private final PaiementService paiementService;
     private final EtatPaiementService etatPaiementService;
     private final FormatVenteService formatVenteService;
+    private final ProduitRepository produitRepository;
+    private final FormatVenteRepository formatVenteRepository;
 
     @Autowired
     public TransactionVenteAndLinesService(
@@ -79,7 +79,7 @@ public class TransactionVenteAndLinesService {
             EtatVenteRepository etatVenteRepository,
             EtatFactureService etatFactureService,
             FactureService factureService,
-            EtatVenteService etatVenteService, PaiementService paiementService, EtatPaiementService etatPaiementService, FormatVenteService formatVenteService) {
+            EtatVenteService etatVenteService, PaiementService paiementService, EtatPaiementService etatPaiementService, FormatVenteService formatVenteService, ProduitRepository produitRepository, FormatVenteRepository formatVenteRepository) {
         this.ligneVenteMapper = ligneVenteMapper;
         this.ligneVenteRepository = ligneVenteRepository;
         this.mouvementStockService = mouvementStockService;
@@ -99,6 +99,8 @@ public class TransactionVenteAndLinesService {
         this.paiementService = paiementService;
         this.etatPaiementService = etatPaiementService;
         this.formatVenteService = formatVenteService;
+        this.produitRepository = produitRepository;
+        this.formatVenteRepository = formatVenteRepository;
     }
 
     private static final String VENTE = "Vente";
@@ -400,7 +402,6 @@ public class TransactionVenteAndLinesService {
     }
 
 
-
     public Page<LigneVenteGetDto> findByVenteId(Long id, Pageable pageable) {
         Page<LigneVente> byVenteId = ligneVenteRepository.findByVenteId(id, pageable);
         return byVenteId.map(ligneVenteMapper::toDto);
@@ -449,13 +450,17 @@ public class TransactionVenteAndLinesService {
     @Transactional
     public LigneVente saveLigneVente(LigneVentePostDto ligneVentePostDto) {
 
-        LigneVente ligneVenteToPost = ligneVenteMapper.toEntity(ligneVentePostDto);
+        LigneVente ligneVente = ligneVenteMapper.toEntity(ligneVentePostDto);
+
+        ligneVente.setVente(venteRepository.findById(ligneVentePostDto.getVenteId()).orElseThrow(() -> new EntityNotFoundException(VENTE, ligneVentePostDto.getVenteId())));
+        ligneVente.setProduit(produitRepository.findById(ligneVentePostDto.getProduitId()).orElseThrow(() -> new EntityNotFoundException("Produit", ligneVentePostDto.getProduitId())));
+        ligneVente.setFormatVente(formatVenteRepository.findById(ligneVentePostDto.getFormatVenteId()).orElseThrow(() -> new EntityNotFoundException("Format de vente", ligneVentePostDto.getFormatVenteId())));
 
         FormatVente formatVente = formatVenteService.findById(ligneVentePostDto.getFormatVenteId());
-        ligneVenteToPost.setFormatVente(formatVente);
+        ligneVente.setFormatVente(formatVente);
 
-        ligneVenteToPost.setTenantId(TenantContext.getTenantId());
-        LigneVente saveLigneVente = ligneVenteRepository.save(ligneVenteToPost);
+        ligneVente.setTenantId(TenantContext.getTenantId());
+        LigneVente saveLigneVente = ligneVenteRepository.save(ligneVente);
 
         entityManager.refresh(saveLigneVente);
 
@@ -472,8 +477,8 @@ public class TransactionVenteAndLinesService {
                 .createdAt(dateCreate)
                 .dateMouvement(dateCreate)
                 .typeMouvementCode("VENTE_PRODUIT")
-                .idEvenementOrigine(Math.toIntExact(saveLigneVente.getVente().getId()))
-                .idLigneOrigine(Math.toIntExact(saveLigneVente.getId()))
+                .idEvenementOrigine(saveLigneVente.getVente().getId())
+                .idLigneOrigine(saveLigneVente.getId())
                 .build();
         mouvementStockService.save(mouvStk);
 
@@ -495,11 +500,14 @@ public class TransactionVenteAndLinesService {
         LigneVente ligneVente = this.findByIdLine(id);
 
         ligneVenteMapper.updateLigneVenteFromDto(ligneVenteUpdateDto, ligneVente);
-        ligneVente.setTenantId(TenantContext.getTenantId());
-        LigneVente save = ligneVenteRepository.save(ligneVente);
 
-        entityManager.refresh(save);
-        return save;
+        ligneVente.setVente(venteRepository.findById(ligneVenteUpdateDto.getVenteId()).orElseThrow(() -> new EntityNotFoundException(VENTE, ligneVenteUpdateDto.getVenteId())));
+        ligneVente.setProduit(produitRepository.findById(ligneVenteUpdateDto.getProduitId()).orElseThrow(() -> new EntityNotFoundException("Produit", ligneVenteUpdateDto.getProduitId())));
+        ligneVente.setFormatVente(formatVenteRepository.findById(ligneVenteUpdateDto.getFormatVenteId()).orElseThrow(() -> new EntityNotFoundException("Format de vente", ligneVenteUpdateDto.getFormatVenteId())));
+
+        ligneVente.setTenantId(TenantContext.getTenantId());
+
+        return ligneVenteRepository.save(ligneVente);
     }
 
 
@@ -558,15 +566,17 @@ public class TransactionVenteAndLinesService {
 
         entityManager.refresh(saveLigneVente);
         // Gestion du mvt de stock
-        mouvementStockService.enregistrerMouvementStock(
-                produitId,
-                ligneVentePostDto.getQuantite(),
-                "VTE_" + ligneVentePostDto.getVenteId() + "_LIG_" + saveLigneVente.getId(),
-                "Généré à partir de la ligne d'une vente",
-                "VENTE_PRODUIT",
-                Math.toIntExact(ligneVente.getVente().getId()),
-                Math.toIntExact(ligneVente.getId())
+        mouvementStockService.save( MouvementStockPostDto.builder()
+                        .produitId(produitId)
+                        .quantite(ligneVentePostDto.getQuantite())
+                        .reference("VTE_" + ligneVentePostDto.getVenteId() + "_LIG_" + saveLigneVente.getId())
+                        .commentaire("Généré à partir de la ligne d'une vente")
+                        .typeMouvementCode("VENTE_PRODUIT")
+                        .idEvenementOrigine(ligneVente.getVente().getId())
+                        .idLigneOrigine(ligneVente.getId())
+                        .build()
         );
+
         return saveLigneVente;
     }
 
@@ -588,8 +598,8 @@ public class TransactionVenteAndLinesService {
                 .createdAt(dateCreate)
                 .dateMouvement(dateCreate)
                 .typeMouvementCode("RETOUR_CLIENT")
-                .idEvenementOrigine(Math.toIntExact(ligneVente.getVente().getId()))
-                .idLigneOrigine(Math.toIntExact(ligneVente.getId()))
+                .idEvenementOrigine(ligneVente.getVente().getId())
+                .idLigneOrigine(ligneVente.getId())
                 .build();
         // soft delete du mvt
         mouvementStockService.save(mvtInverse);
