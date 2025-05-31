@@ -16,10 +16,6 @@ public class VenteUpdateDto {
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    private Long clientId;
-
-    private Long employeId;
-
     private Boolean actif;
 
 
