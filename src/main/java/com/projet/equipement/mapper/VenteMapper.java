@@ -13,13 +13,13 @@ public interface VenteMapper {
 
     @Mapping(source = "etat", target = "etatId", qualifiedByName = "mapEtatToId")
     @Mapping(source = "employe", target = "employeId", qualifiedByName = "mapEmployeToId")
-      VenteGetDto toDto(Vente vente);
+    VenteGetDto toDto(Vente vente);
 
 
-      Vente toEntity(VentePostDto ventePostDto);
+    Vente toEntity(VentePostDto ventePostDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-      void updateDto(VenteUpdateDto venteUpdateDto, @MappingTarget Vente vente);
+    void updateDto(VenteUpdateDto venteUpdateDto, @MappingTarget Vente vente);
 
 
     @Named("mapEmployeToId")

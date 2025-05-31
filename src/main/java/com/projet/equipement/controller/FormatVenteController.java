@@ -2,16 +2,15 @@ package com.projet.equipement.controller;
 
 import com.projet.equipement.dto.formatVente.FormatVenteGetDto;
 import com.projet.equipement.dto.formatVente.FormatVentePostDto;
+import com.projet.equipement.dto.formatVente.FormatVenteUpdateDto;
 import com.projet.equipement.mapper.FormatVenteMapper;
 import com.projet.equipement.services.FormatVenteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/formats-vente")
@@ -50,5 +49,17 @@ public class FormatVenteController {
                 )
 
         );
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<FormatVenteGetDto> updateFormatVente(@PathVariable Long id , @Valid  @RequestBody FormatVenteUpdateDto formatVenteUpdateDto) {
+        FormatVenteGetDto formatVenteGetDto = formatVenteService.update(id, formatVenteUpdateDto);
+        return ResponseEntity.ok(formatVenteGetDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFormatVente(@PathVariable Long id) {
+        formatVenteService.deleteById(id);
+        return ResponseEntity.ok("FormatVente deleted");
     }
 }

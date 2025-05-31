@@ -26,8 +26,6 @@ public interface PanierProduitMapper {
     PanierProduit toEntity(PanierProduitPostDto panierProduitPostDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-//    @Mapping(target = "produitId", source = "produit", qualifiedByName = "mapProduitToId")
-//    @Mapping(target = "panierId", source = "panier", qualifiedByName = "mapPanierToId")
     void updateProduitFromDto(PanierProduitUpdateDto panierProduitUpdateDto, @MappingTarget PanierProduit panierProduit);
 
     @Named("mapIdToProduit")
