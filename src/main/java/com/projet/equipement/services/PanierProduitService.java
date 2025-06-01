@@ -9,35 +9,34 @@ import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.PanierProduitMapper;
 import com.projet.equipement.repository.*;
-import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class PanierProduitService {
     private final PanierProduitRepository panierProduitRepository;
     private final PanierProduitMapper panierProduitMapper;
-    private final EntityManager entityManager;
-    private final UniteVenteService uniteVenteService;
     private final FormatVenteService formatVenteService;
     private final FormatVenteRepository formatVenteRepository;
     private final UniteVenteRepository uniteVenteRepository;
     private final ProduitRepository produitRepository;
     private final PanierRepository panierRepository;
 
-    public PanierProduitService(PanierProduitRepository panierProduitRepository, PanierProduitMapper panierProduitMapper, EntityManager entityManager, UniteVenteService uniteVenteService, FormatVenteService formatVenteService, FormatVenteRepository formatVenteRepository, UniteVenteRepository uniteVenteRepository, ProduitRepository produitRepository, PanierRepository panierRepository) {
+    public PanierProduitService(PanierProduitRepository panierProduitRepository,
+                                PanierProduitMapper panierProduitMapper,
+                                FormatVenteService formatVenteService,
+                                FormatVenteRepository formatVenteRepository,
+                                UniteVenteRepository uniteVenteRepository,
+                                ProduitRepository produitRepository,
+                                PanierRepository panierRepository) {
         this.panierProduitRepository = panierProduitRepository;
         this.panierProduitMapper = panierProduitMapper;
-        this.entityManager = entityManager;
-        this.uniteVenteService = uniteVenteService;
         this.formatVenteService = formatVenteService;
         this.formatVenteRepository = formatVenteRepository;
         this.uniteVenteRepository = uniteVenteRepository;
@@ -117,19 +116,17 @@ public class PanierProduitService {
             produit.setFormatVente(formatVente);
             saved = panierProduitRepository.save(produit);
         }else{
-            FormatVente formatVente = formatVenteService.findAllByProduitId(panierProduit.getProduitId(), Pageable.unpaged()).getContent().stream().findFirst().orElseThrow(()-> new EntityNotFoundException("Format de vente", panierProduit.getProduitId().toString()));
+            UniteVente uniteVente = uniteVenteRepository.findByCode("UNI").orElseThrow(()-> new EntityNotFoundException("Unité vente", "UNI"));
+            FormatVente formatVente = formatVenteService.findByUniteVente_IdAndProduit_Id(uniteVente.getId(), panierProduit.getProduitId());
 
             PanierProduit entity = panierProduitMapper.toEntity(panierProduit);
             Panier panier = panierRepository.findById(panierProduit.getPanierId()).orElseThrow(()->new EntityNotFoundException("Panier", panierProduit.getPanierId()));
             entity.setPanier(panier);
             entity.setProduit(produitRepository.findById(panierProduit.getProduitId()).orElseThrow(()->new EntityNotFoundException("Produit", panierProduit.getProduitId())));
-            entity.setFormatVente(formatVenteRepository.findById(panierProduit.getFormatVenteId()).orElseThrow(()->new EntityNotFoundException("Format de vente", panierProduit.getFormatVenteId().toString())));
             entity.setFormatVente(formatVente);
             entity.setTenantId(TenantContext.getTenantId());
             saved = panierProduitRepository.save(entity);
         }
-
-
 
         return panierProduitMapper.toGetDto(saved);
     }

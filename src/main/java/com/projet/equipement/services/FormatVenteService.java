@@ -40,7 +40,12 @@ public class FormatVenteService {
     
     public FormatVente findById(Long id) {
         return formatVenteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Format de vente non trouvé"));
+                .orElseThrow(() -> new EntityNotFoundException("Format de vente", id));
+    }
+
+    public FormatVente findByUniteVente_IdAndProduit_Id(Long id, Long produitId) {
+        return formatVenteRepository.findByUniteVente_IdAndProduit_Id(id, produitId)
+                .orElseThrow(() -> new EntityNotFoundException("Format de vente", id));
     }
 
 

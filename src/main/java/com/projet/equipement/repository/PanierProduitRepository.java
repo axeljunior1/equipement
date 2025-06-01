@@ -18,7 +18,4 @@ public interface PanierProduitRepository extends JpaRepository<PanierProduit, Lo
     @Query("select p from PanierProduit p where p.panier.id = :idPanier and p.produit.id = :idProduit ")
     Optional<PanierProduit> findByIdPanierAndIdProduit(@Param("idPanier") Long idPanier, @Param("idProduit")Long idProduit);
 
-    //
-//    @Query("select p from Panier p where p.employe.id = :id and p.etat.id in (select e.id from Etat e where e.nom in ('cree', 'attente') )")
-//    List<Panier> findByEmployeId(Long id);
 }
