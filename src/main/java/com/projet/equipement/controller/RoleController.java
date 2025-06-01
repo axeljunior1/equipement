@@ -3,15 +3,20 @@ package com.projet.equipement.controller;
 import com.projet.equipement.dto.role.RoleGetDto;
 import com.projet.equipement.dto.role.RolePostDto;
 import com.projet.equipement.dto.role.RoleUpdateDto;
+import com.projet.equipement.entity.PaiementRequest;
 import com.projet.equipement.entity.Role;
 import com.projet.equipement.mapper.RoleMapper;
+import com.projet.equipement.services.MtnMomoService;
 import com.projet.equipement.services.RoleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RequestMapping("/roles")
 @RestController
@@ -66,3 +71,4 @@ public class RoleController {
 
 
 }
+

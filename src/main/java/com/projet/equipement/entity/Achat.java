@@ -44,4 +44,3 @@ public class Achat extends MultiTenantEntity{
 
 
 }
-
