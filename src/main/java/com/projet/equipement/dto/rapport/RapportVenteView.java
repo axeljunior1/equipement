@@ -6,7 +6,13 @@ public interface RapportVenteView {
 
     String getNomProduit();
 
+    String getLibelleFormat();
+
+    String getUniteVenteCode();
+
     Long getQuantiteTotale();
+
+    Long getQuantiteParFormat();
 
     java.math.BigDecimal getPrixAchat();
 
@@ -21,5 +27,6 @@ public interface RapportVenteView {
     java.time.LocalDateTime getPremiereVente();
 
     java.time.LocalDateTime getDerniereVente();
+
 }
 

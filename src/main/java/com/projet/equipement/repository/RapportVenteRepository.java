@@ -16,17 +16,19 @@ public interface RapportVenteRepository extends JpaRepository<LigneVente, Intege
 
     @Query(
             """
+    
       SELECT
             p.id  idProduit,
-          p.nom nomProduit,
-          SUM(l.quantite) quantiteTotale,
+          p.nom nomProduit, fv.quantiteParFormat quantiteParFormat,
+          SUM(l.quantite * fv.quantiteParFormat) quantiteTotale,
           t.prixAchat prixAchat,
-          l.prixVente prixVente,
+          fv.prixVente prixVente,
           SUM(l.quantite * l.prixVente) montantVenteTotal,
           SUM((l.quantite * l.prixVente) - (l.quantite * t.prixAchat)) margeTotale,
           COUNT(DISTINCT v.id) nombreVentes,
           MIN(v.createdAt) premiereVente,
-          MAX(v.createdAt) derniereVente
+          MAX(v.createdAt) derniereVente,
+                fv.id, fv.libelleFormat libelleFormat, fv.uniteVente.code uniteVenteCode
 
       FROM LigneVente l
            JOIN Vente v ON v.id = l.vente.id and v.createdAt between :start and :end
@@ -34,7 +36,8 @@ public interface RapportVenteRepository extends JpaRepository<LigneVente, Intege
            JOIN TarifAchat t ON p.id = t.produit.id
            JOIN Client c ON v.client.id = c.id
            JOIN EtatVente e ON v.etat.id = e.id AND (e.libelle = 'FERMEE' or e.libelle = "PAYEE")
-      GROUP BY p.id, p.nom, t.prixAchat, p.prixVente,l.prixVente
+                 join FormatVente fv on fv.id = l.formatVente.id
+      GROUP BY p.id, p.nom, t.prixAchat, p.prixVente,l.prixVente, l.formatVente.id
       """
     )
     List<RapportVenteView> rapportVente(@Param("start") LocalDateTime start, @Param("end")LocalDateTime end);

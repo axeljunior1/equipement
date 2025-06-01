@@ -97,7 +97,7 @@ public class PanierProduitService {
 
     public PanierProduitGetDto save(PanierProduitPostDto panierProduit) {
 
-        PanierProduit saved = null;
+        PanierProduit saved;
 
         PanierProduit produit = panierProduitRepository.findByIdPanierAndIdProduit(
                 panierProduit.getPanierId(),
