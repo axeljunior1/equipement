@@ -63,10 +63,10 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestHeader(name = "X-Tenant-ID", required = true) String tenantId ,@RequestBody LoginRequest loginRequest) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-            String token = jwtUtil.generateToken(loginRequest.getUsername(), loginRequest.getTenantId());
+            String token = jwtUtil.generateToken(loginRequest.getUsername(), tenantId);
 
             EmployeGetDto byUsername = employeService.findByUsername(loginRequest.getUsername());
 
@@ -97,7 +97,7 @@ public class AuthController {
                     .build();
             return ResponseEntity.ok().body(response);
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(401).body("Nom ou mot de passe incorrect. =>" + jwtUtil.generateToken(loginRequest.getUsername(), loginRequest.getTenantId()));
+            return ResponseEntity.status(401).body("Nom ou mot de passe incorrect.");
         }
     }
 

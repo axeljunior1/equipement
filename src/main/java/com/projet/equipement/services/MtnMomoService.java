@@ -64,8 +64,7 @@ public class MtnMomoService {
 
         try {
             ResponseEntity<Map> res = rest.exchange(url, HttpMethod.GET, entity, Map.class);
-            String status = res.getBody().get("status").toString();
-            return status; // "PENDING", "SUCCESSFUL", "FAILED"
+            return res.getBody().get("status").toString(); // "PENDING", "SUCCESSFUL", "FAILED"
         } catch (Exception e) {
             System.out.println("Erreur statut : " + e.getMessage());
             return "ERREUR";

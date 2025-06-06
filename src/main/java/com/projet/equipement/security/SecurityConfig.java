@@ -44,8 +44,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(r -> r
                         .requestMatchers("/static/**", "/index.html", "/favicon.ico", "/build/**", "/css/**", "/js/**", "/assets/**")  // Permet l'accès aux ressources statiques
                         .permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()  // Permet l'accès à /login sans authentification
-                        .requestMatchers(HttpMethod.POST, "login").permitAll()  // Permet l'accès à /login sans authentification
+                        .requestMatchers(
+                                "/api/auth/**",                    // pour login/register
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()                        .requestMatchers(HttpMethod.POST, "login").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers( "test").permitAll()  // Permet l'accès à /login sans authentification
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("tenant/**").hasRole("ADMIN")  // Permet l'accès à /login sans authentification
