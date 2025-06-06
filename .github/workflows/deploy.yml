@@ -40,6 +40,8 @@ jobs:
           echo "db_password=${{ secrets.DB_PASSWORD }}" >> .env
           echo "JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "momo_api_apikey=${{ secrets.MOMO_API_APIKEY }}" >> .env
+          echo "momo_api_userid=${{ secrets.MOMO_API_USERID }}" >> .env
           echo "SPRING_PROFILES_ACTIVE=prod" >> .env
 
       # 4) Déployer sur l’EC2
