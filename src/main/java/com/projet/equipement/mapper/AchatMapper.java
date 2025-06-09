@@ -5,10 +5,7 @@ import com.projet.equipement.dto.achat.AchatPostDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
 import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.Employe;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", uses = EmployeMapper.class)
 public interface AchatMapper {
@@ -43,6 +40,7 @@ public interface AchatMapper {
      * @param achatUpdateDto the data transfer object containing the updated values for the Achat
      * @param achat the target Achat entity to be updated
      */
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateDto( AchatUpdateDto achatUpdateDto, @MappingTarget Achat achat);
 
 

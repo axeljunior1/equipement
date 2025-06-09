@@ -2,6 +2,7 @@ package com.projet.equipement.dto.paiement;
 
 import com.projet.equipement.dto.etatPaiement.EtatPaiementGetDTO;
 import com.projet.equipement.entity.EtatPaiement;
+import com.projet.equipement.entity.ModePaiement;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ public class PaiementGetDTO {
     private Long venteId;
     private Long etatId;
     private BigDecimal montantPaye;
-    private String modePaiement;
+    private ModePaiement modePaiement;
     private String reference;
     private LocalDateTime createdAt;
     private EtatPaiement etat;

@@ -15,7 +15,6 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.VenteMapper;
 import com.projet.equipement.repository.*;
 import com.projet.equipement.utils.FactureNumeroGenerator;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.statemachine.StateMachine;
@@ -201,7 +200,7 @@ public class VenteService {
 
         BigDecimal montantTotal = BigDecimal.valueOf(vente.getMontantTotal());
         BigDecimal totalDejaPaye = vente.getPaiements().stream()
-                .map(Paiements::getMontantPaye).reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(Paiement::getMontantPaye).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalApresPaiement = totalDejaPaye.add(montantPaiement);
         BigDecimal resteAPayer = montantTotal.subtract(totalApresPaiement);
 
@@ -250,7 +249,7 @@ public class VenteService {
         String etatMachine = sm.getState().getId().toString();
 
         // Sauvegarde du paiement
-        Paiements paiement = Paiements.builder()
+        Paiement paiement = Paiement.builder()
                 .etat(etatPaiementService.findByLibelle(etatMachine))
                 .vente(vente)
                 .montantPaye(montantPaiement)
@@ -286,7 +285,7 @@ public class VenteService {
         String etatMachine = sm.getState().getId().toString();
 
         // Sauvegarde du paiement
-        Paiements paiement = Paiements.builder()
+        Paiement paiement = Paiement.builder()
                 .etat(etatPaiementService.findByLibelle(etatMachine))
                 .vente(vente)
                 .montantPaye(BigDecimal.valueOf(0))
@@ -354,7 +353,7 @@ public class VenteService {
 
 
             // Sauvegarde du paiement
-            Paiements paiement = Paiements.builder()
+            Paiement paiement = Paiement.builder()
                     .etat(etatPaiementService.findByLibelle(etatMachine))
                     .vente(vente)
                     .montantPaye(montantPaiement)
@@ -398,7 +397,7 @@ public class VenteService {
             String etatMachine = sm.getState().getId().toString();
 
             // Sauvegarde du paiement
-            Paiements paiement = Paiements.builder()
+            Paiement paiement = Paiement.builder()
                     .etat(etatPaiementService.findByLibelle(etatMachine))
                     .vente(vente)
                     .montantPaye(montantPaiement)

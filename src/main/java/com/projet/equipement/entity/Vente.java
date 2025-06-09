@@ -52,7 +52,7 @@ public class Vente extends MultiTenantEntity {
     private Set<LigneVente> ligneVentes;
 
     @OneToMany(mappedBy = "vente")
-    private List<Paiements> paiements;
+    private List<Paiement> paiements;
 
     @OneToMany(mappedBy = "vente")
     private List<Retour> retours;

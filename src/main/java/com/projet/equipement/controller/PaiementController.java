@@ -5,6 +5,7 @@ import com.projet.equipement.dto.paiement.PaiementGetDTO;
 import com.projet.equipement.dto.paiement.PaiementPostDTO;
 import com.projet.equipement.dto.paiement.PaiementUpdateDTO;
 import com.projet.equipement.services.PaiementService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class PaiementController {
 
     // Créer un paiement
     @PostMapping
-    public ResponseEntity<PaiementGetDTO> createPaiement(@RequestBody PaiementPostDTO paiementPostDTO) {
+    public ResponseEntity<PaiementGetDTO> createPaiement(@Valid @RequestBody PaiementPostDTO paiementPostDTO) {
         PaiementGetDTO paiementGetDTO = paiementService.createPaiement(paiementPostDTO);
         return new ResponseEntity<>(paiementGetDTO, HttpStatus.CREATED);
     }

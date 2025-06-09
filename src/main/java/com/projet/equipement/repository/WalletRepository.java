@@ -1,6 +1,6 @@
-package com.projet.equipement.repository.payapp;
+package com.projet.equipement.repository;
 
-import com.projet.equipement.entity.payapp.Wallet;
+import com.projet.equipement.entity.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigDecimal;

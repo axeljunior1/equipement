@@ -1,6 +1,5 @@
-package com.projet.equipement.entity.payapp;
+package com.projet.equipement.entity;
 
-import com.projet.equipement.entity.MultiTenantEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "WALLET")
 public class Wallet extends MultiTenantEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private BigDecimal balance;

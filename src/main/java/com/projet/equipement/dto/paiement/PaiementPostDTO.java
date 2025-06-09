@@ -1,5 +1,7 @@
 package com.projet.equipement.dto.paiement;
 
+import com.projet.equipement.entity.ModePaiement;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,10 +16,16 @@ import java.time.LocalDateTime;
 @Data
 public class PaiementPostDTO {
 
+    @NotNull
     private Long venteId;
+    @NotNull
     private BigDecimal montantPaye;
-    private String modePaiement;
+    @NotNull
+    private String modePaiementCode;
+    private Long modePaiementId;
+    @NotNull
     private String reference;
+    @NotNull
     private Long etatId;
 
     @Builder.Default

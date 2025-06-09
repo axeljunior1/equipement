@@ -1,12 +1,18 @@
 package com.projet.equipement.services;
 
 import com.projet.equipement.entity.PaiementRequest;
-import org.springframework.beans.factory.annotation.Value;
+import com.projet.equipement.entity.Paiement;
+import com.projet.equipement.entity.TenantContext;
+import com.projet.equipement.repository.PaiementRepository;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class MtnMomoService {
@@ -15,8 +21,13 @@ public class MtnMomoService {
 
 
     private final RestTemplate rest = new RestTemplate();
-    public MtnMomoService(MomoTokenService momoTokenService) {
+    private final EtatPaiementService etatPaiementService;
+    private final PaiementRepository paiementRepository;
+
+    public MtnMomoService(MomoTokenService momoTokenService, EtatPaiementService etatPaiementService, PaiementRepository paiementRepository) {
         this.momoTokenService = momoTokenService;
+        this.etatPaiementService = etatPaiementService;
+        this.paiementRepository = paiementRepository;
     }
 
 
@@ -52,6 +63,8 @@ public class MtnMomoService {
         }
     }
 
+
+    @Transactional
     public String getStatut(String referenceId) {
         String url = "https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay/" + referenceId;
 
@@ -64,7 +77,37 @@ public class MtnMomoService {
 
         try {
             ResponseEntity<Map> res = rest.exchange(url, HttpMethod.GET, entity, Map.class);
-            return res.getBody().get("status").toString(); // "PENDING", "SUCCESSFUL", "FAILED"
+            Map<String, Object> body = res.getBody();
+            if (body == null) return "ERREUR";
+
+            String status = (String) body.get("status");
+
+            // Ne sauvegarder que si la transaction est terminée
+            if (!"PENDING".equalsIgnoreCase(status)) {
+                Paiement transaction = new Paiement();
+
+                transaction.setEtat(etatPaiementService.findByLibelle(Objects.equals(status, "SUCCESSFUL") || Objects.equals(status, "SUCCESS")   ? "PAYEE" : "ERREUR"));
+                transaction.setTenantId(TenantContext.getTenantId());
+                transaction.setUpdatedAt(LocalDateTime.now());
+                transaction.setUpdatedAt(LocalDateTime.now());
+
+                // Conversion de amount (String → BigDecimal)
+                String amountStr = (String) body.get("amount");
+                if (amountStr != null) {
+                    transaction.setMontantPaye(new BigDecimal(amountStr));
+                }
+
+                // Extraction du numéro du client (payer.partyId)
+//                Map<String, String> payer = (Map<String, String>) body.get("payer");
+//                if (payer != null) {
+//                    transaction.setClientPhone(payer.get("partyId"));
+//                }
+
+                paiementRepository.save(transaction);
+            }
+
+            return status;
+
         } catch (Exception e) {
             System.out.println("Erreur statut : " + e.getMessage());
             return "ERREUR";

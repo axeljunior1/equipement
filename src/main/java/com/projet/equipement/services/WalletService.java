@@ -1,8 +1,8 @@
-package com.projet.equipement.services.payapp;
+package com.projet.equipement.services;
 
-import com.projet.equipement.entity.payapp.Wallet;
+import com.projet.equipement.entity.Wallet;
 import com.projet.equipement.exceptions.EntityNotFoundException;
-import com.projet.equipement.repository.payapp.WalletRepository;
+import com.projet.equipement.repository.WalletRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

@@ -6,10 +6,7 @@ import com.projet.equipement.dto.facture.FactureUpdateDTO;
 import com.projet.equipement.entity.EtatFacture;
 import com.projet.equipement.entity.Facture;
 import com.projet.equipement.entity.Vente;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", uses = VenteMapper.class) // Utilisation d'un mapper Vente si nécessaire
 public interface FactureMapper {
@@ -27,6 +24,7 @@ public interface FactureMapper {
     @Mapping(source = "venteId", target = "vente", qualifiedByName = "mapIdToVente") // Convertit l'ID en entité 'Vente' pour la création
     Facture toEntity(FacturePostDTO facturePostDTO);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateDto(FactureUpdateDTO factureUpdateDTO, @MappingTarget Facture facture);
 
     @Named("mapVenteToId")

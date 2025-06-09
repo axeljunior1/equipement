@@ -7,10 +7,7 @@ import com.projet.equipement.entity.FormatVente;
 import com.projet.equipement.entity.Vente;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Produit;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", uses = {ProduitMapper.class, VenteMapper.class})
 public interface LigneVenteMapper {
@@ -24,7 +21,7 @@ public interface LigneVenteMapper {
 
     LigneVente toEntity(LigneVentePostDto ligneVentePostDto);
 
-
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateLigneVenteFromDto(LigneVenteUpdateDto ligneVenteUpdateDto, @MappingTarget LigneVente ligneVente);
 
 

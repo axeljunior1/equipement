@@ -1,7 +1,7 @@
 package com.projet.equipement.controller;
 
-import com.projet.equipement.entity.payapp.Wallet;
-import com.projet.equipement.services.payapp.WalletService;
+import com.projet.equipement.entity.Wallet;
+import com.projet.equipement.services.WalletService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
