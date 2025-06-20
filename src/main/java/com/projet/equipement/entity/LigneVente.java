@@ -45,8 +45,7 @@ public class LigneVente extends MultiTenantEntity {
     @JsonIgnore
     private FormatVente formatVente;
 
-    @OneToMany(mappedBy = "ligneVente")
-    private List<Retour> retours;
+
 
 }
 

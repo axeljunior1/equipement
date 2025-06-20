@@ -20,20 +20,22 @@ public class Retour extends MultiTenantEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "quantite")
-    private int quantité;
 
-    private LocalDateTime dateRetour;
+    @Column(name = "date_creation")
+    private LocalDateTime createdAt;
 
-    private String raison; // facultatif : produit défectueux, erreur, etc.
-
-    @ManyToOne
-    @JoinColumn(name = "ligne_id", nullable = false)
-    private LigneVente ligneVente;
 
     @ManyToOne
     @JoinColumn(name = "vente_id", nullable = false)
     private Vente vente;
+
+    @ManyToOne
+    @JoinColumn(name = "type_retour_id", nullable = false)
+    private TypeRetour typeRetour;
+
+    @ManyToOne
+    @JoinColumn(name = "etat_retour_id", nullable = false)
+    private EtatRetour etat;
 
 
 }
