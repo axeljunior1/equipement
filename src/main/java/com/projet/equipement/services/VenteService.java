@@ -86,9 +86,13 @@ public class VenteService {
     }
 
 
-    public VenteGetDto findById(Long id){
+    public VenteGetDto findDtoById(Long id){
         Vente vente = venteRepository.findById(id).orElseThrow(()->new EntityNotFoundException(VENTE, id));
         return venteMapper.toDto(vente);
+    }
+
+    public Vente findById(Long id){
+        return venteRepository.findById(id).orElseThrow(()->new EntityNotFoundException(VENTE, id));
     }
 
     public Page<VenteGetDto> findAll(Pageable pageable) {

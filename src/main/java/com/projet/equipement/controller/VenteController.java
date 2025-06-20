@@ -44,7 +44,7 @@ public class VenteController {
 
     @GetMapping("/{id}")
     public ResponseEntity<VenteGetDto> findVente(@PathVariable Long id) {
-        VenteGetDto vente = venteService.findById(id);
+        VenteGetDto vente = venteService.findDtoById(id);
         return ResponseEntity.ok(vente);
     }
 
