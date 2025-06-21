@@ -48,18 +48,6 @@ public class VenteGetDto {
 
     private List<PaiementGetDTO> paiements;
 
-    public BigDecimal getResteAPayer() {
-        if (montantTotal == null || paiements == null) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal totalPaye = paiements.stream()
-                .filter(p -> p.getMontantPaye() != null && (Objects.equals(p.getEtat().getLibelle(), "PAYEE") || Objects.equals(p.getEtat().getLibelle(), "PAIEMENT_PARTIEL")))
-                .map(PaiementGetDTO::getMontantPaye)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return BigDecimal.valueOf(montantTotal).subtract(totalPaye);
-    }
 
 
 }

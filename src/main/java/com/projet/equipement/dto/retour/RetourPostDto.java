@@ -1,11 +1,13 @@
 package com.projet.equipement.dto.retour;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Getter
 @Setter
 public class RetourPostDto {
@@ -20,6 +22,7 @@ public class RetourPostDto {
     @NotNull
     private Long etatId;
 
-    private LocalDateTime dateCreation;
+    @Builder.Default
+    private LocalDateTime dateCreation = LocalDateTime.now();
 
 }

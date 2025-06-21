@@ -17,21 +17,4 @@ public interface RetourMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateDto(RetourUpdateDto retourUpdateDto, @MappingTarget Retour retour);
 
-
-//    @Named("mapTypeToId")
-//    default Long mapTypeToId(TypeRetour typeRetour) {
-//        return typeRetour.getId();
-//    }
-//
-//    @Named("mapVenteToId")
-//    default Long mapVenteToId(Vente vente) {
-//        return vente.getId();
-//    }
-//
-//    @Named("mapEtatToId")
-//    default Long mapEtatToId(EtatRetour etatRetour) {
-//        return etatRetour.getId();
-//    }
-
-
 }

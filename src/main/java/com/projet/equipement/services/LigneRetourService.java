@@ -4,6 +4,7 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.ligneRetour.LigneRetourGetDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourPostDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourUpdateDto;
+import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.entity.LigneRetour;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Retour;
@@ -92,4 +93,8 @@ public class LigneRetourService {
     }
 
 
+    public Page<LigneRetourGetDto> findByRetourId(Long id, Pageable pageable) {
+        Page<LigneRetour> ligneRetours = ligneRetourRepository.findByRetour_Id(id, pageable);
+        return ligneRetours.map(ligneRetourMapper::toDto);
+    }
 }

@@ -1,5 +1,6 @@
 package com.projet.equipement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,12 +50,15 @@ public class Vente extends MultiTenantEntity {
     private Employe employe;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "vente")
+    @JsonIgnore
     private Set<LigneVente> ligneVentes;
 
     @OneToMany(mappedBy = "vente")
+    @JsonIgnore
     private List<Paiement> paiements;
 
     @OneToMany(mappedBy = "vente")
+    @JsonIgnore
     private List<Retour> retours;
 
 

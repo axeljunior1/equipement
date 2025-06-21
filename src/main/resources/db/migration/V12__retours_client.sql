@@ -28,6 +28,7 @@ create table etat_retour (
                                constraint fk_etat_retour_tenant foreign key (tenant_id)
                                    references tenant(id) on delete cascade
 );
+
 CREATE TABLE retour
 (
     id             SERIAL PRIMARY KEY,
@@ -36,7 +37,7 @@ CREATE TABLE retour
     etat_retour_id BIGINT       NOT NULL,
     date_creation  DATETIME     NOT NULL,
     tenant_id      VARCHAR(100) NOT NULL,
-    CONSTRAINT uc_retour UNIQUE (id, vente_id, type_retour_id, etat_retour_id, tenant_id),
+    CONSTRAINT uc_retour UNIQUE (vente_id, type_retour_id, etat_retour_id, tenant_id),
 
     CONSTRAINT fk_retour_tenant FOREIGN KEY (tenant_id) REFERENCES tenant (id) ON DELETE CASCADE,
     CONSTRAINT fk_retour_vente FOREIGN KEY (vente_id) REFERENCES ventes (id_ventes),
@@ -51,12 +52,24 @@ CREATE TABLE ligne_retour
     ligne_vente_id BIGINT       NOT NULL,
     quantite       INT          NOT NULL,
     tenant_id      VARCHAR(100) NOT NULL,
-    CONSTRAINT uc_ligne_retour UNIQUE (id, retour_id, ligne_vente_id, tenant_id),
+    CONSTRAINT uc_ligne_retour UNIQUE (retour_id, ligne_vente_id, tenant_id),
 
     CONSTRAINT fk_ligne_retour_tenant FOREIGN KEY (tenant_id) REFERENCES tenant (id) ON DELETE CASCADE,
     CONSTRAINT fk_ligne_retour_retour FOREIGN KEY (retour_id) REFERENCES retour (id),
     CONSTRAINT fk_ligne_retour_lignevente FOREIGN KEY (ligne_vente_id) REFERENCES lignes_ventes (id_lignes_ventes)
 );
 
+-- Valeurs pour le tenant 'AxelairCorp' (à adapter selon ton environnement)
+INSERT INTO type_retour (libelle, description, tenant_id)
+VALUES
+    ('REMBOURSEMENT', 'Retour avec remboursement client', 'AxelairCorp'),
+    ('AVOIR', 'Retour avec création d’un avoir client', 'AxelairCorp');
 
+
+INSERT INTO etat_retour (libelle, description, tenant_id)
+VALUES
+    ('EN_ATTENTE_VALIDATION', 'Retour en attente de validation manuelle', 'AxelairCorp'),
+    ('VALIDE', 'Retour validé', 'AxelairCorp'),
+    ('TRAITE', 'Retour traité (paiement ou avoir effectué)', 'AxelairCorp'),
+    ('REJETE', 'Retour refusé ou invalidé', 'AxelairCorp');
 

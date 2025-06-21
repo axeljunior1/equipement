@@ -20,7 +20,7 @@ public class Paiement extends MultiTenantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_paiement")
-    private Long idPaiement;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "vente_id", nullable = false)

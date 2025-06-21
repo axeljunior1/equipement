@@ -1,5 +1,6 @@
 package com.projet.equipement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
-@Table(name = "paiements")
+@Table(name = "mode_paiement")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +29,7 @@ public class ModePaiement extends MultiTenantEntity{
     private boolean active = true;
 
     @OneToMany(mappedBy = "modePaiement")
+    @JsonIgnore
     private List<Paiement> paiements;
 
 

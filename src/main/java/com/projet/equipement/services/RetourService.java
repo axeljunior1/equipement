@@ -4,10 +4,7 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.retour.RetourGetDto;
 import com.projet.equipement.dto.retour.RetourPostDto;
 import com.projet.equipement.dto.retour.RetourUpdateDto;
-import com.projet.equipement.entity.EtatRetour;
-import com.projet.equipement.entity.Retour;
-import com.projet.equipement.entity.TypeRetour;
-import com.projet.equipement.entity.Vente;
+import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.RetourMapper;
 import com.projet.equipement.repository.EtatRetourRepository;
@@ -51,6 +48,7 @@ public class RetourService {
     
     //save
     public RetourGetDto save(Retour retour){
+        retour.setTenantId(TenantContext.getTenantId());
         return retourMapper.toDto(retourRepository.save(retour));
     }
 

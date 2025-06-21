@@ -1,11 +1,13 @@
 package com.projet.equipement.dto.ligneRetour;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Getter
 @Setter
 public class LigneRetourPostDto {
@@ -19,7 +21,7 @@ public class LigneRetourPostDto {
     @NotNull
     private Integer quantite;
 
-
-    private LocalDateTime dateCreation;
+    @Builder.Default
+    private LocalDateTime dateCreation = LocalDateTime.now();
 
 }
