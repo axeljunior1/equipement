@@ -1,7 +1,9 @@
 package com.projet.equipement.controller;
 
-import com.projet.equipement.entity.PaiementRequest;
+import com.projet.equipement.entity.PaiementRequestMomo;
+import com.projet.equipement.entity.StatusMomoRequest;
 import com.projet.equipement.services.MtnMomoService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +21,16 @@ public class PaiementMomoController {
     }
 
     @PostMapping("/payer")
-    public ResponseEntity<?> lancerPaiement(@RequestBody PaiementRequest request) {
+    public ResponseEntity<?> lancerPaiement(@RequestBody PaiementRequestMomo request) {
         boolean result = momoService.initierPaiement(request);
         return result
                 ? ResponseEntity.ok().body("Paiement initié")
                 : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur MTN");
     }
 
-    @GetMapping("/statut/{referenceId}")
-    public ResponseEntity<Map<String, String>> verifierStatut(@PathVariable String referenceId) {
-        String statut = momoService.getStatut(referenceId);
+    @PostMapping("/statut")
+    public ResponseEntity<Map<String, String>> verifierStatut(@RequestBody @Valid StatusMomoRequest statusMomoRequest) {
+        String statut = momoService.getStatut(statusMomoRequest);
         return ResponseEntity.ok(Map.of("status", statut));
     }
 }

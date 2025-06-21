@@ -1,7 +1,6 @@
 package com.projet.equipement.entity;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -12,13 +11,13 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaiementRequest {
-//    private String numero;
-//    private String montant;
+public class PaiementRequestMomo {
     @NotNull
-    private Long modePaiementId;
+    private String numero;
 
     @NotNull
-    @Positive
-    BigDecimal montantPaiement;
+    private String montant;
+
+    @NotNull
+    private String referenceId;
 }

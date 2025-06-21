@@ -1,9 +1,10 @@
 package com.projet.equipement.services;
 
-import com.projet.equipement.entity.PaiementRequest;
-import com.projet.equipement.entity.Paiement;
-import com.projet.equipement.entity.TenantContext;
+import com.projet.equipement.entity.*;
+import com.projet.equipement.exceptions.EntityNotFoundException;
+import com.projet.equipement.repository.ModePaimentRepository;
 import com.projet.equipement.repository.PaiementRepository;
+import com.projet.equipement.repository.VenteRepository;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +24,21 @@ public class MtnMomoService {
     private final RestTemplate rest = new RestTemplate();
     private final EtatPaiementService etatPaiementService;
     private final PaiementRepository paiementRepository;
+    private final ModePaimentRepository modePaimentRepository;
+    private final VenteRepository venteRepository;
+    private final VenteService venteService;
 
-    public MtnMomoService(MomoTokenService momoTokenService, EtatPaiementService etatPaiementService, PaiementRepository paiementRepository) {
+    public MtnMomoService(MomoTokenService momoTokenService, EtatPaiementService etatPaiementService, PaiementRepository paiementRepository, ModePaimentRepository modePaimentRepository, VenteRepository venteRepository, VenteService venteService) {
         this.momoTokenService = momoTokenService;
         this.etatPaiementService = etatPaiementService;
         this.paiementRepository = paiementRepository;
+        this.modePaimentRepository = modePaimentRepository;
+        this.venteRepository = venteRepository;
+        this.venteService = venteService;
     }
 
 
-    public boolean initierPaiement(PaiementRequest request) {
+    public boolean initierPaiement(PaiementRequestMomo request) {
 
         String url = "https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay";
         System.out.println(momoTokenService.getValidAccessToken() + " " + request.getNumero() + " " + request.getMontant() + " " + request.getReferenceId() + " " + url);
@@ -65,8 +72,8 @@ public class MtnMomoService {
 
 
     @Transactional
-    public String getStatut(String referenceId) {
-        String url = "https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay/" + referenceId;
+    public String getStatut(StatusMomoRequest statusMomoRequest) {
+        String url = "https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay/" + statusMomoRequest.getRefId();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(momoTokenService.getValidAccessToken());
@@ -84,26 +91,17 @@ public class MtnMomoService {
 
             // Ne sauvegarder que si la transaction est terminée
             if (!"PENDING".equalsIgnoreCase(status)) {
-                Paiement transaction = new Paiement();
 
-                transaction.setEtat(etatPaiementService.findByLibelle(Objects.equals(status, "SUCCESSFUL") || Objects.equals(status, "SUCCESS")   ? "PAYEE" : "ERREUR"));
-                transaction.setTenantId(TenantContext.getTenantId());
-                transaction.setUpdatedAt(LocalDateTime.now());
-                transaction.setUpdatedAt(LocalDateTime.now());
+                PaiementRequest paiment = new PaiementRequest();
+                paiment.setModePaiementId(modePaimentRepository.findByCode("Mobile Money")
+                        .orElseThrow(
+                                () -> new EntityNotFoundException("Mode de paiement", "Mobile Money")).getId()
+                );
+                paiment.setMontantPaiement(new BigDecimal((String) body.get("amount")));
 
-                // Conversion de amount (String → BigDecimal)
-                String amountStr = (String) body.get("amount");
-                if (amountStr != null) {
-                    transaction.setMontantPaye(new BigDecimal(amountStr));
-                }
+                venteService.payer(statusMomoRequest.getVenteId(), paiment);
 
-                // Extraction du numéro du client (payer.partyId)
-//                Map<String, String> payer = (Map<String, String>) body.get("payer");
-//                if (payer != null) {
-//                    transaction.setClientPhone(payer.get("partyId"));
-//                }
 
-                paiementRepository.save(transaction);
             }
 
             return status;

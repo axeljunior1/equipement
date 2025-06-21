@@ -81,9 +81,9 @@ public class VenteController {
 
 
     @PostMapping("/payer/{id}")
-    public ResponseEntity<String> payerVenteSansState(@PathVariable Long id, @RequestBody PaiementRequest paiementRequest) {
+    public ResponseEntity<String> payerVenteSansState(@PathVariable Long id, @RequestBody  PaiementRequest paiementRequest) {
 
-        venteService.payer(id, paiementRequest.getMontantPaiement());
+        venteService.payer(id, paiementRequest);
 
         return ResponseEntity.ok(" Vente payed !!");
     }

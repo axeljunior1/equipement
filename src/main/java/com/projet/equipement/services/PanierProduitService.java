@@ -53,7 +53,7 @@ public class PanierProduitService {
         List<PanierProduitGetDto> panierProduitGetDtos = (panierProduitRepository.findAllByPanierId(id)).stream().map(panierProduitMapper::toGetDto).toList();
         for (PanierProduitGetDto p : panierProduitGetDtos) {
 
-            Produit produit = produitRepository.findById(p.getId()).orElseThrow(()-> new EntityNotFoundException("Produit", p.getId()));
+            Produit produit = produitRepository.findById(p.getProduit().getId()).orElseThrow(()-> new EntityNotFoundException("Produit", p.getId()));
 
             initFormatVente(produit);
 

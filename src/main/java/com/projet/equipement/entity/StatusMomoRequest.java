@@ -12,13 +12,13 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaiementRequest {
-//    private String numero;
-//    private String montant;
-    @NotNull
-    private Long modePaiementId;
+public class StatusMomoRequest {
+
 
     @NotNull
-    @Positive
-    BigDecimal montantPaiement;
+    private String refId;
+
+    @NotNull
+    private Long venteId;
+
 }

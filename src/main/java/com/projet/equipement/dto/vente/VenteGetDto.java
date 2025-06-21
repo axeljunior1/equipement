@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.vente;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.paiement.PaiementGetDTO;
@@ -48,6 +49,19 @@ public class VenteGetDto {
 
     private List<PaiementGetDTO> paiements;
 
+    @JsonProperty("resteAPayer")
+    public BigDecimal getResteAPayer() {
+        if (montantTotal == null || paiements == null) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal totalPaye = paiements.stream()
+                .filter(p -> p.getMontantPaye() != null && (Objects.equals(p.getEtat().getLibelle(), "PAYEE") || Objects.equals(p.getEtat().getLibelle(), "PAIEMENT_PARTIEL")))
+                .map(PaiementGetDTO::getMontantPaye)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return BigDecimal.valueOf(montantTotal).subtract(totalPaye);
+    }
 
 
 }

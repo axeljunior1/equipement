@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.devise;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -8,13 +9,13 @@ import lombok.Setter;
 @Setter
 public class DevisePostDto {
 
-    @NonNull
+    @NotNull
     private String code;     // Ex: USD, EUR
 
-    @NonNull
+    @NotNull
     private String nom;      // Ex: Dollar américain
 
-    @NonNull
+    @NotNull
     private String symbole;  // Ex: $
 
 }

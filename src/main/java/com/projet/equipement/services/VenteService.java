@@ -51,6 +51,7 @@ public class VenteService {
     private final LigneVenteRepository ligneVenteRepository;
     private final EtatPaiementService etatPaiementService;
     private final PaiementService paiementService;
+    private final ModePaimentRepository modePaimentRepository;
 
     public VenteService(VenteRepository venteRepository,
                         VenteMapper venteMapper,
@@ -66,7 +67,7 @@ public class VenteService {
                         FactureService factureService,
                         LigneVenteRepository ligneVenteRepository,
                         StateMachineFactory<VenteEnum, VenteEvent> factory,
-                        EtatPaiementService etatPaiementService, PaiementService paiementService) {
+                        EtatPaiementService etatPaiementService, PaiementService paiementService, ModePaimentRepository modePaimentRepository) {
         this.venteRepository = venteRepository;
         this.venteMapper = venteMapper;
         this.clientRepository = clientRepository;
@@ -83,6 +84,7 @@ public class VenteService {
         this.factory = factory;
         this.etatPaiementService = etatPaiementService;
         this.paiementService = paiementService;
+        this.modePaimentRepository = modePaimentRepository;
     }
 
 
@@ -96,7 +98,7 @@ public class VenteService {
     }
 
     public Page<VenteGetDto> findAll(Pageable pageable) {
-        return venteRepository.findAll(pageable).map(venteMapper::toDto);
+        return venteRepository.findAllActif(pageable).map(venteMapper::toDto);
     }
 
     public Vente save(VentePostDto ventePostDto) {
@@ -199,13 +201,17 @@ public class VenteService {
      * Process a payment for a sale
      *
      * @param venteId         ID of the sale to process payment for
-     * @param montantPaiement Amount of the payment to process
+     * @param paiementRequest Amount of the payment to process
      */
     @Transactional
-    public void payer(Long venteId, BigDecimal montantPaiement) {
+    public void payer(Long venteId, PaiementRequest paiementRequest) {
         // Find the sale or throw exception if not found
         Vente vente = venteRepository.findById(venteId)
                 .orElseThrow(() -> new RuntimeException("Vente non trouvée"));
+
+        ModePaiement modePaiement = modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
+                ()-> new EntityNotFoundException("Mode de paiement", paiementRequest.getModePaiementId())
+        );
 
         // Calculate payment amounts
         BigDecimal montantTotal = BigDecimal.valueOf(vente.getMontantTotal());
@@ -213,36 +219,36 @@ public class VenteService {
         BigDecimal totalDejaPaye = vente.getPaiements().stream()
                 .map(Paiement::getMontantPaye).reduce(BigDecimal.ZERO, BigDecimal::add);
         // Calculate new total after this payment
-        BigDecimal totalApresPaiement = totalDejaPaye.add(montantPaiement);
+        BigDecimal totalApresPaiement = totalDejaPaye.add(paiementRequest.getMontantPaiement());
         // Calculate remaining amount to pay
         BigDecimal resteAPayer = montantTotal.subtract(totalApresPaiement);
 
         // Validate payment amount is not more than total due
         if (resteAPayer.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalStateException(String.format("Montant de paiement invalide: Montant total %s << montant paiement %s",
-                    montantTotal, montantPaiement));
+                    montantTotal, paiementRequest.getMontantPaiement()));
         }
 
         // Handle full payment scenarios
         if (resteAPayer.compareTo(BigDecimal.ZERO) == 0) {
             // First full payment
             if (totalDejaPaye.compareTo(BigDecimal.ZERO) == 0) {
-                fairePaiement(vente, montantPaiement);
+                fairePaiement(vente, paiementRequest);
             }
             // Final payment completing previous partial payments
             else if (totalDejaPaye.compareTo(BigDecimal.ZERO) > 0) {
-                fairePaiementTotal(vente, montantPaiement);
+                fairePaiementTotal(vente, paiementRequest);
             }
         }
         // Handle partial payment
         else if (resteAPayer.compareTo(BigDecimal.ZERO) > 0) {
-            fairePaiementPartiel(vente, montantPaiement);
+            fairePaiementPartiel(vente, paiementRequest);
         }
     }
 
 
     @Transactional
-    public void fairePaiement(Vente vente, BigDecimal montantPaiement) {
+    public void fairePaiement(Vente vente, PaiementRequest paiementRequest) {
 
 
         // Récupération et synchronisation de la machine d'état
@@ -265,7 +271,10 @@ public class VenteService {
         Paiement paiement = Paiement.builder()
                 .etat(etatPaiementService.findByLibelle(etatMachine))
                 .vente(vente)
-                .montantPaye(montantPaiement)
+                .montantPaye(paiementRequest.getMontantPaiement())
+                .modePaiement(modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
+                        () -> new EntityNotFoundException("Mode de paiement", paiementRequest.getModePaiementId())
+                ))
                 .updatedAt(LocalDateTime.now())
                 .build();
         paiementService.savePaiement(paiement);
@@ -343,10 +352,10 @@ public class VenteService {
     }
 
     @Transactional
-    public void fairePaiementTotal(Vente vente, BigDecimal montantPaiement) {
+    public void fairePaiementTotal(Vente vente, PaiementRequest paiementRequest) {
 
 
-        if (montantPaiement.compareTo(BigDecimal.valueOf(vente.getMontantTotal())) < 0) {
+        if (paiementRequest.getMontantPaiement().compareTo(BigDecimal.valueOf(vente.getMontantTotal())) < 0) {
 
 
             // Récupération et synchronisation de la machine d'état
@@ -369,7 +378,10 @@ public class VenteService {
             Paiement paiement = Paiement.builder()
                     .etat(etatPaiementService.findByLibelle(etatMachine))
                     .vente(vente)
-                    .montantPaye(montantPaiement)
+                    .montantPaye(paiementRequest.getMontantPaiement())
+                    .modePaiement(modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
+                            () -> new EntityNotFoundException("Mode de paiement", paiementRequest.getModePaiementId())
+                    ))
                     .updatedAt(LocalDateTime.now())
                     .build();
             paiementService.savePaiement(paiement);
@@ -385,10 +397,10 @@ public class VenteService {
 
 
     @Transactional
-    public void fairePaiementPartiel(Vente vente, BigDecimal montantPaiement) {
+    public void fairePaiementPartiel(Vente vente, PaiementRequest paiementRequest) {
 
 
-        if (montantPaiement.compareTo(BigDecimal.valueOf(vente.getMontantTotal())) < 0) {
+        if (paiementRequest.getMontantPaiement().compareTo(BigDecimal.valueOf(vente.getMontantTotal())) < 0) {
 
             // Récupération et synchronisation de la machine d'état
             StateMachine<VenteEnum, VenteEvent> sm = factory.getStateMachine(vente.getId().toString());
@@ -413,7 +425,10 @@ public class VenteService {
             Paiement paiement = Paiement.builder()
                     .etat(etatPaiementService.findByLibelle(etatMachine))
                     .vente(vente)
-                    .montantPaye(montantPaiement)
+                    .montantPaye(paiementRequest.getMontantPaiement())
+                    .modePaiement(modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
+                            () -> new EntityNotFoundException("Mode de paiement", paiementRequest.getModePaiementId())
+                    ))
                     .updatedAt(LocalDateTime.now())
                     .build();
             paiementService.savePaiement(paiement);
