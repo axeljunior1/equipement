@@ -73,6 +73,7 @@ public class VenteController {
     @Transactional // Active la gestion transactionnelle
     public ResponseEntity<VenteGetDto> createVenteNLignes(@Valid @RequestBody ValiderPanierDTO validerPanierDTO
     ) {
+
         VenteGetDto venteGetDto = venteService.validerVenteDansPanier(validerPanierDTO);
 
         return ResponseEntity.ok(venteGetDto);

@@ -4,7 +4,6 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.ligneRetour.LigneRetourGetDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourPostDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourUpdateDto;
-import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.entity.LigneRetour;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Retour;

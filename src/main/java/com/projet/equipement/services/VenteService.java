@@ -195,39 +195,48 @@ public class VenteService {
     }
 
 
-
-
+    /**
+     * Process a payment for a sale
+     *
+     * @param venteId         ID of the sale to process payment for
+     * @param montantPaiement Amount of the payment to process
+     */
     @Transactional
     public void payer(Long venteId, BigDecimal montantPaiement) {
+        // Find the sale or throw exception if not found
         Vente vente = venteRepository.findById(venteId)
                 .orElseThrow(() -> new RuntimeException("Vente non trouvée"));
 
+        // Calculate payment amounts
         BigDecimal montantTotal = BigDecimal.valueOf(vente.getMontantTotal());
+        // Sum all previous payments
         BigDecimal totalDejaPaye = vente.getPaiements().stream()
                 .map(Paiement::getMontantPaye).reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Calculate new total after this payment
         BigDecimal totalApresPaiement = totalDejaPaye.add(montantPaiement);
+        // Calculate remaining amount to pay
         BigDecimal resteAPayer = montantTotal.subtract(totalApresPaiement);
 
+        // Validate payment amount is not more than total due
         if (resteAPayer.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalStateException(String.format("Montant de paiement invalide: Montant total %s << montant paiement %s",
                     montantTotal, montantPaiement));
         }
 
+        // Handle full payment scenarios
         if (resteAPayer.compareTo(BigDecimal.ZERO) == 0) {
-
+            // First full payment
             if (totalDejaPaye.compareTo(BigDecimal.ZERO) == 0) {
-
                 fairePaiement(vente, montantPaiement);
-
-            } else if (totalDejaPaye.compareTo(BigDecimal.ZERO) > 0) {
-
-                fairePaiementTotal(vente, montantPaiement);
-
             }
-        } else if (resteAPayer.compareTo(BigDecimal.ZERO) > 0) {
-
+            // Final payment completing previous partial payments
+            else if (totalDejaPaye.compareTo(BigDecimal.ZERO) > 0) {
+                fairePaiementTotal(vente, montantPaiement);
+            }
+        }
+        // Handle partial payment
+        else if (resteAPayer.compareTo(BigDecimal.ZERO) > 0) {
             fairePaiementPartiel(vente, montantPaiement);
-
         }
     }
 
