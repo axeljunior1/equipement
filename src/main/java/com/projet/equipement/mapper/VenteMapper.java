@@ -10,7 +10,7 @@ import com.projet.equipement.entity.EtatVente;
 import com.projet.equipement.entity.Vente;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {EmployeMapper.class, ClientMapper.class, LigneVenteMapper.class, PaiementMapper.class})
+@Mapper(componentModel = "spring", uses = {EmployeMapper.class, ClientMapper.class, LigneVenteMapper.class, PaiementMapper.class, LigneVenteMapper.class})
 public interface VenteMapper {
 
     @Mapping(source = "etat", target = "etatId", qualifiedByName = "mapEtatToId")

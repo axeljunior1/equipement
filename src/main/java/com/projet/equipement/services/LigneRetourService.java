@@ -16,6 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class LigneRetourService {
 
@@ -26,68 +29,81 @@ public class LigneRetourService {
     private final LigneVenteRepository ligneVenteRepository;
 
     public LigneRetourService(LigneRetourRepository ligneRetourRepository,
-                                   LigneRetourMapper ligneRetourMapper,
-                                   RetourRepository retourRepository,
-                                   LigneVenteRepository ligneVenteRepository) {
+                              LigneRetourMapper ligneRetourMapper,
+                              RetourRepository retourRepository,
+                              LigneVenteRepository ligneVenteRepository) {
         this.ligneRetourRepository = ligneRetourRepository;
         this.ligneRetourMapper = ligneRetourMapper;
         this.retourRepository = retourRepository;
         this.ligneVenteRepository = ligneVenteRepository;
     }
 
-    public LigneRetourGetDto findById(Long id){
+    public LigneRetourGetDto findById(Long id) {
         return ligneRetourMapper.toDto(ligneRetourRepository.findById(id).orElseThrow(
-                ()-> new EntityNotFoundException("LigneRetour", id)));
+                () -> new EntityNotFoundException("LigneRetour", id)));
     }
-    
+
     // ligneRetourne tout
-    public Page<LigneRetourGetDto> findAll(Pageable pageable){
+    public Page<LigneRetourGetDto> findAll(Pageable pageable) {
         Page<LigneRetour> all = ligneRetourRepository.findAll(pageable);
         return all.map(ligneRetourMapper::toDto);
     }
-    
+
     //save
-    public LigneRetourGetDto save(LigneRetour ligneRetour){
+    public LigneRetourGetDto save(LigneRetour ligneRetour) {
         return ligneRetourMapper.toDto(ligneRetourRepository.save(ligneRetour));
     }
-    
-    
+
+
     //save
-    public LigneRetourGetDto save(LigneRetourPostDto ligneRetourPostDto){
+    public LigneRetourGetDto save(LigneRetourPostDto ligneRetourPostDto) {
         Retour retour = retourRepository.findById(ligneRetourPostDto.getRetourId()).orElseThrow(
-                ()-> new EntityNotFoundException("Retour", ligneRetourPostDto.getRetourId()));
+                () -> new EntityNotFoundException("Retour", ligneRetourPostDto.getRetourId()));
         LigneVente ligneVente = ligneVenteRepository.findById(ligneRetourPostDto.getLigneVenteId()).orElseThrow(
-                ()-> new EntityNotFoundException("LigneVente", ligneRetourPostDto.getLigneVenteId()));
+                () -> new EntityNotFoundException("LigneVente", ligneRetourPostDto.getLigneVenteId()));
 
         LigneRetour ligneRetour = ligneRetourMapper.toEntity(ligneRetourPostDto);
-        
+
         ligneRetour.setRetour(retour);
         ligneRetour.setLigneVente(ligneVente);
 
         return ligneRetourMapper.toDto(ligneRetourRepository.save(ligneRetour));
     }
-    
-    //modifier
-    public LigneRetourGetDto update(LigneRetourUpdateDto ligneRetourUpdateDto, Long id){
-        LigneRetour ligneRetour = ligneRetourRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("LigneRetour", id) );
 
+    public void saveAll(List<LigneRetourPostDto> ligneRetourPostDtos) {
+
+        if (!ligneRetourPostDtos.isEmpty()) {
+            ligneRetourPostDtos.forEach(ligneRetourPostDto -> {
+                Optional<LigneRetour> retour = ligneRetourRepository.findByRetour_IdAndLigneVente_Id(
+                        ligneRetourPostDto.getRetourId(),
+                        ligneRetourPostDto.getLigneVenteId());
+                if (retour.isEmpty()) {
+                    save(ligneRetourPostDto);
+                }
+            });
+        }
+    }
+
+    //modifier
+    public LigneRetourGetDto update(LigneRetourUpdateDto ligneRetourUpdateDto, Long id) {
+        LigneRetour ligneRetour = ligneRetourRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("LigneRetour", id));
 
 
         Retour retour = retourRepository.findById(ligneRetourUpdateDto.getRetourId()).orElseThrow(
-                ()-> new EntityNotFoundException("Retour", ligneRetourUpdateDto.getRetourId()));
+                () -> new EntityNotFoundException("Retour", ligneRetourUpdateDto.getRetourId()));
         LigneVente ligneVente = ligneVenteRepository.findById(ligneRetourUpdateDto.getLigneVenteId()).orElseThrow(
-                ()-> new EntityNotFoundException("LigneVente", ligneRetourUpdateDto.getLigneVenteId()));
+                () -> new EntityNotFoundException("LigneVente", ligneRetourUpdateDto.getLigneVenteId()));
 
         ligneRetourMapper.updateDto(ligneRetourUpdateDto, ligneRetour);
 
         ligneRetour.setRetour(retour);
         ligneRetour.setLigneVente(ligneVente);
-        
+
         return ligneRetourMapper.toDto(ligneRetourRepository.save(ligneRetour));
     }
-    
+
     //delete
-    public void deleteById(Long id){
+    public void deleteById(Long id) {
         ligneRetourRepository.deleteById(id);
     }
 

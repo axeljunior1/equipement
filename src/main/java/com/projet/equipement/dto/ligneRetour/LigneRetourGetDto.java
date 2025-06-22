@@ -16,12 +16,11 @@ public class LigneRetourGetDto {
 
     private Long id ;
 
-    private RetourGetDto retour;
+    private Long retourId;
 
     private LigneVenteGetDto ligneVente;
 
     private Integer quantite;
-
 
     private LocalDateTime dateCreation;
 

@@ -9,6 +9,7 @@ import lombok.Setter;
 public class LigneVenteGetDto {
 
     private Long id;
+
     private Double prixVente;
 
     private Integer quantite;
@@ -20,8 +21,6 @@ public class LigneVenteGetDto {
     private Long produitId;
 
     private String  produitNom;
-
-    private ProduitGetDto produit;
 
     private Long formatVenteId;
 

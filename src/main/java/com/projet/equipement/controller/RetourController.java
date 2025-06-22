@@ -36,7 +36,7 @@ public class RetourController {
 
 
     @GetMapping
-    public ResponseEntity<Page<RetourGetDto>> getAll(Pageable pageable) {
+    public ResponseEntity<Page<RetourLightGetDto>> getAll(Pageable pageable) {
         return ResponseEntity.ok(retourService.findAll(pageable));
     }
 
@@ -48,6 +48,16 @@ public class RetourController {
     @PutMapping("/{id}")
     public ResponseEntity<RetourGetDto> update(@PathVariable Long id, @RequestBody RetourUpdateDto updateDto) {
         return ResponseEntity.ok(retourService.update(updateDto, id));
+    }
+
+    @GetMapping("/{id}/valider")
+    public ResponseEntity<RetourGetDto> valider(@PathVariable Long id) {
+        return ResponseEntity.ok(retourService.valider(id));
+    }
+
+    @GetMapping("/{id}/rejeter")
+    public ResponseEntity<RetourGetDto> rejeter(@PathVariable Long id) {
+        return ResponseEntity.ok(retourService.rejeter(id));
     }
 
     @DeleteMapping("/{id}")

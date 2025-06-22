@@ -22,7 +22,4 @@ public class RetourPostDto {
     @NotNull
     private Long etatId;
 
-    @Builder.Default
-    private LocalDateTime dateCreation = LocalDateTime.now();
-
 }

@@ -13,6 +13,7 @@ import org.mapstruct.*;
 public interface LigneVenteMapper {
 
     @Mapping(source = "produit", target = "produitId", qualifiedByName = "mapProduitToId")
+    @Mapping(source = "produit", target = "produitNom", qualifiedByName = "mapProduitToNom")
     @Mapping(source = "vente", target = "venteId", qualifiedByName = "mapVenteToId")
     @Mapping(source = "formatVente", target = "formatVenteId", qualifiedByName = "mapFormatToId")
     @Mapping(source = "formatVente", target = "formatVenteLibelle", qualifiedByName = "mapFormatToLib")
@@ -43,6 +44,11 @@ public interface LigneVenteMapper {
     @Named("mapVenteToId")
     default Long mapVenteToId(Vente vente) {
         return vente.getId();
+    }
+
+    @Named("mapProduitToNom")
+    default String mapProduitToNom(Produit produit) {
+        return produit.getNom();
     }
 
 

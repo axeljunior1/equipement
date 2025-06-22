@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "etat_retour")
+@Table(name = "type_retour")
 @Getter
 @Setter
 @NoArgsConstructor

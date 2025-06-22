@@ -4,14 +4,14 @@ import com.projet.equipement.dto.ligneRetour.LigneRetourGetDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourPostDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourUpdateDto;
 import com.projet.equipement.entity.LigneRetour;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import com.projet.equipement.entity.Retour;
+import com.projet.equipement.entity.TypeRetour;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {RetourMapper.class, LigneVenteMapper.class})
+@Mapper(componentModel = "spring", uses = {RetourMapper.class, LigneVenteMapper.class, TypeRetour.class})
 public interface LigneRetourMapper {
 
+    @Mapping(source = "retour", target = "retourId", qualifiedByName = "mapRetourToId")
     LigneRetourGetDto toDto(LigneRetour ligneRetour);
 
     LigneRetour toEntity(LigneRetourPostDto ligneRetourPostDto);
@@ -19,6 +19,10 @@ public interface LigneRetourMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateDto(LigneRetourUpdateDto ligneRetourUpdateDto, @MappingTarget LigneRetour ligneRetour);
 
+    @Named("mapRetourToId")
+    default Long mapRetourToId(Retour retour){
+        return retour.getId();
+    }
 
 
 }

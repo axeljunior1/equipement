@@ -12,15 +12,27 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RetourGetDto {
+public class RetourLightGetDto {
 
     private Long id ;
 
-    private VenteLightDto vente;
+    private Long venteId;
 
-    private TypeRetour typeRetour;
+    private Long typeId;
 
-    private EtatRetour etat;
+    private String typeLibelle;
+
+    private Long etatId;
+
+    private String etatLibelle;
+
+    private Long clientId;
+
+    private String clientNom;
+
+    private Long employeId;
+
+    private String employeNom;
 
     private List<LigneRetourGetDto> ligneRetours;
 
