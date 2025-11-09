@@ -1,6 +1,8 @@
 package com.projet.equipement.dto.retour;
 
+import com.projet.equipement.dto.etatRetour.EtatRetourGetDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourGetDto;
+import com.projet.equipement.dto.typeretour.TypeRetourGetDto;
 import com.projet.equipement.dto.vente.VenteLightDto;
 import com.projet.equipement.entity.EtatRetour;
 import com.projet.equipement.entity.TypeRetour;
@@ -18,9 +20,9 @@ public class RetourGetDto {
 
     private VenteLightDto vente;
 
-    private TypeRetour typeRetour;
+    private TypeRetourGetDto typeRetour;
 
-    private EtatRetour etat;
+    private EtatRetourGetDto etat;
 
     private List<LigneRetourGetDto> ligneRetours;
 

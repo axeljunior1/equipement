@@ -1,0 +1,18 @@
+package com.projet.equipement.dto.etatRetour;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class EtatRetourGetDto {
+
+        private Long id ;
+
+        private String libelle;
+
+        private String description;
+
+
+
+}

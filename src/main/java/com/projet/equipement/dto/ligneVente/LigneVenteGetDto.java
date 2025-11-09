@@ -22,6 +22,10 @@ public class LigneVenteGetDto {
 
     private String  produitNom;
 
+    private String  produitDeviseVenteCode;
+
+    private String  produitDeviseVenteSymbole;
+
     private Long formatVenteId;
 
     private String formatVenteLibelle;

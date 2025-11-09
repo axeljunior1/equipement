@@ -14,6 +14,8 @@ public interface LigneVenteMapper {
 
     @Mapping(source = "produit", target = "produitId", qualifiedByName = "mapProduitToId")
     @Mapping(source = "produit", target = "produitNom", qualifiedByName = "mapProduitToNom")
+    @Mapping(source = "produit", target = "produitDeviseVenteCode", qualifiedByName = "produitDeviseVenteCode")
+    @Mapping(source = "produit", target = "produitDeviseVenteSymbole", qualifiedByName = "produitDeviseVenteSymbole")
     @Mapping(source = "vente", target = "venteId", qualifiedByName = "mapVenteToId")
     @Mapping(source = "formatVente", target = "formatVenteId", qualifiedByName = "mapFormatToId")
     @Mapping(source = "formatVente", target = "formatVenteLibelle", qualifiedByName = "mapFormatToLib")
@@ -49,6 +51,16 @@ public interface LigneVenteMapper {
     @Named("mapProduitToNom")
     default String mapProduitToNom(Produit produit) {
         return produit.getNom();
+    }
+
+    @Named("produitDeviseVenteCode")
+    default String produitDeviseVenteCode(Produit produit) {
+        return produit.getDevise().getCode();
+    }
+
+    @Named("produitDeviseVenteSymbole")
+    default String produitDeviseVenteSymbole(Produit produit) {
+        return produit.getDevise().getSymbole();
     }
 
 
