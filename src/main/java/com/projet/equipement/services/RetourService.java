@@ -1,12 +1,14 @@
 package com.projet.equipement.services;
 
 
+import com.projet.equipement.constants.RefCodes;
 import com.projet.equipement.dto.retour.RetourGetDto;
 import com.projet.equipement.dto.retour.RetourLightGetDto;
 import com.projet.equipement.dto.retour.RetourPostDto;
 import com.projet.equipement.dto.retour.RetourUpdateDto;
 import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
+import com.projet.equipement.exceptions.InvalidOperationException;
 import com.projet.equipement.mapper.LigneRetourMapper;
 import com.projet.equipement.mapper.RetourMapper;
 import com.projet.equipement.repository.EtatPanierRepository;
@@ -77,11 +79,22 @@ public class RetourService {
 
 
     //save
-    public RetourGetDto save(RetourPostDto retourPostDto){
+    public RetourGetDto save(RetourPostDto retourPostDto) throws InvalidOperationException {
         Vente vente = venteService.findById(retourPostDto.getVenteId());
-        EtatRetour etatRetour = etatRetourService.findById(retourPostDto.getEtatId());
+        
+        String codeEtatVente = vente.getEtat().getLibelle(); // ou getLibelle() selon ton modèle
+        if (!estEtatVenteAutorisePourRetour(codeEtatVente)) {
+            throw new InvalidOperationException(
+                    "Impossible de créer un retour pour une vente avec l’état " + codeEtatVente
+            );
+        }
+
+        EtatRetour etatRetour = etatRetourRepository.findByLibelle("EN_ATTENTE_VALIDATION").orElseThrow(
+                () -> new EntityNotFoundException("Etat retour", retourPostDto.getVenteId())
+        );
         TypeRetour typeRetour = typeRetourService.findById(retourPostDto.getTypeId());
-        Retour retour = retourMapper.toEntity(retourPostDto);
+
+        Retour retour = new Retour();
 
         retour.setVente(vente);
         retour.setEtat(etatRetour);
@@ -91,6 +104,18 @@ public class RetourService {
 
         return retourMapper.toDto(retourRepository.save(retour));
     }
+
+    private boolean estEtatVenteAutorisePourRetour(String code) {
+        if (code == null) return false;
+
+        return switch (code) {
+            case RefCodes.EtatVente.PAIEMENT_PARTIEL,
+                 RefCodes.EtatVente.PAYEE,
+                 RefCodes.EtatVente.VENTE_A_CREDIT -> true;
+            default -> false;
+        };
+    }
+
 
     //modifier
     public RetourGetDto update(RetourUpdateDto retourUpdateDto, Long id){

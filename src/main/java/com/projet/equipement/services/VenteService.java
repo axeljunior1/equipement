@@ -209,9 +209,9 @@ public class VenteService {
         Vente vente = venteRepository.findById(venteId)
                 .orElseThrow(() -> new RuntimeException("Vente non trouvée"));
 
-        ModePaiement modePaiement = modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
-                ()-> new EntityNotFoundException("Mode de paiement", paiementRequest.getModePaiementId())
-        );
+//        ModePaiement modePaiement = modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
+//                ()-> new EntityNotFoundException("Mode de paiement", paiementRequest.getModePaiementId())
+//        );
 
         // Calculate payment amounts
         BigDecimal montantTotal = BigDecimal.valueOf(vente.getMontantTotal());

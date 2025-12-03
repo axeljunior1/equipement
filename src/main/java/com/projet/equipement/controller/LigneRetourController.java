@@ -4,9 +4,11 @@ package com.projet.equipement.controller;
 import com.projet.equipement.dto.ligneRetour.LigneRetourGetDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourPostDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourUpdateDto;
+import com.projet.equipement.exceptions.ApiError;
 import com.projet.equipement.services.LigneRetourService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,8 +51,18 @@ public class LigneRetourController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        ligneRetourService.deleteById(id);
-        return ResponseEntity.ok().body("Deleted");
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        boolean deleted = ligneRetourService.deleteById(id);
+        if (deleted) {
+            return ResponseEntity.ok("Deleted");
+        } else {
+        ApiError errorResponse = new ApiError(
+                HttpStatus.FORBIDDEN.value(),
+                "Suppression non autorisée",
+                "La ligne de retour ne peut pas être supprimée car son état ne le permet pas.",
+                "LigneRetour id=" + id
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
     }
 }

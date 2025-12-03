@@ -25,7 +25,6 @@ public interface RetourMapper {
     RetourLightGetDto toLightDto(Retour retour);
 
 
-    Retour toEntity(RetourPostDto retourPostDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateDto(RetourUpdateDto retourUpdateDto, @MappingTarget Retour retour);

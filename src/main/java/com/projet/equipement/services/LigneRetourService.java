@@ -9,6 +9,7 @@ import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Retour;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.LigneRetourMapper;
+import com.projet.equipement.repository.EtatRetourRepository;
 import com.projet.equipement.repository.LigneRetourRepository;
 import com.projet.equipement.repository.LigneVenteRepository;
 import com.projet.equipement.repository.RetourRepository;
@@ -27,15 +28,17 @@ public class LigneRetourService {
     private final LigneRetourMapper ligneRetourMapper;
     private final RetourRepository retourRepository;
     private final LigneVenteRepository ligneVenteRepository;
+    private final EtatRetourRepository etatRetourRepository;
 
     public LigneRetourService(LigneRetourRepository ligneRetourRepository,
                               LigneRetourMapper ligneRetourMapper,
                               RetourRepository retourRepository,
-                              LigneVenteRepository ligneVenteRepository) {
+                              LigneVenteRepository ligneVenteRepository, EtatRetourRepository etatRetourRepository) {
         this.ligneRetourRepository = ligneRetourRepository;
         this.ligneRetourMapper = ligneRetourMapper;
         this.retourRepository = retourRepository;
         this.ligneVenteRepository = ligneVenteRepository;
+        this.etatRetourRepository = etatRetourRepository;
     }
 
     public LigneRetourGetDto findById(Long id) {
@@ -102,10 +105,19 @@ public class LigneRetourService {
         return ligneRetourMapper.toDto(ligneRetourRepository.save(ligneRetour));
     }
 
-    //delete
-    public void deleteById(Long id) {
-        ligneRetourRepository.deleteById(id);
+    public boolean deleteById(Long id) {
+        LigneRetour ligneRetour = ligneRetourRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("LigneRetour", id));
+
+        String retourLib = ligneRetour.getRetour().getEtat().getLibelle();
+
+        if (retourLib != null && (retourLib.equals("TRAITE") || retourLib.equals("EN_ATTENTE_VALIDATION"))) {
+            ligneRetourRepository.deleteById(id);
+            return true; // suppression effectuée
+        }
+        return false; // suppression refusée
     }
+
 
 
     public Page<LigneRetourGetDto> findByRetourId(Long id, Pageable pageable) {
