@@ -20,7 +20,7 @@ public class LigneVente extends MultiTenantEntity {
     @Column(name = "id_lignes_ventes")
     private Long id;
 
-    @Column(name = "prix_vente_unitaire")
+    @Column(name = "prix_vente")
     private Double prixVente;
 
     @Column(name = "quantite")

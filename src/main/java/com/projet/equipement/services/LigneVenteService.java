@@ -108,8 +108,8 @@ public class LigneVenteService {
                 .createdAt(dateCreate)
                 .dateMouvement(dateCreate)
                 .typeMouvementCode("VENTE_PRODUIT")
-                .idEvenementOrigine(saveLigneVente.getVente().getId())
-                .idLigneOrigine(saveLigneVente.getId())
+                .sourceType("VENTE")
+                .sourceId(ligneVentePostDto.getVenteId())
                 .build();
         mouvementStockService.save(mouvStk);
 
@@ -147,8 +147,8 @@ public class LigneVenteService {
                 .createdAt(dateCreate)
                 .dateMouvement(dateCreate)
                 .typeMouvementCode("RETOUR_CLIENT")
-                .idEvenementOrigine(ligneVente.getVente().getId())
-                .idLigneOrigine(ligneVente.getId())
+                .sourceId(ligneVente.getVente().getId())
+                .sourceType("RETOUR_CLIENT")
                 .build();
         // soft delete du mvt
         mouvementStockService.save(mvtInverse);

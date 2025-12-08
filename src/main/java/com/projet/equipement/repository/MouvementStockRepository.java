@@ -18,9 +18,9 @@ import java.util.Optional;
 @Repository
 public interface MouvementStockRepository extends JpaRepository<MouvementStock,  Long> {
 
-    Optional<MouvementStock> findByIdEvenementOrigineAndIdLigneOrigine( Integer idEvenementOrigine, Integer idLigneOrigine );
+    Optional<MouvementStock> findBySourceIdAndSourceType( Long sourceId, String sourceType);
 
-    List<MouvementStock> findByIdEvenementOrigine(Integer idEvenementOrigine);
+    List<MouvementStock> findBySourceId(Long sourceId);
 
 
     @Query("select mv from MouvementStock mv where mv.produit.id = :id")
@@ -33,17 +33,17 @@ public interface MouvementStockRepository extends JpaRepository<MouvementStock, 
 
     Optional<MouvementStock> findByReference(String reference);
 
-    void deleteByReference(String reference);
-
-    void deleteByIdEvenementOrigineAndIdLigneOrigine(Integer idEvenementOrigine, Integer idLigneOrigine);
-
-    @Modifying
-    @Transactional
-    @Query("delete from MouvementStock ms where ms.idEvenementOrigine = :idEveOri and ms.typeMouvement.code = :typeMvtCode ")
-    void deleteByIdEvenementOrigineAndTypeMouvementCode(@Param("idEveOri") Long idEveOri, @Param("typeMvtCode") String typeMvtCode);
-
-    @Query("select ms from MouvementStock ms where ms.idEvenementOrigine = :idEveOri and ms.typeMouvement.code = :typeMvtCode ")
-    List<MouvementStock> findByIdEvenementOrigineAndTypeMouvementCode(@Param("idEveOri") Long idEveOri, @Param("typeMvtCode") String typeMvtCode);
+//    void deleteByReference(String reference);
+//
+//    void deleteByIdEvenementOrigineAndIdLigneOrigine(Integer idEvenementOrigine, Integer idLigneOrigine);
+//
+//    @Modifying
+//    @Transactional
+//    @Query("delete from MouvementStock ms where ms.idEvenementOrigine = :idEveOri and ms.typeMouvement.code = :typeMvtCode ")
+//    void deleteByIdEvenementOrigineAndTypeMouvementCode(@Param("idEveOri") Long idEveOri, @Param("typeMvtCode") String typeMvtCode);
+//
+//    @Query("select ms from MouvementStock ms where ms.idEvenementOrigine = :idEveOri and ms.typeMouvement.code = :typeMvtCode ")
+//    List<MouvementStock> findByIdEvenementOrigineAndTypeMouvementCode(@Param("idEveOri") Long idEveOri, @Param("typeMvtCode") String typeMvtCode);
 
 
 }

@@ -28,9 +28,9 @@ public class MouvementStockPostDto {
 
     private LocalDateTime createdAt; // Date de création
 
-    private Long idLigneOrigine;
+    private Long sourceId;
 
-    private Long idEvenementOrigine;
+    private String sourceType;
 
 
 }
