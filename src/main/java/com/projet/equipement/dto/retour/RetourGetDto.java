@@ -1,11 +1,9 @@
 package com.projet.equipement.dto.retour;
 
-import com.projet.equipement.dto.etatRetour.EtatRetourGetDto;
+import com.projet.equipement.dto.etatDto.EtatRetourGetDto;
 import com.projet.equipement.dto.ligneRetour.LigneRetourGetDto;
 import com.projet.equipement.dto.typeretour.TypeRetourGetDto;
 import com.projet.equipement.dto.vente.VenteLightDto;
-import com.projet.equipement.entity.EtatRetour;
-import com.projet.equipement.entity.TypeRetour;
 import lombok.Getter;
 import lombok.Setter;
 

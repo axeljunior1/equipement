@@ -13,9 +13,5 @@ public class VenteLightDto {
     private Long id;
     private Double montantTotal;
     private LocalDateTime createdAt;
-
-    private String clientNom;
-    private String employeNom;
-
     private List<LigneVenteGetDto> ligneVentes;
 }

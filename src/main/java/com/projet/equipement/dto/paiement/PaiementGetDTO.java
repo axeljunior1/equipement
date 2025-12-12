@@ -1,5 +1,6 @@
 package com.projet.equipement.dto.paiement;
 
+import com.projet.equipement.dto.etatDto.EtatPaiementGetDto;
 import com.projet.equipement.entity.EtatPaiement;
 import com.projet.equipement.entity.ModePaiement;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class PaiementGetDTO {
     private ModePaiement modePaiement;
     private String reference;
     private LocalDateTime createdAt;
-    private EtatPaiement etat;
+    private EtatPaiementGetDto etat;
 }
 
 

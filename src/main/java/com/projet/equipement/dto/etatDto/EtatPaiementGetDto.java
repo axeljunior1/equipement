@@ -1,17 +1,17 @@
-package com.projet.equipement.dto.etatRetour;
+package com.projet.equipement.dto.etatDto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class EtatRetourGetDto {
+public class EtatPaiementGetDto {
 
         private Long id ;
 
         private String libelle;
 
-        private String description;
+//        private String description;
 
 
 

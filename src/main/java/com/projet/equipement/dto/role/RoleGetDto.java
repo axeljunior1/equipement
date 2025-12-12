@@ -11,6 +11,7 @@ import java.util.Set;
 @Setter
 public class RoleGetDto {
 
+    private Long id;
 
     private String nom;
 

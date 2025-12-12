@@ -8,11 +8,10 @@ import com.projet.equipement.entity.Role;
 import com.projet.equipement.entity.RoleEmploye;
 import org.mapstruct.*;
 
-
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {RoleEmployeMapper.class})
 public interface EmployeMapper {
 
 

@@ -1,6 +1,6 @@
 package com.projet.equipement.dto.employe;
 
-import com.projet.equipement.entity.RoleEmploye;
+import com.projet.equipement.dto.roleEmploye.RoleEmployeGetDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +17,7 @@ public class EmployeGetDto {
     private Boolean actif;
     private Set<Long> rolesIds = new HashSet<>();
     private Set<String> rolesNoms = new HashSet<>();
-    private Set<RoleEmploye> employeRoles = new HashSet<>();
+    private Set<RoleEmployeGetDto> employeRoles = new HashSet<>();
 
 //    private String role;
 

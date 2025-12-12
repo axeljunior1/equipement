@@ -13,12 +13,8 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {EmployeMapper.class, ClientMapper.class, LigneVenteMapper.class, PaiementMapper.class, LigneVenteMapper.class})
 public interface VenteMapper {
 
-    @Mapping(source = "etat", target = "etatId", qualifiedByName = "mapEtatToId")
-    @Mapping(source = "employe", target = "employeId", qualifiedByName = "mapEmployeToId")
     VenteGetDto toDto(Vente vente);
 
-    @Mapping(source = "client", target = "clientNom", qualifiedByName = "mapClientToNom")
-    @Mapping(source = "employe", target = "employeNom", qualifiedByName = "mapEmployeToNom")
     VenteLightDto toLightDto(Vente vente);
 
 

@@ -3,13 +3,14 @@ package com.projet.equipement.mapper;
 import com.projet.equipement.dto.roleEmploye.RoleEmployeGetDto;
 import com.projet.equipement.dto.roleEmploye.RoleEmployePostDto;
 import com.projet.equipement.dto.roleEmploye.RoleEmployeUpdateDto;
+import com.projet.equipement.entity.EmployeeRoleId;
 import com.projet.equipement.entity.RoleEmploye;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", uses = {RoleMapper.class, EmployeMapper.class})
+@Mapper(componentModel = "spring", uses = {RoleMapper.class, EmployeMapper.class, EmployeeRoleId.class})
 public interface RoleEmployeMapper {
 
 
