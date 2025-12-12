@@ -7,7 +7,6 @@ import com.projet.equipement.dto.ligneRetour.LigneRetourUpdateDto;
 import com.projet.equipement.entity.LigneRetour;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Retour;
-import com.projet.equipement.entity.Vente;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.LigneRetourMapper;
 import com.projet.equipement.repository.EtatRetourRepository;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,18 +29,16 @@ public class LigneRetourService {
     private final RetourRepository retourRepository;
     private final LigneVenteRepository ligneVenteRepository;
     private final EtatRetourRepository etatRetourRepository;
-    private final VenteService venteService;
 
     public LigneRetourService(LigneRetourRepository ligneRetourRepository,
                               LigneRetourMapper ligneRetourMapper,
                               RetourRepository retourRepository,
-                              LigneVenteRepository ligneVenteRepository, EtatRetourRepository etatRetourRepository, VenteService venteService) {
+                              LigneVenteRepository ligneVenteRepository, EtatRetourRepository etatRetourRepository) {
         this.ligneRetourRepository = ligneRetourRepository;
         this.ligneRetourMapper = ligneRetourMapper;
         this.retourRepository = retourRepository;
         this.ligneVenteRepository = ligneVenteRepository;
         this.etatRetourRepository = etatRetourRepository;
-        this.venteService = venteService;
     }
 
     public LigneRetourGetDto findById(Long id) {
@@ -69,13 +65,6 @@ public class LigneRetourService {
         LigneVente ligneVente = ligneVenteRepository.findById(ligneRetourPostDto.getLigneVenteId()).orElseThrow(
                 () -> new EntityNotFoundException("LigneVente", ligneRetourPostDto.getLigneVenteId()));
 
-         Integer qteVente = ligneVente.getQuantite();
-         if (ligneRetourPostDto.getQuantite()>qteVente) {
-             throw new RuntimeException(
-                     "La quantité retournée est superieur à la qté vendu"
-             );
-         }
-
         LigneRetour ligneRetour = ligneRetourMapper.toEntity(ligneRetourPostDto);
 
         ligneRetour.setRetour(retour);
@@ -86,27 +75,13 @@ public class LigneRetourService {
 
     public void saveAll(List<LigneRetourPostDto> ligneRetourPostDtos) {
 
-        // SI LA QUANTITE EST SUPERIEUR A LA QTE DANS LA VENTE ALORS ON RETOURNE UNE EXCEPTION
-
-
         if (!ligneRetourPostDtos.isEmpty()) {
             ligneRetourPostDtos.forEach(ligneRetourPostDto -> {
-
-                Optional<LigneRetour> ligneRetour = ligneRetourRepository.findByRetour_IdAndLigneVente_Id(
+                Optional<LigneRetour> retour = ligneRetourRepository.findByRetour_IdAndLigneVente_Id(
                         ligneRetourPostDto.getRetourId(),
                         ligneRetourPostDto.getLigneVenteId());
-                if (ligneRetour.isEmpty() ) {
+                if (retour.isEmpty()) {
                     save(ligneRetourPostDto);
-                } else if (Objects.equals(ligneRetour.get().getRetour().getEtat().getLibelle(), "EN_ATTENTE_VALIDATION")){
-                    LigneVente lv = ligneRetour.get().getLigneVente();
-                    Integer qteVente = lv.getQuantite();
-                    if (ligneRetour.get().getQuantite()>qteVente) {
-                        throw new RuntimeException("La qtantité retournée est superieur à la qté vendu");
-                    }
-                    ligneRetour.get().setQuantite(ligneRetourPostDto.getQuantite());
-                    ligneRetourRepository.save(ligneRetour.get());
-                }else {
-                    throw new RuntimeException("L'etat de la vente ne le permet pas");
                 }
             });
         }

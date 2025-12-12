@@ -27,13 +27,11 @@ public class MouvementStock extends MultiTenantEntity  {
     @Column(name = "quantite", nullable = false)
     private Integer quantite; // Quantité du mouvement (doit être positive)
 
+    @Column(name = "id_ligne_origine", nullable = false)
+    private Integer idLigneOrigine;
 
-    @Column(name = "source_type")
-    private String sourceType ;
-
-
-    @Column(name = "source_id")
-    private Long sourceId ;
+    @Column(name = "id_evenement_origine", nullable = false)
+    private Integer idEvenementOrigine;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_mouvement_id", nullable = false)

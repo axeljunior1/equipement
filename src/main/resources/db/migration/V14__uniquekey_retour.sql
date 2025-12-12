@@ -1,3 +1,0 @@
--- Suppression de la contrainte UNIQUE UC_RETOUR dans la table RETOUR
-ALTER TABLE RETOUR
-    DROP CONSTRAINT IF EXISTS UC_RETOUR;

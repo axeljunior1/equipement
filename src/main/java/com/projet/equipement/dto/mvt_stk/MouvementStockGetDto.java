@@ -33,8 +33,10 @@ public class MouvementStockGetDto {
 
     private LocalDateTime createdAt; // Date de création
 
-    private String sourceType;
+    private Integer idLigneOrigine;
 
-    private Long sourceId ;
+    private Integer idEvenementOrigine;
+
+
 
 }

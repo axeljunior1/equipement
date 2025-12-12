@@ -62,7 +62,7 @@ public class LigneAchatService {
     @Transactional
     public LigneAchatGetDto save(LigneAchatPostDto ligneAchatPostDto) {
 
-        if (ligneAchatPostDto.getPrixAchatF() != null) {
+        if (ligneAchatPostDto.getPrixAchatF() != null){
             TarifAchat tarifAchat = tarifAchatService.findByProduitId(ligneAchatPostDto.getProduitId());
             tarifAchat.setPrixAchat(BigDecimal.valueOf(ligneAchatPostDto.getPrixAchatF()));
 
@@ -72,9 +72,9 @@ public class LigneAchatService {
 
         LigneAchat ligneAchat = ligneAchatMapper.toEntity(ligneAchatPostDto);
         //set achat
-        ligneAchat.setAchat(achatRepository.findById(ligneAchatPostDto.getAchatId()).orElseThrow(() -> new EntityNotFoundException("Achat", ligneAchatPostDto.getAchatId())));
+        ligneAchat.setAchat(achatRepository.findById(ligneAchatPostDto.getAchatId()).orElseThrow(()-> new EntityNotFoundException("Achat", ligneAchatPostDto.getAchatId())));
         //set produit
-        ligneAchat.setProduit(produitRepository.findById(ligneAchatPostDto.getProduitId()).orElseThrow(() -> new EntityNotFoundException("Produit", ligneAchatPostDto.getProduitId())));
+        ligneAchat.setProduit(produitRepository.findById(ligneAchatPostDto.getProduitId()).orElseThrow(()-> new EntityNotFoundException("Produit", ligneAchatPostDto.getProduitId())));
 
         ligneAchat.setTenantId(TenantContext.getTenantId());
         LigneAchat saveLigneAchat = ligneAchatRepository.save(ligneAchat);
@@ -92,8 +92,8 @@ public class LigneAchatService {
                 .createdAt(dateCreate)
                 .dateMouvement(dateCreate)
                 .typeMouvementCode("ACHAT_MARCHANDISE")
-                .sourceType("ACHAT")
-                .sourceId(ligneAchatPostDto.getAchatId())
+                .idEvenementOrigine(saveLigneAchat.getAchat().getId())
+                .idLigneOrigine(saveLigneAchat.getId())
                 .build());
 
 
@@ -102,13 +102,13 @@ public class LigneAchatService {
 
     @Transactional
     public LigneAchatGetDto updateLigneAchat(LigneAchatUpdateDto ligneAchatUpdateDto, Long id) {
-        LigneAchat ligneAchat = ligneAchatRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("LigneAchat", id));
+        LigneAchat ligneAchat = ligneAchatRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("LigneAchat", id));
 
         ligneAchatMapper.updateLigneAchatFromDto(ligneAchatUpdateDto, ligneAchat);
         //set achat
-        ligneAchat.setAchat(achatRepository.findById(ligneAchatUpdateDto.getAchatId()).orElseThrow(() -> new EntityNotFoundException("Achat", ligneAchatUpdateDto.getAchatId())));
+        ligneAchat.setAchat(achatRepository.findById(ligneAchatUpdateDto.getAchatId()).orElseThrow(()-> new EntityNotFoundException("Achat", ligneAchatUpdateDto.getAchatId())));
         //set produit
-        ligneAchat.setProduit(produitRepository.findById(ligneAchatUpdateDto.getProduitId()).orElseThrow(() -> new EntityNotFoundException("Produit", ligneAchatUpdateDto.getProduitId())));
+        ligneAchat.setProduit(produitRepository.findById(ligneAchatUpdateDto.getProduitId()).orElseThrow(()-> new EntityNotFoundException("Produit", ligneAchatUpdateDto.getProduitId())));
 
         ligneAchat.setTenantId(TenantContext.getTenantId());
         LigneAchat savedLine = ligneAchatRepository.save(ligneAchat);
@@ -133,8 +133,8 @@ public class LigneAchatService {
                 .createdAt(dateCreate)
                 .dateMouvement(dateCreate)
                 .typeMouvementCode("RETOUR_FOURNISSEUR")
-                .sourceId(ligneAchat.getAchat().getId())
-                .sourceType("RETOUR_FOURNISSEUR")
+                .idEvenementOrigine(ligneAchat.getAchat().getId())
+                .idLigneOrigine(ligneAchat.getId())
                 .build();
         // soft delete du mvt
         mouvementStockService.save(mvtInverse);

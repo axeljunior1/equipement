@@ -13,6 +13,11 @@ import com.projet.equipement.repository.TypeMouvementStockRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class MouvementStockService {
@@ -30,18 +35,18 @@ public class MouvementStockService {
         this.typeMouvementStockRepository = typeMouvementStockRepository;
     }
 
-    public Page<MouvementStock> findAll(Pageable pageable) {
+    public Page<MouvementStock> findAll(Pageable pageable){
         return mouvementStockRepository.findAll(pageable);
     }
 
 
-    public MouvementStock findById(Long id) {
-        return mouvementStockRepository.findById(id)
+    public  MouvementStock findById(Long id){
+        return  mouvementStockRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produit", id));
     }
 
 
-    public MouvementStock save(MouvementStockPostDto mouvementStockPostDto) {
+    public MouvementStock save(MouvementStockPostDto mouvementStockPostDto){
         MouvementStock mouvementStock = mouvementStockMapper.toEntity(mouvementStockPostDto);
 
         mouvementStock.setProduit(produitRepository.findById(mouvementStockPostDto.getProduitId()).orElseThrow(()-> new EntityNotFoundException("Produit", mouvementStockPostDto.getProduitId())));
@@ -52,7 +57,7 @@ public class MouvementStockService {
     }
 
 
-    public MouvementStock updateMouvementStock(MouvementStockUpdateDto mouvementStockUpdateDto, Long id) {
+    public MouvementStock updateMouvementStock(MouvementStockUpdateDto mouvementStockUpdateDto, Long id){
         MouvementStock mouvementStock = findById(id);
         mouvementStockMapper.updateMouvementStockFromDto(mouvementStockUpdateDto, mouvementStock);
         return mouvementStockRepository.save(mouvementStock);
@@ -61,16 +66,19 @@ public class MouvementStockService {
 
     /**
      * Soft delete
-     *
      * @param id id du mvt
      */
-    public void deleteById(Long id) {
+    public void deleteById(Long id){
         mouvementStockRepository.deleteById(id);
     }
 
     public Page<MouvementStock> findAllMouvementStockByProductId(Long id, Pageable pageable) {
-        return mouvementStockRepository.findAllMouvementStockByProductId(id, pageable);
+        return mouvementStockRepository.findAllMouvementStockByProductId(id, pageable) ;
     }
+
+
+
+
 
 
 }

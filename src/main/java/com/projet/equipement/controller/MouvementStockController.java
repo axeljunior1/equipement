@@ -1,6 +1,7 @@
 package com.projet.equipement.controller;
 
 import com.projet.equipement.dto.mvt_stk.MouvementStockGetDto;
+import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockUpdateDto;
 import com.projet.equipement.entity.MouvementStock;
 import com.projet.equipement.mapper.MouvementStockMapper;
@@ -41,10 +42,10 @@ public class MouvementStockController {
         return ResponseEntity.ok(mouvementStock);
     }
 
-//    @PostMapping("")
-//    public ResponseEntity<MouvementStock> save(@RequestBody MouvementStockPostDto mouvementStockPostDto){
-//        return ResponseEntity.ok(mouvementStockService.save(mouvementStockPostDto));
-//    }
+    @PostMapping("")
+    public ResponseEntity<MouvementStock> save(@RequestBody MouvementStockPostDto mouvementStockPostDto){
+        return ResponseEntity.ok(mouvementStockService.save(mouvementStockPostDto));
+    }
 
 
     @PatchMapping("/{id}")
