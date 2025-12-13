@@ -1,8 +1,5 @@
 package com.projet.equipement.dto.mvt_stk;
 
-import com.projet.equipement.entity.MouvementStock;
-import com.projet.equipement.entity.Produit;
-import com.projet.equipement.entity.TypeMouvementStock;
 import lombok.*;
 
 import java.time.LocalDateTime;

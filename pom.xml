@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.projet</groupId>
     <artifactId>equipement</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>equipement</name>
     <description>equipement</description>
     <url/>
@@ -49,12 +49,6 @@
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-core</artifactId>
             <version>6.4.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.5.0</version>
         </dependency>
 
         <dependency>

@@ -9,7 +9,7 @@ import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Produit;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {ProduitMapper.class, VenteMapper.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {ProduitMapper.class, VenteMapper.class})
 public interface LigneVenteMapper {
 
     @Mapping(source = "produit", target = "produitId", qualifiedByName = "mapProduitToId")

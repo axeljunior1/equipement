@@ -4,17 +4,14 @@ import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.ligneVente.LigneVenteUpdateDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
-import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.StockInsuffisantException;
 import com.projet.equipement.mapper.LigneVenteMapper;
-import com.projet.equipement.mapper.VenteMapper;
 import com.projet.equipement.repository.FormatVenteRepository;
 import com.projet.equipement.repository.LigneVenteRepository;
 import com.projet.equipement.repository.ProduitRepository;
 import com.projet.equipement.repository.VenteRepository;
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +24,6 @@ public class LigneVenteService {
 
     private final LigneVenteRepository ligneVenteRepository;
     private final VenteRepository venteRepository;
-    private final VenteMapper venteMapper;
     private final LigneVenteMapper ligneVenteMapper;
     private final ProduitRepository produitRepository;
     private final FormatVenteRepository formatVenteRepository;
@@ -35,10 +31,17 @@ public class LigneVenteService {
     private final MouvementStockService mouvementStockService;
     private final StockCourantService stockCourantService;
 
-    public LigneVenteService(LigneVenteRepository ligneVenteRepository, VenteRepository venteRepository, VenteMapper venteMapper, LigneVenteMapper ligneVenteMapper, ProduitRepository produitRepository, FormatVenteRepository formatVenteRepository, FormatVenteService formatVenteService, MouvementStockService mouvementStockService, StockCourantService stockCourantService) {
+    public LigneVenteService(LigneVenteRepository ligneVenteRepository,
+                             LigneVenteMapper ligneVenteMapper,
+                             ProduitRepository produitRepository,
+                             FormatVenteRepository formatVenteRepository,
+                             FormatVenteService formatVenteService,
+                             MouvementStockService mouvementStockService,
+                             StockCourantService stockCourantService,
+                             VenteRepository venteRepository
+    ) {
         this.ligneVenteRepository = ligneVenteRepository;
         this.venteRepository = venteRepository;
-        this.venteMapper = venteMapper;
         this.ligneVenteMapper = ligneVenteMapper;
         this.produitRepository = produitRepository;
         this.formatVenteRepository = formatVenteRepository;
@@ -98,21 +101,6 @@ public class LigneVenteService {
         updateTotalVente(saveLigneVente.getVente().getId());
 
 
-        LocalDateTime dateCreate = LocalDateTime.now();
-        // Enregistrement du mouvement de stock via le service dédié
-        MouvementStockPostDto mouvStk = MouvementStockPostDto.builder()
-                .reference("VTE_" + ligneVentePostDto.getVenteId() + "_LIG_" + saveLigneVente.getId())
-                .produitId(ligneVentePostDto.getProduitId())
-                .quantite(ligneVentePostDto.getQuantite())
-                .commentaire("Généré à partir de la ligne d'un vente")
-                .createdAt(dateCreate)
-                .dateMouvement(dateCreate)
-                .typeMouvementCode("VENTE_PRODUIT")
-                .idEvenementOrigine(saveLigneVente.getVente().getId())
-                .idLigneOrigine(saveLigneVente.getId())
-                .build();
-        mouvementStockService.save(mouvStk);
-
 
         return saveLigneVente;
     }
@@ -134,6 +122,12 @@ public class LigneVenteService {
     public void deleteLinesByIdSoft(Long id) {
         // cet id est l'id de la ligne d'achat
         LigneVente ligneVente = ligneVenteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ligne vente", id));
+
+        String etat = ligneVente.getVente().getEtat().getLibelle();
+
+        if (!etat.equals("EN_ATTENTE_PAIEMENT")){
+            throw new RuntimeException("L'état de la vente ne permet pas suppression: " +  etat + " qui est different de : " + "EN_ATTENTE_PAIEMENT") ;
+        }
 
         String reference = "ACH_" + ligneVente.getVente().getId() + "_LIG_" + ligneVente.getId() + "_DEL";
 

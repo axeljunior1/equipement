@@ -65,5 +65,13 @@ public class AchatController {
         return ResponseEntity.ok("Achat deleted");
     }
 
+    @GetMapping("/{id}/valider")
+    public ResponseEntity<String> validerAchat(@PathVariable Long id) {
+
+        achatService.validerAchat(id);
+
+        return ResponseEntity.ok("Achat valider");
+    }
+
 
 }

@@ -1,9 +1,9 @@
 package com.projet.equipement.services;
 
-import com.projet.equipement.entity.*;
+import com.projet.equipement.entity.Employe;
+import com.projet.equipement.entity.Tenant;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
-import com.projet.equipement.repository.EmployeRepository;
-import com.projet.equipement.repository.RoleEmployeRepository;
 import com.projet.equipement.repository.TenantRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,22 +20,16 @@ import java.util.Optional;
 public class TenantService {
 
     private final TenantRepository tenantRepository;
-    private final RoleService roleService;
-    private final RoleEmployeRepository roleEmployeRepository;
-    private final EmployeRepository employeRepository;
     private final EmployeService employeService;
     private final TenantInitializer tenantInitializer;
     private final EntityManager entityManager;
 
     @Autowired
     public TenantService(TenantRepository tenantRepository,
-                         RoleService roleService,
                          EntityManager entityManager,
-                         RoleEmployeRepository roleEmployeRepository, EmployeRepository employeRepository, EmployeService employeService, TenantInitializer tenantInitializer) {
+                         EmployeService employeService,
+                         TenantInitializer tenantInitializer) {
         this.tenantRepository = tenantRepository;
-        this.roleService = roleService;
-        this.roleEmployeRepository = roleEmployeRepository;
-        this.employeRepository = employeRepository;
         this.employeService = employeService;
         this.tenantInitializer = tenantInitializer;
         this.entityManager = entityManager;
@@ -44,7 +37,7 @@ public class TenantService {
 
     // Créer un nouveau tenant
     @Transactional
-    public Tenant createTenant(Tenant tenant) throws IOException {
+    public Tenant createTenant(Tenant tenant) throws  IOException {
         //Create Tenant
         tenant.setActive(true);
         Tenant savedTenant = tenantRepository.save(tenant);

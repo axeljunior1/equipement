@@ -1,6 +1,5 @@
 package com.projet.equipement.dto.ligneVente;
 
-import com.projet.equipement.dto.produit.ProduitGetDto;
 import lombok.Getter;
 import lombok.Setter;
 

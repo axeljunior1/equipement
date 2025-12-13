@@ -29,11 +29,6 @@ public class TypeMouvementStock extends MultiTenantEntity {
     @Column(nullable = false, length = 10)
     private String typeMouvement;
 
-//    @OneToMany(mappedBy = "typeMouvement")
-//    @JsonIgnore
-//    private Set<TypeMouvementStock> typeMouvementStocks;
-
-
 
 }
 

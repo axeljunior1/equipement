@@ -11,9 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/unites-vente")
 @RequiredArgsConstructor
@@ -25,7 +22,7 @@ public class UniteVenteController {
     @GetMapping
     public ResponseEntity<Page<UniteVenteGetDto>> getAllUniteVentes(Pageable pageable) {
 
-        Page<UniteVente> uniteVente = uniteVenteService.findAll(pageable);;
+        Page<UniteVente> uniteVente = uniteVenteService.findAll(pageable);
         return ResponseEntity.ok(uniteVente.map(uniteVenteMapper::toDto));
 
     }

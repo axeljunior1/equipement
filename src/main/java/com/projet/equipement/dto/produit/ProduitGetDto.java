@@ -2,7 +2,6 @@ package com.projet.equipement.dto.produit;
 
 import com.projet.equipement.dto.categorie.CategorieGetDto;
 import com.projet.equipement.entity.FormatVente;
-import com.projet.equipement.entity.UniteVente;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 

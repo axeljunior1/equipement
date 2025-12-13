@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 
-@Mapper(componentModel = "spring", uses = CategorieMapper.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = CategorieMapper.class)
 public interface ProduitMapper {
 
 

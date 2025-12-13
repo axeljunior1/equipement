@@ -13,8 +13,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaiementRequest {
-//    private String numero;
-//    private String montant;
     @NotNull
     private Long modePaiementId;
 

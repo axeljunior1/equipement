@@ -8,7 +8,7 @@ import com.projet.equipement.entity.Facture;
 import com.projet.equipement.entity.Vente;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = VenteMapper.class) // Utilisation d'un mapper Vente si nécessaire
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = VenteMapper.class) // Utilisation d'un mapper Vente si nécessaire
 public interface FactureMapper {
 
     @Mapping(source = "etat", target = "etatNom", qualifiedByName = "mapEtatToNom") // Convertit l'ID en entité 'Vente'

@@ -7,7 +7,7 @@ import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.Employe;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = EmployeMapper.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {EmployeMapper.class, EtatAchatMapper.class})
 public interface AchatMapper {
 
 
@@ -54,13 +54,6 @@ public interface AchatMapper {
     default Long mapEmployeToId(Employe employe){
         return employe.getId();
     }
-
-    /**
-     * Maps a given identifier to an Employe entity.
-     *
-     * @param id the identifier of the Employe
-     * @return an Employe entity with its id field populated
-     */
 
 
 

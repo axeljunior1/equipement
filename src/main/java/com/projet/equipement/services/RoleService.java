@@ -20,18 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class RoleService {
     private final RoleRepository roleRepository;
-    private final AuthorityService authorityService;
     private final RoleMapper roleMapper;
     private final AuthorityRoleService authorityRoleService;
     private final EntityManager entityManager;
 
     public RoleService(RoleRepository roleRepository,
-                       AuthorityService authorityService,
                        RoleMapper roleMapper,
                        EntityManager entityManager,
                        AuthorityRoleService authorityRoleService) {
         this.roleRepository = roleRepository;
-        this.authorityService = authorityService;
         this.roleMapper = roleMapper;
         this.authorityRoleService = authorityRoleService;
         this.entityManager = entityManager;

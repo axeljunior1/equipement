@@ -2,8 +2,6 @@ package com.projet.equipement.dto.ligneAchat;
 
 import com.projet.equipement.dto.achat.AchatGetDto;
 import com.projet.equipement.dto.produit.ProduitGetDto;
-import com.projet.equipement.entity.LigneAchat;
-import com.projet.equipement.entity.Produit;
 import lombok.Getter;
 import lombok.Setter;
 

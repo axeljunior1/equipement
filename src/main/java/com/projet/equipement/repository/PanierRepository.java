@@ -1,8 +1,6 @@
 package com.projet.equipement.repository;
 
-import com.projet.equipement.entity.Achat;
 import com.projet.equipement.entity.Panier;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

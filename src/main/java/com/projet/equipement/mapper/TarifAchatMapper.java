@@ -8,7 +8,7 @@ import com.projet.equipement.entity.TarifAchat;
 import org.mapstruct.*;
 
 
-@Mapper(componentModel = "spring", uses = ProduitMapper.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ProduitMapper.class)
 public interface TarifAchatMapper {
 
     @Mapping(target = "id", source = "id")

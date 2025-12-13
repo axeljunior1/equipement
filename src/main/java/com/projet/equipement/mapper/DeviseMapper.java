@@ -4,10 +4,9 @@ import com.projet.equipement.dto.devise.DeviseGetDto;
 import com.projet.equipement.dto.devise.DevisePostDto;
 import com.projet.equipement.dto.devise.DeviseUpdateDto;
 import com.projet.equipement.entity.Devise;
-import com.projet.equipement.entity.Employe;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = EmployeMapper.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = EmployeMapper.class)
 public interface DeviseMapper {
 
 

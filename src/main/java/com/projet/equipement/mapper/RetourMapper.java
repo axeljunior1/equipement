@@ -2,13 +2,11 @@ package com.projet.equipement.mapper;
 
 import com.projet.equipement.dto.retour.RetourGetDto;
 import com.projet.equipement.dto.retour.RetourLightGetDto;
-import com.projet.equipement.dto.retour.RetourPostDto;
 import com.projet.equipement.dto.retour.RetourUpdateDto;
 import com.projet.equipement.entity.*;
-import jdk.jfr.Name;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {VenteMapper.class, EtatRetour.class, TypeRetour.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {VenteMapper.class, EtatRetour.class, TypeRetour.class})
 public interface RetourMapper {
 
     RetourGetDto toDto(Retour retour);

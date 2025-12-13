@@ -9,7 +9,6 @@ import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.EmployeMapper;
 import com.projet.equipement.repository.EmployeRepository;
-import com.projet.equipement.repository.RoleEmployeRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

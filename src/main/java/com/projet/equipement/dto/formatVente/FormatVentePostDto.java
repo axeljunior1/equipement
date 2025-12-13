@@ -1,7 +1,5 @@
 package com.projet.equipement.dto.formatVente;
 
-import com.projet.equipement.entity.Produit;
-import com.projet.equipement.entity.UniteVente;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

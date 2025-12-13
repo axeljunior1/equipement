@@ -62,6 +62,14 @@ public class LigneAchatService {
     @Transactional
     public LigneAchatGetDto save(LigneAchatPostDto ligneAchatPostDto) {
 
+        String achatEtat = achatRepository.findById(ligneAchatPostDto.getAchatId()).orElseThrow(
+                        ()->  new EntityNotFoundException("Achat", ligneAchatPostDto.getAchatId())
+                )
+                .getEtat().getLibelle();
+        if (!achatEtat.equals("CREEE") ) {
+            throw new RuntimeException("L'etat de l'achat ne permet pas l'ajout de ligne");
+        }
+
         if (ligneAchatPostDto.getPrixAchatF() != null){
             TarifAchat tarifAchat = tarifAchatService.findByProduitId(ligneAchatPostDto.getProduitId());
             tarifAchat.setPrixAchat(BigDecimal.valueOf(ligneAchatPostDto.getPrixAchatF()));
@@ -81,20 +89,6 @@ public class LigneAchatService {
 
 
         updateTotalAchat(saveLigneAchat.getAchat().getId());
-
-        LocalDateTime dateCreate = LocalDateTime.now();
-        // Enregistrement du mouvement de stock via le service dédié
-        mouvementStockService.save(MouvementStockPostDto.builder()
-                .reference("ACH_" + ligneAchatPostDto.getAchatId() + "_LIG_" + saveLigneAchat.getId())
-                .produitId(ligneAchatPostDto.getProduitId())
-                .quantite(ligneAchatPostDto.getQuantite())
-                .commentaire("Généré à partir de la ligne d'un achat")
-                .createdAt(dateCreate)
-                .dateMouvement(dateCreate)
-                .typeMouvementCode("ACHAT_MARCHANDISE")
-                .idEvenementOrigine(saveLigneAchat.getAchat().getId())
-                .idLigneOrigine(saveLigneAchat.getId())
-                .build());
 
 
         return ligneAchatMapper.toDto(saveLigneAchat);

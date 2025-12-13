@@ -8,7 +8,7 @@ import com.projet.equipement.entity.Retour;
 import com.projet.equipement.entity.TypeRetour;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {RetourMapper.class, LigneVenteMapper.class, TypeRetour.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {RetourMapper.class, LigneVenteMapper.class, TypeRetour.class})
 public interface LigneRetourMapper {
 
     @Mapping(source = "retour", target = "retourId", qualifiedByName = "mapRetourToId")

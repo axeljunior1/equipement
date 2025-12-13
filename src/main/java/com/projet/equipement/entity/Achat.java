@@ -20,6 +20,11 @@ public class Achat extends MultiTenantEntity{
     @Column(name = "id_achat")
     private Long id;
 
+
+    @ManyToOne
+    @JoinColumn(name = "etat_id", nullable = false)
+    private EtatAchat etat;
+
     @Column(name = "montant_total" , nullable = false)
     private Double montantTotal;
 

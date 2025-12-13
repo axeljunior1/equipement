@@ -10,7 +10,7 @@ import org.mapstruct.*;
 
 import java.util.Set;
 
-@Mapper(componentModel = "spring", uses = Authority.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = Authority.class)
 public interface RoleMapper {
 
 

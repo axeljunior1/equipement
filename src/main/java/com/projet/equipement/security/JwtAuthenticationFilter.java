@@ -2,9 +2,7 @@ package com.projet.equipement.security;
 
 
 import com.projet.equipement.entity.TenantContext;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

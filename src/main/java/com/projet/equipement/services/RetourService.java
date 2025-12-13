@@ -11,7 +11,6 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.exceptions.InvalidOperationException;
 import com.projet.equipement.mapper.LigneRetourMapper;
 import com.projet.equipement.mapper.RetourMapper;
-import com.projet.equipement.repository.EtatPanierRepository;
 import com.projet.equipement.repository.EtatRetourRepository;
 import com.projet.equipement.repository.LigneRetourRepository;
 import com.projet.equipement.repository.RetourRepository;
@@ -33,14 +32,16 @@ public class RetourService {
     private final TypeRetourService typeRetourService;
     private final LigneRetourRepository ligneRetourRepository;
     private final LigneRetourMapper ligneRetourMapper;
-    private final EtatPanierRepository etatPanierRepository;
     private final EtatRetourRepository etatRetourRepository;
 
     public RetourService(RetourRepository retourRepository,
                          RetourMapper retourMapper,
                          EtatRetourService etatRetourService,
                          VenteService venteService,
-                         TypeRetourService typeRetourService, LigneRetourRepository ligneRetourRepository, LigneRetourMapper ligneRetourMapper, EtatPanierRepository etatPanierRepository, EtatRetourRepository etatRetourRepository) {
+                         TypeRetourService typeRetourService,
+                         LigneRetourRepository ligneRetourRepository,
+                         LigneRetourMapper ligneRetourMapper,
+                         EtatRetourRepository etatRetourRepository) {
         this.retourRepository = retourRepository;
         this.retourMapper = retourMapper;
         this.etatRetourService = etatRetourService;
@@ -48,7 +49,6 @@ public class RetourService {
         this.typeRetourService = typeRetourService;
         this.ligneRetourRepository = ligneRetourRepository;
         this.ligneRetourMapper = ligneRetourMapper;
-        this.etatPanierRepository = etatPanierRepository;
         this.etatRetourRepository = etatRetourRepository;
     }
 
@@ -109,9 +109,8 @@ public class RetourService {
         if (code == null) return false;
 
         return switch (code) {
-            case RefCodes.EtatVente.PAIEMENT_PARTIEL,
-                 RefCodes.EtatVente.PAYEE,
-                 RefCodes.EtatVente.VENTE_A_CREDIT -> true;
+            case
+                 RefCodes.EtatVente.PAYEE -> true;
             default -> false;
         };
     }

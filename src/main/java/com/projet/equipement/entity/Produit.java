@@ -84,13 +84,4 @@ public class Produit extends MultiTenantEntity {
     @JoinColumn(name = "devise_id", nullable = false)
     private Devise devise;
 
-
-//    @OneToMany(mappedBy = "produit")
-//    @JsonIgnore
-//    private Set<MouvementStock> mouvementStocks ;
-//
-//    @OneToOne(mappedBy = "produit")
-//    @JsonIgnore
-//    private LigneVente ligneVente ;
-
 }

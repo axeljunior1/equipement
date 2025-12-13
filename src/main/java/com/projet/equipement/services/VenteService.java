@@ -3,6 +3,7 @@ package com.projet.equipement.services;
 import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.facture.FacturePostDTO;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
+import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.dto.panierProduit.PanierProduitGetDto;
 import com.projet.equipement.dto.validerPanier.ValiderPanierDTO;
 import com.projet.equipement.dto.vente.VenteGetDto;
@@ -52,6 +53,7 @@ public class VenteService {
     private final EtatPaiementService etatPaiementService;
     private final PaiementService paiementService;
     private final ModePaimentRepository modePaimentRepository;
+    private final MouvementStockService mouvementStockService;
 
     public VenteService(VenteRepository venteRepository,
                         VenteMapper venteMapper,
@@ -67,7 +69,7 @@ public class VenteService {
                         FactureService factureService,
                         LigneVenteRepository ligneVenteRepository,
                         StateMachineFactory<VenteEnum, VenteEvent> factory,
-                        EtatPaiementService etatPaiementService, PaiementService paiementService, ModePaimentRepository modePaimentRepository) {
+                        EtatPaiementService etatPaiementService, PaiementService paiementService, ModePaimentRepository modePaimentRepository, MouvementStockService mouvementStockService) {
         this.venteRepository = venteRepository;
         this.venteMapper = venteMapper;
         this.clientRepository = clientRepository;
@@ -85,6 +87,7 @@ public class VenteService {
         this.etatPaiementService = etatPaiementService;
         this.paiementService = paiementService;
         this.modePaimentRepository = modePaimentRepository;
+        this.mouvementStockService = mouvementStockService;
     }
 
 
@@ -181,6 +184,12 @@ public class VenteService {
     @Transactional
     public void softDeleteVente(Long id) {
 
+        String etat = findById(id).getEtat().getLibelle();
+
+        if (!etat.equals("EN_ATTENTE_PAIEMENT")) {
+            throw new RuntimeException("L'état de la vente ne permet pas suppression: " +  etat + " qui est different de : " + "EN_ATTENTE_PAIEMENT") ;
+        }
+
         List<LigneVente> ligneVentes = ligneVenteRepository.findByVenteId(id);
         for (LigneVente ligneVente : ligneVentes) {
             ligneVenteService.deleteLinesByIdSoft(ligneVente.getId());
@@ -234,16 +243,40 @@ public class VenteService {
             // First full payment
             if (totalDejaPaye.compareTo(BigDecimal.ZERO) == 0) {
                 fairePaiement(vente, paiementRequest);
+                lancerMvmStk(vente);
             }
             // Final payment completing previous partial payments
             else if (totalDejaPaye.compareTo(BigDecimal.ZERO) > 0) {
                 fairePaiementTotal(vente, paiementRequest);
+                lancerMvmStk(vente);
             }
         }
         // Handle partial payment
         else if (resteAPayer.compareTo(BigDecimal.ZERO) > 0) {
             fairePaiementPartiel(vente, paiementRequest);
         }
+    }
+
+    private void lancerMvmStk(Vente vente) {
+
+        vente.getLigneVentes().forEach(ligneVente -> {
+            LocalDateTime dateCreate = LocalDateTime.now();
+            // Enregistrement du mouvement de stock via le service dédié
+            MouvementStockPostDto mouvStk = MouvementStockPostDto.builder()
+                    .reference("VTE_" + vente.getId() + "_LIG_" + ligneVente.getId())
+                    .produitId(ligneVente.getProduit().getId())
+                    .quantite(ligneVente.getQuantite())
+                    .commentaire("Généré à partir de la ligne d'un vente")
+                    .createdAt(dateCreate)
+                    .dateMouvement(dateCreate)
+                    .typeMouvementCode("VENTE_PRODUIT")
+                    .idEvenementOrigine(ligneVente.getVente().getId())
+                    .idLigneOrigine(ligneVente.getId())
+                    .build();
+            mouvementStockService.save(mouvStk);
+        });
+
+
     }
 
 
@@ -441,6 +474,31 @@ public class VenteService {
         }
 
 
+    }
+
+    public void annulerVente(Long venteId) {
+
+        Vente vente = venteRepository.findById(venteId).orElseThrow(() -> new EntityNotFoundException(VENTE, venteId));
+
+        // Récupération et synchronisation de la machine d'état
+        StateMachine<VenteEnum, VenteEvent> sm = factory.getStateMachine(vente.getId().toString());
+        sm.getStateMachineAccessor().doWithAllRegions(access ->
+                access.resetStateMachine(new DefaultStateMachineContext<>(
+                        VenteEnum.valueOf(vente.getEtat().getLibelle()),
+                        null, null, null)));
+
+
+        // Mise à jour de l'état de la vente
+
+        boolean ok = sm.sendEvent(VenteEvent.ANNULER_VENTE);
+        if (!ok) throw new IllegalStateException("Transition non autorisée");
+        String etatMachine = sm.getState().getId().toString();
+
+        vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
+                new EntityNotFoundException(ETAT_VENTE, etatMachine)));
+
+        vente.setTenantId(TenantContext.getTenantId());
+        venteRepository.save(vente);
     }
 
 

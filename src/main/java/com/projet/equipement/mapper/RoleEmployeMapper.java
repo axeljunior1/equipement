@@ -5,12 +5,9 @@ import com.projet.equipement.dto.roleEmploye.RoleEmployePostDto;
 import com.projet.equipement.dto.roleEmploye.RoleEmployeUpdateDto;
 import com.projet.equipement.entity.EmployeeRoleId;
 import com.projet.equipement.entity.RoleEmploye;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {RoleMapper.class, EmployeMapper.class, EmployeeRoleId.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {RoleMapper.class, EmployeMapper.class, EmployeeRoleId.class})
 public interface RoleEmployeMapper {
 
 

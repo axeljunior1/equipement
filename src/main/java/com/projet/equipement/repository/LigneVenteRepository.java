@@ -39,7 +39,7 @@ public interface LigneVenteRepository extends JpaRepository<LigneVente, Long> {
           COUNT(DISTINCT v.id) AS NOMBRE_VENTES,
           MIN(v.createdAt) AS PREMIERE_VENTE,
           MAX(v.createdAt) AS DERNIERE_VENTE
-      FROM LigneVente l 
+      FROM LigneVente l
            JOIN Vente v ON v.id = l.vente.id
            JOIN Produit p ON l.produit.id = p.id
            JOIN TarifAchat t ON p.id = t.produit.id

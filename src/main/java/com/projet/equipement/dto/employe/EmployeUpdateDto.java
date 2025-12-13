@@ -1,10 +1,8 @@
 package com.projet.equipement.dto.employe;
 
-import com.projet.equipement.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 

@@ -10,7 +10,7 @@ import com.projet.equipement.entity.Produit;
 import org.mapstruct.*;
 
 
-@Mapper(componentModel = "spring", uses = PanierMapper.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = PanierMapper.class)
 public interface PanierProduitMapper {
 
 

@@ -3,7 +3,6 @@ package com.projet.equipement.services;
 
 import com.projet.equipement.entity.*;
 import com.projet.equipement.exceptions.EntityNotFoundException;
-import com.projet.equipement.repository.EmployeRepository;
 import com.projet.equipement.repository.RoleEmployeRepository;
 import com.projet.equipement.repository.RoleRepository;
 import com.projet.equipement.repository.TenantRepository;
@@ -18,15 +17,12 @@ import java.util.Set;
 @Service
 public class RoleEmployeService {
     private final RoleEmployeRepository roleEmployeRepository;
-    private final EmployeRepository employeRepository;
     private final TenantRepository tenantRepository;
     private final RoleRepository roleRepository;
 
     public RoleEmployeService(RoleEmployeRepository roleEmployeRepository,
-                              EmployeRepository employeRepository,
                               TenantRepository tenantRepository, RoleRepository roleRepository) {
         this.roleEmployeRepository = roleEmployeRepository;
-        this.employeRepository = employeRepository;
         this.tenantRepository = tenantRepository;
         this.roleRepository = roleRepository;
     }

@@ -1,7 +1,6 @@
 package com.projet.equipement.services;
 
 
-import com.projet.equipement.dto.formatVente.FormatVentePostDto;
 import com.projet.equipement.dto.produit.ProduitGetDto;
 import com.projet.equipement.dto.produit.ProduitPostDto;
 import com.projet.equipement.dto.produit.ProduitUpdateDto;

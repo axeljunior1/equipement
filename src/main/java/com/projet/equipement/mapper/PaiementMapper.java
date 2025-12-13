@@ -8,7 +8,7 @@ import com.projet.equipement.entity.Paiement;
 import com.projet.equipement.entity.Vente;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {VenteMapper.class, EtatPaiementMapper.class, EtatPaiement.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {VenteMapper.class, EtatPaiementMapper.class, EtatPaiement.class})
 public interface PaiementMapper {
 
     @Mapping(source = "etat", target = "etatId", qualifiedByName = "mapEtatToId") // Convertit la relation 'Vente' en son ID

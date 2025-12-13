@@ -9,7 +9,6 @@ import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Retour;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.LigneRetourMapper;
-import com.projet.equipement.repository.EtatRetourRepository;
 import com.projet.equipement.repository.LigneRetourRepository;
 import com.projet.equipement.repository.LigneVenteRepository;
 import com.projet.equipement.repository.RetourRepository;
@@ -28,17 +27,15 @@ public class LigneRetourService {
     private final LigneRetourMapper ligneRetourMapper;
     private final RetourRepository retourRepository;
     private final LigneVenteRepository ligneVenteRepository;
-    private final EtatRetourRepository etatRetourRepository;
 
     public LigneRetourService(LigneRetourRepository ligneRetourRepository,
                               LigneRetourMapper ligneRetourMapper,
                               RetourRepository retourRepository,
-                              LigneVenteRepository ligneVenteRepository, EtatRetourRepository etatRetourRepository) {
+                              LigneVenteRepository ligneVenteRepository) {
         this.ligneRetourRepository = ligneRetourRepository;
         this.ligneRetourMapper = ligneRetourMapper;
         this.retourRepository = retourRepository;
         this.ligneVenteRepository = ligneVenteRepository;
-        this.etatRetourRepository = etatRetourRepository;
     }
 
     public LigneRetourGetDto findById(Long id) {

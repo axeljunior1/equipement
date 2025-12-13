@@ -11,7 +11,7 @@ import org.mapstruct.*;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {RoleEmployeMapper.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {RoleEmployeMapper.class})
 public interface EmployeMapper {
 
 

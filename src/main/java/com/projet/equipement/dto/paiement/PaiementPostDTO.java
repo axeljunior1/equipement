@@ -1,6 +1,5 @@
 package com.projet.equipement.dto.paiement;
 
-import com.projet.equipement.entity.ModePaiement;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

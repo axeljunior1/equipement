@@ -12,6 +12,7 @@ import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.stereotype.Component;
 
+@SuppressWarnings("EmptyMethod")
 @Aspect
 @Component
 public class TenantFilterAspect {

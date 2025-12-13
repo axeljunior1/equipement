@@ -106,4 +106,13 @@ public class VenteController {
     }
 
 
+    @GetMapping("/{id}/annuler")
+    public ResponseEntity<String> annulerVente(@PathVariable Long id) {
+
+        venteService.annulerVente(id);
+
+        return ResponseEntity.ok(" Vente annulé !!");
+    }
+
+
 }

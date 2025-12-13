@@ -1,8 +1,5 @@
 package com.projet.equipement.dto.ligneRetour;
 
-import com.projet.equipement.dto.ligneVente.LigneVenteGetDto;
-import com.projet.equipement.dto.retour.RetourGetDto;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

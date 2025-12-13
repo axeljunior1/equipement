@@ -1,7 +1,7 @@
 package com.projet.equipement.dto.achat;
 
 import com.projet.equipement.dto.employe.EmployeGetDto;
-import com.projet.equipement.entity.Achat;
+import com.projet.equipement.dto.etatDto.EtatAchatGetDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +19,8 @@ public class AchatGetDto {
     private Long employeId;
 
     private String  employeNom;
+
+    private EtatAchatGetDto etat;
 
     private EmployeGetDto employe;
 
