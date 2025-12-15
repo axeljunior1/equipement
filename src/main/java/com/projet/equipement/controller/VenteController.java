@@ -114,5 +114,13 @@ public class VenteController {
         return ResponseEntity.ok(" Vente annulé !!");
     }
 
+    @GetMapping("/{id}/rembourser")
+    public ResponseEntity<String> rembourserVente(@PathVariable Long id) {
+
+//        venteService.annulerVente(id);
+
+        return ResponseEntity.badRequest().body(" Non géré pour l'instant !!");
+    }
+
 
 }
