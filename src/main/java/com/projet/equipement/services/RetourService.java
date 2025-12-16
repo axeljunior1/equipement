@@ -2,6 +2,7 @@ package com.projet.equipement.services;
 
 
 import com.projet.equipement.constants.RefCodes;
+import com.projet.equipement.dto.avoir.AvoirPostDto;
 import com.projet.equipement.dto.retour.RetourGetDto;
 import com.projet.equipement.dto.retour.RetourLightGetDto;
 import com.projet.equipement.dto.retour.RetourPostDto;
@@ -14,11 +15,15 @@ import com.projet.equipement.mapper.RetourMapper;
 import com.projet.equipement.repository.EtatRetourRepository;
 import com.projet.equipement.repository.LigneRetourRepository;
 import com.projet.equipement.repository.RetourRepository;
+import jakarta.persistence.TableGenerator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +38,8 @@ public class RetourService {
     private final LigneRetourRepository ligneRetourRepository;
     private final LigneRetourMapper ligneRetourMapper;
     private final EtatRetourRepository etatRetourRepository;
+    private final LigneRetourService ligneRetourService;
+    private final AvoirService avoirService;
 
     public RetourService(RetourRepository retourRepository,
                          RetourMapper retourMapper,
@@ -41,7 +48,8 @@ public class RetourService {
                          TypeRetourService typeRetourService,
                          LigneRetourRepository ligneRetourRepository,
                          LigneRetourMapper ligneRetourMapper,
-                         EtatRetourRepository etatRetourRepository) {
+                         EtatRetourRepository etatRetourRepository,
+                         LigneRetourService ligneRetourService, AvoirService avoirService) {
         this.retourRepository = retourRepository;
         this.retourMapper = retourMapper;
         this.etatRetourService = etatRetourService;
@@ -50,6 +58,8 @@ public class RetourService {
         this.ligneRetourRepository = ligneRetourRepository;
         this.ligneRetourMapper = ligneRetourMapper;
         this.etatRetourRepository = etatRetourRepository;
+        this.ligneRetourService = ligneRetourService;
+        this.avoirService = avoirService;
     }
 
     public RetourGetDto findById(Long id){
@@ -58,6 +68,10 @@ public class RetourService {
         Page<LigneRetour> byRetourId = ligneRetourRepository.findByRetour_Id(retour.getId(), Pageable.unpaged());
         retour.setLigneRetours(byRetourId.stream().map(ligneRetourMapper::toDto).collect(Collectors.toList()));
         return retour;
+    }
+
+    public Retour findRetourById(Long id){
+        return retourRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Retour", id));
     }
     
     // retourne tout
@@ -120,7 +134,6 @@ public class RetourService {
     public RetourGetDto update(RetourUpdateDto retourUpdateDto, Long id){
         Retour retour = retourRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Retour", id) );
 
-
         Vente vente = venteService.findById(retourUpdateDto.getVenteId());
         EtatRetour etatRetour = etatRetourService.findById(retourUpdateDto.getEtatId());
         TypeRetour typeRetour = typeRetourService.findById(retourUpdateDto.getTypeId());
@@ -133,6 +146,7 @@ public class RetourService {
         return retourMapper.toDto(retourRepository.save(retour));
     }
 
+    @Transactional
     public RetourGetDto valider(Long id){
         Retour retour = retourRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Retour", id)
@@ -141,7 +155,34 @@ public class RetourService {
         retour.setEtat(etatRetourRepository.findByLibelle("VALIDE").orElseThrow(
                 () -> new EntityNotFoundException("Etat retour", "VALIDE")
         ));
-        return retourMapper.toDto(retourRepository.save(retour));
+
+        Retour retourSaved = retourRepository.save(retour);
+
+        if (retourSaved.getTypeRetour().getLibelle().equals("AVOIR")){
+            validerRetourAvoir(id, retourSaved);
+        }
+
+
+        return retourMapper.toDto(retourSaved);
+    }
+
+    private void validerRetourAvoir(Long id, Retour retour) {
+        AvoirPostDto avoirPostDto = new AvoirPostDto();
+
+        avoirPostDto.setClientId(retour.getVente().getClient().getId());
+        avoirPostDto.setRetourId(retour.getId());
+        avoirPostDto.setVenteOrigineId(retour.getVente().getId());
+
+        List<LigneRetour> ligneRetours = ligneRetourRepository.findByRetour_Id(id);
+
+        BigDecimal montantInitial = ligneRetours.stream().map(LigneRetour::getPrix).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        avoirPostDto.setMontantInitial(montantInitial);
+
+        avoirPostDto.setEtat("ACTIF");
+        avoirPostDto.setCreatedAt(LocalDateTime.now());
+
+        avoirService.saveAvoir(avoirPostDto);
     }
 
     public RetourGetDto rejeter(Long id){

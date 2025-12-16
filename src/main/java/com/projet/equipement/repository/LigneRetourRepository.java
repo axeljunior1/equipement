@@ -6,12 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface LigneRetourRepository extends JpaRepository<LigneRetour, Long> {
 
     Page<LigneRetour> findByRetour_Id(Long id, Pageable pageable);
+
+    List<LigneRetour> findByRetour_Id(Long id);
 
     Optional<LigneRetour> findByRetour_IdAndLigneVente_Id(Long retourId, Long ligneVenteId);
 }

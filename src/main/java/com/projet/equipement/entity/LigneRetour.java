@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Builder
@@ -23,6 +25,9 @@ public class LigneRetour extends MultiTenantEntity {
     @JoinColumn(name = "ligne_vente_id")
     @JsonIgnore
     private LigneVente ligneVente;
+
+    @Column(name = "prix_vente_unitaire")
+    private BigDecimal prix;
 
     @ManyToOne()
     @JoinColumn(name = "retour_id")

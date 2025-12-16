@@ -7,6 +7,7 @@ import com.projet.equipement.dto.ligneRetour.LigneRetourUpdateDto;
 import com.projet.equipement.entity.LigneRetour;
 import com.projet.equipement.entity.LigneVente;
 import com.projet.equipement.entity.Retour;
+import com.projet.equipement.entity.TenantContext;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.LigneRetourMapper;
 import com.projet.equipement.repository.LigneRetourRepository;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,6 +68,8 @@ public class LigneRetourService {
 
         ligneRetour.setRetour(retour);
         ligneRetour.setLigneVente(ligneVente);
+        ligneRetour.setPrix(BigDecimal.valueOf(ligneVente.getPrixVente()));
+        ligneRetour.setTenantId(TenantContext.getTenantId());
 
         return ligneRetourMapper.toDto(ligneRetourRepository.save(ligneRetour));
     }
