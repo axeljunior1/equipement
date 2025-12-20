@@ -19,11 +19,13 @@ public class ConfigurationStateMachineVente extends EnumStateMachineConfigurerAd
                 .withStates()
                 .initial(VenteEnum.EN_ATTENTE_PAIEMENT)
                 .state(VenteEnum.PAIEMENT_PARTIEL)
+                .state(VenteEnum.REMBOURSEE)
                 .state(VenteEnum.VENTE_A_CREDIT)
                 .state(VenteEnum.PAYEE)
                 .state(VenteEnum.FERMEE)
                 .state(VenteEnum.ANNULEE)
                 .end(VenteEnum.FERMEE)
+                .end(VenteEnum.REMBOURSEE)
                 .end(VenteEnum.ANNULEE);
     }
 
@@ -31,7 +33,9 @@ public class ConfigurationStateMachineVente extends EnumStateMachineConfigurerAd
     public void configure(StateMachineTransitionConfigurer<VenteEnum, VenteEvent> transitions) throws Exception {
         transitions
                 .withExternal().source(VenteEnum.EN_ATTENTE_PAIEMENT).target(VenteEnum.PAIEMENT_PARTIEL).event(VenteEvent.FAIRE_PAIEMENT_PARTIEL)
+                .and().withExternal().source(VenteEnum.PAIEMENT_PARTIEL).target(VenteEnum.REMBOURSEE).event(VenteEvent.REMBOURSER_PAIMENT_PARTIEL)
                 .and().withExternal().source(VenteEnum.EN_ATTENTE_PAIEMENT).target(VenteEnum.PAYEE).event(VenteEvent.FAIRE_PAIEMENT)
+                .and().withExternal().source(VenteEnum.PAIEMENT_PARTIEL).target(VenteEnum.PAIEMENT_PARTIEL).event(VenteEvent.FAIRE_PAIEMENT_PARTIEL_PARTIEL)
                 .and().withExternal().source(VenteEnum.EN_ATTENTE_PAIEMENT).target(VenteEnum.VENTE_A_CREDIT).event(VenteEvent.MARQUER_COMME_CREDIT)
                 .and().withExternal().source(VenteEnum.PAIEMENT_PARTIEL).target(VenteEnum.PAYEE).event(VenteEvent.FAIRE_PAIEMENT_TOTAL)
                 .and().withExternal().source(VenteEnum.VENTE_A_CREDIT).target(VenteEnum.PAIEMENT_PARTIEL).event(VenteEvent.FAIRE_PAIEMENT_DETTE)

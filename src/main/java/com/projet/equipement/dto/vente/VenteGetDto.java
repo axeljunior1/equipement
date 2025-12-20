@@ -1,6 +1,7 @@
 package com.projet.equipement.dto.vente;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.projet.equipement.constants.RefCodes;
 import com.projet.equipement.dto.client.ClientGetDto;
 import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.etatDto.EtatVenteGetDto;
@@ -45,7 +46,7 @@ public class VenteGetDto {
         }
 
         BigDecimal totalPaye = paiements.stream()
-                .filter(p -> p.getMontantPaye() != null && (Objects.equals(p.getEtat().getLibelle(), "PAYEE") || Objects.equals(p.getEtat().getLibelle(), "PAIEMENT_PARTIEL")))
+                .filter(p -> p.getMontantPaye() != null && (Objects.equals(p.getEtat().getLibelle(), RefCodes.EtatPaiement.SUCCES) || Objects.equals(p.getEtat().getLibelle(), "PAIEMENT_PARTIEL")))
                 .map(PaiementGetDTO::getMontantPaye)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

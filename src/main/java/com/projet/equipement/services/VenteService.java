@@ -1,10 +1,12 @@
 package com.projet.equipement.services;
 
+import com.projet.equipement.constants.RefCodes;
 import com.projet.equipement.dto.employe.EmployeGetDto;
 import com.projet.equipement.dto.facture.FacturePostDTO;
 import com.projet.equipement.dto.ligneVente.LigneVentePostDto;
 import com.projet.equipement.dto.mvt_stk.MouvementStockPostDto;
 import com.projet.equipement.dto.panierProduit.PanierProduitGetDto;
+import com.projet.equipement.dto.utilisationAvoir.UtilisationAvoirPostDto;
 import com.projet.equipement.dto.validerPanier.ValiderPanierDTO;
 import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
@@ -16,6 +18,7 @@ import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.mapper.VenteMapper;
 import com.projet.equipement.repository.*;
 import com.projet.equipement.utils.FactureNumeroGenerator;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.statemachine.StateMachine;
@@ -54,6 +57,10 @@ public class VenteService {
     private final PaiementService paiementService;
     private final ModePaimentRepository modePaimentRepository;
     private final MouvementStockService mouvementStockService;
+    private final AvoirRepository avoirRepository;
+    private final UtilisationAvoirService utilisationAvoirService;
+    private final UtilisationAvoirRepository utilisationAvoirRepository;
+    private final PaiementRepository paiementRepository;
 
     public VenteService(VenteRepository venteRepository,
                         VenteMapper venteMapper,
@@ -69,7 +76,7 @@ public class VenteService {
                         FactureService factureService,
                         LigneVenteRepository ligneVenteRepository,
                         StateMachineFactory<VenteEnum, VenteEvent> factory,
-                        EtatPaiementService etatPaiementService, PaiementService paiementService, ModePaimentRepository modePaimentRepository, MouvementStockService mouvementStockService) {
+                        EtatPaiementService etatPaiementService, PaiementService paiementService, ModePaimentRepository modePaimentRepository, MouvementStockService mouvementStockService, AvoirRepository avoirRepository, UtilisationAvoirService utilisationAvoirService, UtilisationAvoirRepository utilisationAvoirRepository, PaiementRepository paiementRepository) {
         this.venteRepository = venteRepository;
         this.venteMapper = venteMapper;
         this.clientRepository = clientRepository;
@@ -88,6 +95,10 @@ public class VenteService {
         this.paiementService = paiementService;
         this.modePaimentRepository = modePaimentRepository;
         this.mouvementStockService = mouvementStockService;
+        this.avoirRepository = avoirRepository;
+        this.utilisationAvoirService = utilisationAvoirService;
+        this.utilisationAvoirRepository = utilisationAvoirRepository;
+        this.paiementRepository = paiementRepository;
     }
 
 
@@ -205,6 +216,37 @@ public class VenteService {
         venteRepository.save(vente);
     }
 
+    @Transactional
+    public void payerAvoir(Long idVente, PaiementRequestAvoir paiementRequest){
+
+        Avoir avoir = avoirRepository.findById(paiementRequest.getIdAvoir()).orElseThrow(
+                () -> new EntityNotFoundException("Avoir", paiementRequest.getIdAvoir())
+        );
+
+        // trouver le montant deja utilisé
+        BigDecimal montantUtilise = utilisationAvoirRepository.sumMontantUtiliseByAvoirId(avoir.getId());
+
+        BigDecimal montantRestant = avoir.getMontantInitial().subtract(montantUtilise);
+
+        if (paiementRequest.getMontantPaiement().compareTo(montantRestant) > 0 ){
+            throw new RuntimeException("Le montant a payer "+ paiementRequest.getMontantPaiement() +" est > au montant restant sur l'avoir "+ montantRestant);
+        }
+
+        @NotNull Long idModePaiment = modePaimentRepository.findByCode("Avoir").orElseThrow(()->new EntityNotFoundException("Mode de paiement", "AVOIR")).getId();
+        payer(idVente, new PaiementRequest(idModePaiment, paiementRequest.getMontantPaiement() ));
+
+        UtilisationAvoirPostDto utilisationAvoirPostDto = UtilisationAvoirPostDto.builder()
+                .venteId(idVente)
+                .avoirId(paiementRequest.getIdAvoir())
+                .createdAt(LocalDateTime.now())
+                .montantUtilise(paiementRequest.getMontantPaiement())
+                .build();
+
+        utilisationAvoirService.save(utilisationAvoirPostDto);
+
+
+    }
+
 
     /**
      * Process a payment for a sale
@@ -218,9 +260,6 @@ public class VenteService {
         Vente vente = venteRepository.findById(venteId)
                 .orElseThrow(() -> new RuntimeException("Vente non trouvée"));
 
-//        ModePaiement modePaiement = modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
-//                ()-> new EntityNotFoundException("Mode de paiement", paiementRequest.getModePaiementId())
-//        );
 
         // Calculate payment amounts
         BigDecimal montantTotal = BigDecimal.valueOf(vente.getMontantTotal());
@@ -302,7 +341,7 @@ public class VenteService {
 
         // Sauvegarde du paiement
         Paiement paiement = Paiement.builder()
-                .etat(etatPaiementService.findByLibelle(etatMachine))
+                .etat(etatPaiementService.findByLibelle(RefCodes.EtatPaiement.SUCCES))
                 .vente(vente)
                 .montantPaye(paiementRequest.getMontantPaiement())
                 .modePaiement(modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
@@ -341,7 +380,7 @@ public class VenteService {
 
         // Sauvegarde du paiement
         Paiement paiement = Paiement.builder()
-                .etat(etatPaiementService.findByLibelle(etatMachine))
+                .etat(etatPaiementService.findByLibelle(RefCodes.EtatPaiement.SUCCES))
                 .vente(vente)
                 .montantPaye(BigDecimal.valueOf(0))
                 .updatedAt(LocalDateTime.now())
@@ -359,28 +398,7 @@ public class VenteService {
 
     public void fermerVente(Long venteId) {
 
-        Vente vente = venteRepository.findById(venteId).orElseThrow(() -> new EntityNotFoundException(VENTE, venteId));
-
-
-        // Récupération et synchronisation de la machine d'état
-        StateMachine<VenteEnum, VenteEvent> sm = factory.getStateMachine(vente.getId().toString());
-        sm.getStateMachineAccessor().doWithAllRegions(access ->
-                access.resetStateMachine(new DefaultStateMachineContext<>(
-                        VenteEnum.valueOf(vente.getEtat().getLibelle()),
-                        null, null, null)));
-
-
-        // Mise à jour de l'état de la vente
-
-        boolean ok = sm.sendEvent(VenteEvent.FERMER_VENTE);
-        if (!ok) throw new IllegalStateException("Transition non autorisée");
-        String etatMachine = sm.getState().getId().toString();
-
-        vente.setEtat(etatVenteRepository.findByLibelle(etatMachine).orElseThrow(() ->
-                new EntityNotFoundException(ETAT_VENTE, etatMachine)));
-
-        vente.setTenantId(TenantContext.getTenantId());
-        venteRepository.save(vente);
+        annulerVente(venteId, VenteEvent.FERMER_VENTE);
 
     }
 
@@ -409,7 +427,7 @@ public class VenteService {
 
             // Sauvegarde du paiement
             Paiement paiement = Paiement.builder()
-                    .etat(etatPaiementService.findByLibelle(etatMachine))
+                    .etat(etatPaiementService.findByLibelle(RefCodes.EtatPaiement.SUCCES))
                     .vente(vente)
                     .montantPaye(paiementRequest.getMontantPaiement())
                     .modePaiement(modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
@@ -449,6 +467,9 @@ public class VenteService {
             if (vente.getEtat().getLibelle().equals("VENTE_A_CREDIT")) {
                 event = VenteEvent.FAIRE_PAIEMENT_DETTE;
             }
+            if (vente.getEtat().getLibelle().equals(VenteEnum.PAIEMENT_PARTIEL.toString())) {
+                event = VenteEvent.FAIRE_PAIEMENT_PARTIEL_PARTIEL;
+            }
             boolean ok = sm.sendEvent(event);
             if (!ok) throw new IllegalStateException("Transition non autorisée");
 
@@ -456,7 +477,7 @@ public class VenteService {
 
             // Sauvegarde du paiement
             Paiement paiement = Paiement.builder()
-                    .etat(etatPaiementService.findByLibelle(etatMachine))
+                    .etat(etatPaiementService.findByLibelle(RefCodes.EtatPaiement.SUCCES))
                     .vente(vente)
                     .montantPaye(paiementRequest.getMontantPaiement())
                     .modePaiement(modePaimentRepository.findById(paiementRequest.getModePaiementId()).orElseThrow(
@@ -476,7 +497,13 @@ public class VenteService {
 
     }
 
+    @Transactional
     public void annulerVente(Long venteId) {
+        annulerVente(venteId, VenteEvent.ANNULER_VENTE);
+    }
+
+    @Transactional
+    public void annulerVente(Long venteId, VenteEvent venteEvent) {
 
         Vente vente = venteRepository.findById(venteId).orElseThrow(() -> new EntityNotFoundException(VENTE, venteId));
 
@@ -490,7 +517,7 @@ public class VenteService {
 
         // Mise à jour de l'état de la vente
 
-        boolean ok = sm.sendEvent(VenteEvent.ANNULER_VENTE);
+        boolean ok = sm.sendEvent(venteEvent);
         if (!ok) throw new IllegalStateException("Transition non autorisée");
         String etatMachine = sm.getState().getId().toString();
 
@@ -501,6 +528,28 @@ public class VenteService {
         venteRepository.save(vente);
     }
 
+    @Transactional
+    public void rembourserVente(Long idVente){
+
+
+
+        BigDecimal montantPayee = paiementRepository.sumPaiementsSuccesByVente(idVente,  RefCodes.EtatPaiement.SUCCES);
+
+        Vente vente = venteRepository.findById(idVente).orElseThrow(() -> new EntityNotFoundException("Vente", idVente));
+        Paiement p = Paiement.builder()
+                .vente(vente)
+                .modePaiement(modePaimentRepository.findByCode(RefCodes.ModePaiement.ESPECES).orElseThrow(()->new EntityNotFoundException("Mode de paiement", RefCodes.ModePaiement.ESPECES)))
+                .montantPaye(montantPayee.negate())
+                .etat(etatPaiementService.findByLibelle(RefCodes.EtatPaiement.SUCCES))
+                .updatedAt(LocalDateTime.now())
+                .build();
+        paiementService.savePaiement(p);
+
+
+
+        annulerVente(idVente, VenteEvent.REMBOURSER_PAIMENT_PARTIEL);
+
+    }
 
     private void applyAssociations(Vente vente, Long clientId, Long employeId, Long etatId) {
         if (clientId != null) {

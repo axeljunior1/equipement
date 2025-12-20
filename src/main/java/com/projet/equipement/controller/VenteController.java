@@ -6,6 +6,7 @@ import com.projet.equipement.dto.vente.VenteGetDto;
 import com.projet.equipement.dto.vente.VentePostDto;
 import com.projet.equipement.dto.vente.VenteUpdateDto;
 import com.projet.equipement.entity.PaiementRequest;
+import com.projet.equipement.entity.PaiementRequestAvoir;
 import com.projet.equipement.entity.Vente;
 import com.projet.equipement.services.LigneVenteService;
 import com.projet.equipement.services.VenteService;
@@ -88,6 +89,14 @@ public class VenteController {
         return ResponseEntity.ok(" Vente payed !!");
     }
 
+    @PostMapping("/payer/{id}/avoir")
+    public ResponseEntity<String> payerVenteAvoir(@PathVariable Long id, @RequestBody PaiementRequestAvoir paiementRequestAvoir) {
+
+        venteService.payerAvoir(id, paiementRequestAvoir);
+
+        return ResponseEntity.ok("Vente avec avoir payée !!");
+    }
+
     @GetMapping("/credit/{id}")
     public ResponseEntity<String> marquerCommeCredit(@PathVariable Long id) {
 
@@ -117,9 +126,9 @@ public class VenteController {
     @GetMapping("/{id}/rembourser")
     public ResponseEntity<String> rembourserVente(@PathVariable Long id) {
 
-//        venteService.annulerVente(id);
+        venteService.rembourserVente(id);
 
-        return ResponseEntity.badRequest().body(" Non géré pour l'instant !!");
+        return ResponseEntity.ok().body("Rembourser !!");
     }
 
 
