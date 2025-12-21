@@ -1,5 +1,6 @@
 package com.projet.equipement.services;
 
+import com.projet.equipement.constants.RefCodes;
 import com.projet.equipement.dto.achat.AchatGetDto;
 import com.projet.equipement.dto.achat.AchatPostDto;
 import com.projet.equipement.dto.achat.AchatUpdateDto;
@@ -78,6 +79,8 @@ public class AchatService {
         achat.setEmploye(employeRepository.findById(achatPostDto.getEmployeId()).orElseThrow(()-> new EntityNotFoundException("Employe", achatPostDto.getEmployeId())));
         achat.setTenantId(TenantContext.getTenantId());
         achat.setMontantTotal(0.0);
+        achat.setUpdatedAt(LocalDateTime.now());
+        achat.setEtat(etatAchatService.findByLibelle(RefCodes.EtatAchat.CREEE));
         return achatMapper.toDto(achatRepository.save(achat));
     }
 
