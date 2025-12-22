@@ -112,7 +112,7 @@ public class VenteService {
     }
 
     public Page<VenteGetDto> findAll(Pageable pageable) {
-        return venteRepository.findAllActif(pageable).map(venteMapper::toDto);
+        return venteRepository.findByActifOrderByCreatedAtDesc(true, pageable).map(venteMapper::toDto);
     }
 
     public Vente save(VentePostDto ventePostDto) {

@@ -3,6 +3,8 @@ package com.projet.equipement.services;
 import com.projet.equipement.entity.EtatVente;
 import com.projet.equipement.exceptions.EntityNotFoundException;
 import com.projet.equipement.repository.EtatVenteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,5 +29,8 @@ public class EtatVenteService {
 
     public List<EtatVente> findAll() {
         return etatVenteRepository.findAll();
+    }
+    public Page<EtatVente> findAll(Pageable pageable) {
+        return etatVenteRepository.findAll(pageable);
     }
 }
